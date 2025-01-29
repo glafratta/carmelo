@@ -184,6 +184,8 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, Transiti
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 
+//std::pair <bool, vertexDescriptor>state_match(const State &, TransitionSystem&,Direction dir=Direction::UNDEFINED, std::vector <vertexDescriptor>* others=NULL, bool relax=0);
+
 //std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end

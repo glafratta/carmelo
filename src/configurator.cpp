@@ -1690,6 +1690,8 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 }
 
 
+
+
 ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
 	// if (planVertices.empty() & planning){
