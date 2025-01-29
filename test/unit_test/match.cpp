@@ -32,7 +32,7 @@ void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s,
     case StateMatcher::_TRUE:
         candidate=State(s);
         break;
-    case StateMatcher::DISTURBANCE:
+    case StateMatcher::D_NEW:
         switch (d_code)
         {
         case 0:
