@@ -478,8 +478,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
-
-						//e_tmp.second=gt::add_edge(v0, task_start, g, iteration, t.direction).first;
 						Task controlGoal_adjusted= controlGoal;
 						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
@@ -489,6 +487,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
 							new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+							edge=new_edge;
 							if (t.direction== g[new_edge.first].direction){
 								g[v0].options.clear();
 							}
@@ -504,7 +503,10 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
-					gt::adjustProbability(g, new_edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
+					gt::adjustProbability(g, edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
+					// if (edge.first!= new_edge.first && new_edge.first!=edgeDescriptor()){
+					// 	boost::remove_edge(edge.first, g);
+					// }
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);

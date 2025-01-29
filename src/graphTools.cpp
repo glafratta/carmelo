@@ -277,22 +277,24 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	if (e.m_target==TransitionSystem::null_vertex()){
 		return;
 	}
-	auto es= boost::out_edges(e.m_source, g);
-	float totObs=0;
-	std::vector <edgeDescriptor> sameTask;
+	//auto es= boost::out_edges(e.m_source, g);
+	std::vector <edgeDescriptor> es=gt::outEdges(g, e.m_source, g[e].direction);
+	//float totObs=0;
+	//std::vector <edgeDescriptor> sameTask;
 	//find total observations
-	for (auto ei= es.first; ei!=es.second; ++ei){
-		edgeDescriptor ei_deref=*ei;
-		if (g[ei_deref].direction==g[e].direction){
-			totObs+=g[(*ei).m_target].nObs;
-			sameTask.push_back(*ei);
-			//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
-		}
+	for (edgeDescriptor & ei:es){
+		g[ei].probability=g[ei.m_target].nObs/es.size();
+		//edgeDescriptor ei_deref=*ei;
+		// if (g[ei].direction==g[e].direction){
+		// 	totObs+=g[ei.m_target].nObs;
+		// 	//sameTask.push_back(ei);
+		// 	//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
+		// }
 	}
 	//adjust
-	for (edgeDescriptor ed: sameTask){
-		g[ed].probability=g[ed.m_target].nObs/totObs;
-	}
+	// for (edgeDescriptor ed: sameTask){
+	// 	g[ed].probability=g[ed.m_target].nObs/totObs;
+	// }
 }
 
 std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const  vertexDescriptor & v, TransitionSystem& g, const int &it, Direction d){
@@ -305,6 +307,7 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 	auto oe=outEdges(g, u, d);
 	for (auto e:oe){
 		if (g[v].Dn == g[e.m_target].Dn&& u!=v ){
+			
 			return result;
 		}
 	}
