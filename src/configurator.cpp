@@ -461,13 +461,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
-				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false), new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
+				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false); //, new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
 					//if ((v0!=v1)){
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
-						new_edge=edge;
+						//new_edge=edge;
 						//edge.second=true; //just means that the edge is valid
 						if (edge.second){
 							g[edge.first]=sk.second; //doesn't update motorstep
@@ -486,13 +486,13 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						if (finished){
 							plan_prov=plan_tmp;
 							boost::remove_edge(edge.first, g);
-							new_edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
-							edge=new_edge;
-							if (t.direction== g[new_edge.first].direction){
+							edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+							//edge=new_edge;
+							if (t.direction== g[edge.first].direction){
 								g[v0].options.clear();
 							}
 							else{
-								g[v0].options={g[new_edge.first].direction};
+								g[v0].options={g[edge.first].direction};
 							}
 						}
 					}
