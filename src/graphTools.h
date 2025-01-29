@@ -84,9 +84,9 @@ struct State{
 		phi=NAIVE_PHI;
 	}
 
-	b2Transform start_from_disturbance()const;
+	b2Transform start_from_Di()const;
 
-	b2Transform end_from_disturbance()const;
+	b2Transform end_from_Dn()const;
 
 	float distance();
 
@@ -101,44 +101,50 @@ namespace math {
 
 
 struct StateDifference{
-	b2Vec2 r_position=b2Vec2(0,0);
-	float r_angle=0;
-	int D_type=0;
-	b2Vec2 D_position=b2Vec2(0,0);
-	float D_angle=0;
-	float D_width=0;
-	float D_length=0;
+	// b2Vec2 r_position=b2Vec2(0,0);
+	// float r_angle=0;
+	b2Transform pose=b2Transform_zero;
+	BodyFeatures Di, Dn;
+	// int D_type=0;
+	// b2Vec2 D_position=b2Vec2(0,0);
+	// float D_angle=0;
+	// float D_width=0;
+	// float D_length=0;
+	enum WHAT_D_FLAG{DI, DN};
 
 	StateDifference()=default;
 
 	StateDifference(const State& s1, const State& s2, bool match_outcome=false, bool match_start=true){
-		init(s1, s2, match_outcome, match_start);
+		init(s1, s2);
 	}
 
 	float sum(){
-		return sum_r()+sum_d_pos()+sum_d_shape();
+		return sum_r()+sum_D(Di)+ sum_D(Dn);
 	}
 
 	float sum_r(){
-		return fabs(r_position.x)+fabs(r_position.y)+fabs(r_angle);
+		return fabs(pose.p.x)+fabs(pose.p.y)+fabs(pose.q.GetAngle());
 	}
 
-	float sum_d_pos(){
-		return fabs(D_position.x)+fabs(D_position.y)+D_angle;
+	float sum_D_pos(const BodyFeatures& bf){
+		return fabs(bf.pose.p.x)+fabs(bf.pose.p.y)+bf.pose.q.GetAngle();
 	}
 
-	float sum_d_shape(){
-		return fabs(D_width)+fabs(D_length);
+	float sum_D_shape(const BodyFeatures& bf){
+		return fabs(bf.width())+fabs(bf.length());
 	}
 
-	float sum_d(){
-		return sum_d_pos()+sum_d_shape();
+	float sum_D(const BodyFeatures& bf){
+		return sum_D_pos(bf)+sum_D_shape(bf);
 	}
 	
 	float get_sum(int);
 
-	void init(const State& ,const State&, bool, bool);
+	void init(const State& ,const State&);
 
+	void fill_invalid_bodyfeatures(BodyFeatures &);
+
+	void fill_valid_bodyfeatures(BodyFeatures &, const State&, const State&, WHAT_D_FLAG);
 };
 
 
@@ -311,7 +317,7 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 
 class StateMatcher{
 	public:
-		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6};
+		enum MATCH_TYPE {_FALSE=0, D_NEW=2, DN_POSE=3, _TRUE=1, ANY=4, D_INIT=5, ABSTRACT=6, DI_POSE=7, DN_SHAPE=8, DI_SHAPE=9, POSE=10};
         //std::vector <float> weights; //disturbance, position vector, angle
 		//assume mean difference 0
 		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
@@ -337,37 +343,62 @@ class StateMatcher{
 		struct StateMatch{
 
 			bool exact(){
-				return pose() && disturbance_exact();
+				return pose() && abstract();
 			}
 
 			bool pose(){
-				return r_position && r_angle;
+				return position && angle;
 			}
 
-			bool disturbance_exact(){
-				return d_position && d_angle && d_type && d_shape;
+			bool abstract(){  //states match Di and Dn regardless of objective pose
+				return Di_exact() && Dn_exact();
 			}
 
-			bool disturbance_pose(){
-				return d_position && d_type && d_angle;
+			bool Di_exact(){
+				return Di_position && Di_angle && Di_shape;
 			}
 
-			bool disturbance_shape(){
-				return d_type && d_shape;
+			bool Dn_exact(){
+				return Dn_position && Dn_angle &&  Dn_shape;
 			}
-			// bool disturbance(){
-			// 	return d_shape && d_type;
-			// }
+
+			bool Di_pose(){
+				return Di_position &&  Di_angle;
+			}
+
+			bool Dn_pose(){
+				return Dn_position && Dn_angle;
+			}
+
+			bool shape_Di(){
+				return  Di_shape;
+			}
+
+			bool shape_Dn(){
+				return Dn_shape;
+			}
+			bool Dn(){
+				return shape_Dn && Dn_pose();
+			}
+
+			bool Di(){
+				return shape_Di && Di_pose();
+			}
 
 			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
-				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
-				r_angle=fabs(sd.r_angle)<error.angle;
-				d_type=sd.D_type==0;
-				d_position= sd.D_position.Length()<(error.dPosition*coefficient);
-				d_angle=fabs(sd.D_angle)<error.angle;
-				bool below_threshold_w=fabs(sd.D_width)<(error.D_dimensions*coefficient);
-				bool below_threshold_l=fabs(sd.D_length)<(error.D_dimensions*coefficient);
-				d_shape= below_threshold_l && below_threshold_w;
+				position = sd.pose.p.Length()<(error.endPosition*coefficient);
+				angle=fabs(sd.pose.q.GetAngle())<error.angle;
+				//d_type=sd.D_type==0;
+				Dn_position= sd.Dn.pose.p.Length()<(error.dPosition*coefficient);
+				Di_position= sd.Di.pose.p.Length()<(error.dPosition*coefficient);
+				Dn_angle=fabs(sd.Dn.pose.q.GetAngle())<error.angle;
+				Di_angle=fabs(sd.Di.pose.q.GetAngle())<error.angle;
+				bool Dn_below_threshold_w=fabs(sd.Dn.width())<(error.D_dimensions*coefficient);
+				bool Dn_below_threshold_l=fabs(sd.Dn.length())<(error.D_dimensions*coefficient);
+				bool Di_below_threshold_w=fabs(sd.Di.width())<(error.D_dimensions*coefficient);
+				bool Di_below_threshold_l=fabs(sd.Di.length())<(error.D_dimensions*coefficient);
+				Dn_shape= Dn_below_threshold_l && Dn_below_threshold_w;
+				Di_shape= Di_below_threshold_l && Di_below_threshold_w;
 
 			}
 
@@ -375,17 +406,20 @@ class StateMatcher{
 				if (exact()){ //match position and disturbance
 					return _TRUE;
 				}
-				else if (pose()){
-					return POSE;
+				else if (abstract()){
+					return ABSTRACT;
 				}
-				else if (disturbance_exact()){
-					return DISTURBANCE;
+				else if (Dn_pose()){
+					return DN_POSE;
 				}
-				else if (disturbance_pose()){
-					return D_POSE;
+				else if (shape_Dn()){
+					return DN_SHAPE;
 				}
-				else if (disturbance_shape()){
-					return D_SHAPE;
+				else if (Di_pose()){
+					return DI_POSE;
+				}
+				else if (shape_Di()){
+					return DI_SHAPE;
 				}
 				else{
 					return _FALSE;
@@ -393,12 +427,17 @@ class StateMatcher{
 			}
 
 			private:
-			bool r_position=0;
-			bool r_angle=0;
-			bool d_position=0;
-			bool d_angle=0;
-			bool d_shape=0;
-			bool d_type=0;
+
+			bool position=0;
+			bool angle=0;
+			bool Di_position=0;
+			bool Di_angle=0;
+			bool Di_shape=0;
+			//bool Di_type=0;
+			bool Dn_position=0;
+			bool Dn_angle=0;
+			bool Dn_shape=0;
+			//bool Dn_type=0;
 		};
 		
 		//float sumVector(DistanceVector);

@@ -13,11 +13,11 @@ orientation subtract(orientation o1, orientation o2){
 	return result;
 }
 
-b2Transform State::start_from_disturbance()const{
-	return Dn.pose()-start; //START
+b2Transform State::start_from_Di()const{
+	return Di.pose()-start; //START
 }
 
-b2Transform State::end_from_disturbance()const{
+b2Transform State::end_from_Dn()const{
 	return Dn.pose()-endPose; //START
 }
 
@@ -29,7 +29,7 @@ float State::distance(){
 float angle_subtract(float a1, float a2){
 	float result = 0;
 	if (fabs(a1)> 3*M_PI_4 || fabs(a2)> 3*M_PI_4){
-		if (a1<0 & a2>0){ 
+		if (a1<0 & a2>0){
 			a2-=2*M_PI;
 		}
 		else if(a2<0 & a1>0){
@@ -61,78 +61,72 @@ void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 }
 
 float StateDifference::get_sum(int mt){
-	if (mt==0 || mt==4){
+	if (mt==StateMatcher::_FALSE || mt==StateMatcher::ANY){
 		return 10000;
 	}
-	else if (mt==1){
+	else if (mt==StateMatcher::_TRUE){
 		return sum();
 	}
-	else if (mt==2){
-		return sum_d();
+	else if (mt==StateMatcher::D_NEW){
+		return sum_D(Dn);
 	}
-	else if (mt==3){
+	else if (mt==StateMatcher::POSE){
 		return sum_r();
+	}
+	else if (mt==StateMatcher::D_INIT){
+		return sum_D(Di);
+	}
+	else if (mt==StateMatcher::ABSTRACT){
+		return sum_D(Dn) +sum_D(Di);
 	}
 }
 
-void StateDifference::init(const State& s1, const State& s2, bool match_outcome, bool match_start){ //observed, desired
-	r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
-	r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-	r_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
+void StateDifference::init(const State& s1, const State& s2){ //observed, desired
+	pose.p.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
+	pose.p.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
+	pose.q.Set(angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle()));
 	if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
 		return;
 	}
-	if (match_outcome){
-		if (s1.outcome==s2.outcome){
-			D_type=0;
-			return;
-		}
-		else if (s1.outcome==simResult::safeForNow && s2.outcome==simResult::successful){
-			D_type=0;
-			return;
-		}
-		else if(s2.outcome==simResult::safeForNow && s1.outcome==simResult::successful){
-			D_type=0;
-			return;
-		}
+	if (s1.Dn.getAffIndex()!= s2.Dn.getAffIndex()){
+		fill_invalid_bodyfeatures(Dn);
 	}
 	else{
-		D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex();
+		fill_valid_bodyfeatures(Dn, s1, s2, DN);
 	}
-	if (D_type!=0){
-		// if (s2.disturbance.getAffIndex()==PURSUE){
-		// 	D_position.x= s1.endPose.p.x-s2.disturbance.bf.pose.p.x; //endpose x
-		// 	D_position.y=s1.endPose.p.y-s2.disturbance.bf.pose.p.y; //endpose y
-		// 	D_angle= angle_subtract(s1.endPose.q.GetAngle(), s2.disturbance.bf.pose.q.GetAngle());
-		// 	D_type=0;
-		// 	return;
-		// }
-		D_position.x=10000;
-		D_position.y=10000;
-		D_angle=M_PI;
-		D_width=10000;
-		D_length=10000;
-		return;
+	if (s1.Di.getAffIndex()!=s2.Di.getAffIndex()){
+		fill_invalid_bodyfeatures(Di);
 	}
-	b2Transform d1=s1.end_from_disturbance(), d2=s2.end_from_disturbance();
-	//if (match_start){
-	//}
-	// else{
-	// 	d1=s1.start_from_disturbance(), d2=s2.start_from_disturbance();
-	// }
-	D_position.x= d1.p.x - d2.p.x; //disturbance x
-	D_position.y= d1.p.y - d2.p.y; //disturbance y
-//	D_type= s1.Dn.getAffIndex()-s2.Dn.getAffIndex(); //disturbance type
-	// if ((s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN &&
-	// 	(s2.disturbance.bodyFeatures().halfLength-s1.disturbance.bodyFeatures().halfWidth)<D_DIMENSIONS_MARGIN){
-	// 		D_width=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfWidth)*2;
-	// 		D_length=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfLength)*2;
-	// 		return;
-	// }
-	D_angle=angle_subtract(d1.q.GetAngle(), d2.q.GetAngle());
-	D_width=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth)*2;
-	D_length=(s1.Dn.bodyFeatures().halfLength-s2.Dn.bodyFeatures().halfLength)*2;
+	else{
+		fill_valid_bodyfeatures(Dn, s1, s2, DI);
 	}
+}
+
+void StateDifference::fill_invalid_bodyfeatures(BodyFeatures & bf){
+	bf.pose.p.x=10000;
+	bf.pose.p.y=10000;
+	bf.pose.q.Set(MAX_ANGLE_ERROR);
+	bf.halfLength=10000;
+	bf.halfWidth=10000;
+}
+
+void StateDifference::fill_valid_bodyfeatures(BodyFeatures & bf, const State& s1, const State& s2, WHAT_D_FLAG flag){
+	b2Transform p1=b2Transform_zero, p2=b2Transform_zero;
+	if (flag==DI){
+		p1=s1.start_from_Di();
+		p2=s2.start_from_Di();
+	}
+	else if (flag==DN){
+		p1=s1.end_from_Dn();
+		p2=s2.end_from_Dn();
+	}
+	bf.pose.p.x= p1.p.x - p2.p.x; //disturbance x
+	bf.pose.p.y= p1.p.y - p2.p.y; //disturbance y
+	bf.pose.q.Set(angle_subtract(p1.q.GetAngle(), p2.q.GetAngle()));
+	bf.halfWidth=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth);
+	bf.halfLength=(s1.Dn.bodyFeatures().halfLength-s2.Dn.bodyFeatures().halfLength);
+
+}
 
 
 void gt::fill(simResult sr, State* s, Edge* e){
@@ -307,7 +301,7 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 	auto oe=outEdges(g, u, d);
 	for (auto e:oe){
 		if (g[v].Dn == g[e.m_target].Dn&& u!=v ){
-			
+
 			return result;
 		}
 	}
@@ -355,7 +349,7 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 				result.push_back(ep2.second.m_target); //source
 			}
 
-			
+
 		}
 		else{
 			break;
@@ -385,16 +379,16 @@ bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& de
 				result=true;
 			}
 			break;
-		case DISTURBANCE:
-			if (candidate==_TRUE || candidate ==DISTURBANCE){
+		case ABSTRACT:
+			if (candidate==_TRUE || candidate ==ABSTRACT){
 				result=true;
 			}
 			break;
-		case D_POSE:
-			if (candidate==_TRUE || candidate==DISTURBANCE || candidate==D_POSE){
-				result=true;
-			}
-			break;
+		// case D_POSE:
+		// 	if (candidate==_TRUE || candidate==DISTURBANCE || candidate==D_POSE){
+		// 		result=true;
+		// 	}
+		// 	break;
 		default:
 			result =int(candidate)==int(desired);
 		break;
@@ -412,7 +406,7 @@ bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& de
 // 	//adjusting for angles with different signs close to pi
 // 	// float candidate_angle=s2.endPose.q.GetAngle();
 // 	// if (fabs(s1.endPose.q.GetAngle())> 3*M_PI_4 || fabs(candidate_angle)> 3*M_PI_4){
-// 	// 	if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){ 
+// 	// 	if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){
 // 	// 		candidate_angle-=2*M_PI;
 // 	// 	}
 // 	// 	else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
@@ -455,9 +449,9 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(const State & s, const State &can
 	// 	stray=(stray_v).Length();
 	// }
 	if ((stray>error.endPosition && s.label==candidate.label)){ //
-		sd.r_position.x=10000; // now pose will not be matched
-		sd.r_position.y=10000;
-		sd.r_angle=M_PI;
+		sd.pose.p.x=10000; // now pose will not be matched
+		sd.pose.p.y=10000;
+		sd.pose.q.Set(MAX_ANGLE_ERROR);
 	}
 	if (NULL!=_sd){
 		*_sd=sd;

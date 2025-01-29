@@ -59,6 +59,14 @@ class BodyFeatures{
 
     bool match(const BodyFeatures&);
 
+    float width()const{
+        return halfWidth*2;
+    }
+
+    float length()const{
+        return halfLength*2;
+    }
+
 };
 
 struct Disturbance{ //this generates error
