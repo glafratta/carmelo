@@ -474,7 +474,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						}
 					//}
 					if (plan_prov.empty()&&currentTask.motorStep==0){
-						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::DISTURBANCE); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
+						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
@@ -887,7 +887,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		compare_tmp.start=compare_start;
 		StateDifference sd_check;
 		auto state_match=matcher.isMatch(compare_tmp,sk.first, NULL, &sd_check);
-		if (state_match==StateMatcher::DISTURBANCE){
+		if (state_match==StateMatcher::ABSTRACT){
 		//if (g[t_start_v].Dn.affordanceIndex==AVOID){
 			//d_adjusted=g[t_start_v].Dn;
 			d_adjusted=dist_match;
@@ -907,7 +907,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		//printf("from %i", ep.first.m_target);
 		b2Transform endPose= skip(ep.first,g,it, &t, stepDistance, p);
 		if (reset_end_criteria){
-			float distance = g[ep.first.m_source].end_from_disturbance().p.Length();
+			float distance = g[ep.first.m_source].end_from_Dn().p.Length();
 			t.setEndCriteria(Distance(distance));
 		}
 		compare_tmp=g[ep.first.m_source];
@@ -936,7 +936,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 			auto _moving=boost::add_edge(movingVertex, v1, g);
 			prev_edge.second=_moving.first;
 		}
-		if (!matcher.match_equal(is_match, StateMatcher::D_POSE)){
+		if (!matcher.match_equal(is_match, StateMatcher::DN_POSE)){
 			result=false;
 			// printf("MISMATCH!!! with v %i expected D:", ep.first.m_source);
 			// debug::print_pose(g[ep.first.m_source].Dn.bf.pose);
@@ -1668,7 +1668,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
 		int out_deg = boost::out_degree(v, g);
 		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){ //|| gt::inEdges(g, v, STOP).empty()
-			desired_match=StateMatcher::MATCH_TYPE::DISTURBANCE;
+			desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
 		}
 		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
 			closest_match=true;
