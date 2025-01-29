@@ -378,11 +378,11 @@ class StateMatcher{
 				return Dn_shape;
 			}
 			bool Dn(){
-				return shape_Dn && Dn_pose();
+				return Dn_shape && Dn_pose();
 			}
 
 			bool Di(){
-				return shape_Di && Di_pose();
+				return Di_shape && Di_pose();
 			}
 
 			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
