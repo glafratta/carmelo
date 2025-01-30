@@ -15,6 +15,8 @@
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
 
+
+
 //typedef b2Transform DeltaPose;
 
 class ConfiguratorInterface{
@@ -206,12 +208,6 @@ std::pair <bool, Direction> getOppositeDirection(Direction);
 void resetPhi(TransitionSystem&g);
 
 void printPlan(std::vector <vertexDescriptor>* p=NULL);
-
-void applyAffineTrans(const b2Transform& , Task& );
-
-void applyAffineTrans(const b2Transform&, TransitionSystem&);
-
-void applyAffineTrans(const b2Transform&, Disturbance&);
 
 std::pair<edgeDescriptor, bool> addVertex(vertexDescriptor & src, vertexDescriptor &v1, TransitionSystem &g, Edge edge=Edge(), bool topDown=0){ //returns edge added
 	std::pair<edgeDescriptor, bool> result;

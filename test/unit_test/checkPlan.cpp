@@ -53,8 +53,8 @@ int main(int argc, char** argv){
     shift.q.Set(MOTOR_CALLBACK*conf.getTask()->action.getOmega()*steps);
     shift.p.x= cos(shift.q.GetAngle())*distanceTraversed;
     shift.p.y= sin(shift.q.GetAngle())*distanceTraversed;
-    conf.applyAffineTrans(shift, conf.transitionSystem);    
-    conf.applyAffineTrans(shift, conf.controlGoal.disturbance);
+    math::applyAffineTrans(shift, conf.transitionSystem);    
+    math::applyAffineTrans(shift, conf.controlGoal.disturbance);
     if (argc>4){
         di.iteration=atoi(argv[4]);
         conf.addIteration(steps-conf.getIteration());

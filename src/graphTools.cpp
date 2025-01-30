@@ -40,12 +40,14 @@ float angle_subtract(float a1, float a2){
 }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
-	pose.q.Set(pose.q.GetAngle()-deltaPose.q.GetAngle());
+	pose.q.Set(pose.q.GetAngle()+deltaPose.q.GetAngle());
 	float og_x= pose.p.x, og_y=pose.p.y;
 	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
 	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
-	pose.p.x-=deltaPose.p.x;
-	pose.p.y-=deltaPose.p.y;
+	// pose.p.x= og_x* cos(pose.q.GetAngle())+ og_y*sin(pose.q.GetAngle());
+	// pose.p.y= og_y* cos(pose.q.GetAngle())- og_x*sin(pose.q.GetAngle());
+	pose.p.x+=deltaPose.p.x; //-
+	pose.p.y+=deltaPose.p.y; //-
 }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
@@ -59,6 +61,24 @@ void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	}
 
 }
+
+
+void math::applyAffineTrans(const b2Transform& deltaPose, TransitionSystem& g){
+	auto vPair =boost::vertices(g);
+	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
+	if (*vIt!=0){
+		math::applyAffineTrans(deltaPose, g[*vIt]);
+	}
+}
+}
+
+void math::applyAffineTrans(const b2Transform& deltaPose, Disturbance& d){
+	if (d.getAffIndex()!=NONE){
+		math::applyAffineTrans(deltaPose, d.bf.pose);
+	}
+}
+
+
 
 float StateDifference::get_sum(int mt){
 	if (mt==StateMatcher::_FALSE || mt==StateMatcher::ANY){
@@ -98,7 +118,7 @@ void StateDifference::init(const State& s1, const State& s2){ //observed, desire
 		fill_invalid_bodyfeatures(Di);
 	}
 	else{
-		fill_valid_bodyfeatures(Dn, s1, s2, DI);
+		fill_valid_bodyfeatures(Di, s1, s2, DI);
 	}
 }
 
@@ -115,16 +135,19 @@ void StateDifference::fill_valid_bodyfeatures(BodyFeatures & bf, const State& s1
 	if (flag==DI){
 		p1=s1.start_from_Di();
 		p2=s2.start_from_Di();
+		bf.halfWidth=(s1.Di.bodyFeatures().halfWidth-s2.Di.bodyFeatures().halfWidth);
+		bf.halfLength=(s1.Di.bodyFeatures().halfLength-s2.Di.bodyFeatures().halfLength);
 	}
 	else if (flag==DN){
 		p1=s1.end_from_Dn();
 		p2=s2.end_from_Dn();
+		bf.halfWidth=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth);
+		bf.halfLength=(s1.Dn.bodyFeatures().halfLength-s2.Dn.bodyFeatures().halfLength);
+
 	}
 	bf.pose.p.x= p1.p.x - p2.p.x; //disturbance x
 	bf.pose.p.y= p1.p.y - p2.p.y; //disturbance y
 	bf.pose.q.Set(angle_subtract(p1.q.GetAngle(), p2.q.GetAngle()));
-	bf.halfWidth=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth);
-	bf.halfLength=(s1.Dn.bodyFeatures().halfLength-s2.Dn.bodyFeatures().halfLength);
 
 }
 

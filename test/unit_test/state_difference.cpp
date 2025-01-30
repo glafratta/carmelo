@@ -34,8 +34,8 @@ int main(int argc, char** argv){
     StateDifference sd(s2, s1);
     StateMatcher matcher;
     StateMatcher::StateMatch sm(sd, matcher.error);
-    if (!sm.disturbance_exact()){
-        printf("sum_d=%f\n", sd.sum_d_pos()+sd.sum_d_shape());
+    if (!sm.Dn_exact()){
+        printf("sum_d=%f\n", sd.sum_D(sd.Dn));
         return 1;
     }
     return 0;

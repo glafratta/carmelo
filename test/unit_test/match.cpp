@@ -1,11 +1,19 @@
 #include "../callbacks.h"
 
-void assign_disturbance(State & s, const b2Transform& t=b2Transform(b2Vec2(0.02,0.02), b2Rot(0)), float hw=0.0, float hl=0.0){
+void assign_disturbance(State & s, StateDifference::WHAT_D_FLAG flag, const b2Transform& t=b2Transform(b2Vec2(0.02,0.02), b2Rot(0)), float hw=0.0, float hl=0.0){
     BodyFeatures bf;
-    bf.pose= s.endPose+t;
     bf.halfLength+=hl;
     bf.halfWidth+=hw;
-    s.Dn=Disturbance(bf);
+    if (flag==StateDifference::DN){
+        bf.pose= s.endPose+t;
+        s.Dn=Disturbance(bf);
+    }
+    else if (flag==StateDifference::DI){
+        bf.pose= s.start+b2Transform(b2Vec2(1.0, 0), b2Rot(0));
+        s.Di=Disturbance(bf);
+
+
+    }
 }
 
 void rand_transform(b2Transform&t){
@@ -32,33 +40,72 @@ void create_match(State& candidate, StateMatcher::MATCH_TYPE mt, const State& s,
     case StateMatcher::_TRUE:
         candidate=State(s);
         break;
+    case StateMatcher::ABSTRACT:
+        candidate.start=s.start+transform;
+        candidate.endPose=s.endPose+transform;
+        candidate.Dn=s.Dn;
+        candidate.Di=s.Di;
+        candidate.Dn.bf.pose=s.Dn.pose()+transform;
+        candidate.Di.bf.pose=s.Di.pose()+transform;
+
+        //candidate=State(s);
+        //math::applyAffineTrans(transform, candidate);
+        break;
     case StateMatcher::D_NEW:
         switch (d_code)
         {
-        case 0:
+        case 0: //exact
             candidate.start=s.start;
-            candidate.endPose=s.endPose+transform;
+            candidate.endPose= candidate.endPose+transform;
+            //math::applyAffineTrans(transform, candidate.endPose); //different end
             candidate.Dn=Disturbance(s.Dn); //exact match
-            candidate.Dn.bf.pose=candidate.Dn.bf.pose+transform;
             break;
         case 1: //ratio +shape match
             rand_transform(candidate.endPose);
-            assign_disturbance(candidate);
+            assign_disturbance(candidate, StateDifference::DN);
             candidate.Dn.bf.halfLength=s.Dn.bf.halfLength;
             candidate.Dn.bf.halfWidth=s.Dn.bf.halfWidth;
             break;
         case 2: //ratio match only //FAIL
             rand_transform(candidate.endPose);
-            assign_disturbance(candidate, b2Transform(b2Vec2((0.02), (0.02)), ((b2Rot)(0))), 0.1, 0.1);
+            assign_disturbance(candidate, StateDifference::DN, b2Transform(b2Vec2((0.02), (0.02)), ((b2Rot)(0))), 0.1, 0.1);
             break;
         case 3: //shape match only
             rand_transform(candidate.endPose);
-            assign_disturbance(candidate, rand_transform());
+            assign_disturbance(candidate, StateDifference::DN,rand_transform());
             break;
         default:
             break;
         }
         break;
+    case StateMatcher::D_INIT:
+        switch (d_code)
+        {
+        case 0: //exact
+            candidate.start=s.start+transform;
+            //math::applyAffineTrans(transform, candidate.endPose); //different end
+            candidate.Di=Disturbance(s.Di); //exact match
+            break;
+        case 1: //ratio +shape match
+            rand_transform(candidate.start);
+            assign_disturbance(candidate, StateDifference::DI);
+            candidate.Di.bf.halfLength=s.Di.bf.halfLength;
+            candidate.Di.bf.halfWidth=s.Di.bf.halfWidth;
+            break;
+        case 2: //ratio match only //FAIL
+            rand_transform(candidate.start);
+            assign_disturbance(candidate, StateDifference::DI, b2Transform(b2Vec2((0.02), (0.02)), ((b2Rot)(0))), 0.1, 0.1);
+            break;
+        case 3: //shape match only
+            assign_disturbance(candidate, StateDifference::DI,rand_transform());
+            rand_transform(candidate.start);
+
+            break;
+        default:
+            break;
+        }
+        break;
+
     case StateMatcher::POSE:
         candidate.endPose=b2Transform(s.endPose);
         break;
@@ -77,12 +124,13 @@ int main(int argc, char** argv){
     s1.start=b2Transform(b2Vec2(0.25, 0.25), b2Rot(M_PI_4));
     s1.endPose=b2Transform(b2Vec2(0.5, 0.5), b2Rot(M_PI_4));    
     s1.outcome=simResult::crashed;
-    assign_disturbance(s1);
+    assign_disturbance(s1, StateDifference::DN);
+    assign_disturbance(s1, StateDifference::DI);
     s1.Dn.bf.halfWidth=0.05;
     s1.Dn.bf.halfLength=0.02;
     StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::_FALSE;
     int d_code=0;
-    printf("MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6}\n");
+    printf("MATCH_TYPE {_FALSE=0, D_NEW=2, DN_POSE=3, _TRUE=1, ANY=4, D_INIT=5, ABSTRACT=6, DI_POSE=7, DN_SHAPE=8, DI_SHAPE=9, POSE=10}\n");
     printf("D code = 0: exact, 1:  ratio+ shape, 2: ratio only, 3: shape\n");
     if (argc>2){
         printf("chosen D code= %i\n", atoi(argv[2]));
@@ -102,7 +150,8 @@ int main(int argc, char** argv){
     printf("disturbance: ");
     print_transform(candidate.Dn.pose());
     print_transform(s1.Dn.pose());
-    StateMatcher::MATCH_TYPE result= matcher.isMatch(s1, candidate);
+    StateDifference sd;
+    StateMatcher::MATCH_TYPE result= matcher.isMatch(s1, candidate, NULL, &sd);
     if (result!=desired_match){
         printf(" desired =%i, result=%i\n", desired_match, result);
         return 1;

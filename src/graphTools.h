@@ -92,11 +92,6 @@ struct State{
 
 };
 
-namespace math {
-	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
-
-	void applyAffineTrans(const b2Transform&, State& );
-};
 
 
 
@@ -166,6 +161,20 @@ typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator;
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
+
+namespace math {
+	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
+
+	void applyAffineTrans(const b2Transform&, State& );
+
+	void applyAffineTrans(const b2Transform& , Task* );
+
+	void applyAffineTrans(const b2Transform&, TransitionSystem&);
+
+	void applyAffineTrans(const b2Transform&, Disturbance&);
+
+};
+
 
 struct Connected{
 	Connected(){}
@@ -385,6 +394,8 @@ class StateMatcher{
 				return Di_shape && Di_pose();
 			}
 
+			StateMatch() =default;
+
 			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				position = sd.pose.p.Length()<(error.endPosition*coefficient);
 				angle=fabs(sd.pose.q.GetAngle())<error.angle;
@@ -393,10 +404,10 @@ class StateMatcher{
 				Di_position= sd.Di.pose.p.Length()<(error.dPosition*coefficient);
 				Dn_angle=fabs(sd.Dn.pose.q.GetAngle())<error.angle;
 				Di_angle=fabs(sd.Di.pose.q.GetAngle())<error.angle;
-				bool Dn_below_threshold_w=fabs(sd.Dn.width())<(error.D_dimensions*coefficient);
-				bool Dn_below_threshold_l=fabs(sd.Dn.length())<(error.D_dimensions*coefficient);
-				bool Di_below_threshold_w=fabs(sd.Di.width())<(error.D_dimensions*coefficient);
-				bool Di_below_threshold_l=fabs(sd.Di.length())<(error.D_dimensions*coefficient);
+				bool Dn_below_threshold_w=fabs(sd.Dn.width())<(error.D_dimensions*coefficient*2);
+				bool Dn_below_threshold_l=fabs(sd.Dn.length())<(error.D_dimensions*coefficient*2);
+				bool Di_below_threshold_w=fabs(sd.Di.width())<(error.D_dimensions*coefficient*2);
+				bool Di_below_threshold_l=fabs(sd.Di.length())<(error.D_dimensions*coefficient*2);
 				Dn_shape= Dn_below_threshold_l && Dn_below_threshold_w;
 				Di_shape= Di_below_threshold_l && Di_below_threshold_w;
 
@@ -409,11 +420,17 @@ class StateMatcher{
 				else if (abstract()){
 					return ABSTRACT;
 				}
+				else if (Dn_exact()){
+					return D_NEW;
+				}
 				else if (Dn_pose()){
 					return DN_POSE;
 				}
 				else if (shape_Dn()){
 					return DN_SHAPE;
+				}
+				else if (Di_exact()){
+					return D_INIT;
 				}
 				else if (Di_pose()){
 					return DI_POSE;
@@ -428,15 +445,15 @@ class StateMatcher{
 
 			private:
 
-			bool position=0;
-			bool angle=0;
-			bool Di_position=0;
-			bool Di_angle=0;
-			bool Di_shape=0;
+			bool position=false;
+			bool angle=false;
+			bool Di_position=false;
+			bool Di_angle=false;
+			bool Di_shape=false;
 			//bool Di_type=0;
-			bool Dn_position=0;
-			bool Dn_angle=0;
-			bool Dn_shape=0;
+			bool Dn_position=false;
+			bool Dn_angle=false;
+			bool Dn_shape=false;
 			//bool Dn_type=0;
 		};
 		

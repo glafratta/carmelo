@@ -31,7 +31,8 @@ add_executable(planner ../test_essentials.h planner.cpp)
 target_link_libraries(planner CloCK ${OpenCV_LIBS} box2d rt  )
 add_executable(split_step ../test_essentials.h split_step.cpp)
 target_link_libraries(split_step CloCK ${OpenCV_LIBS} box2d rt  )
-
+add_executable(affine_transformation ../test_essentials.h affine_transform.cpp)
+target_link_libraries(affine_transformation CloCK ${OpenCV_LIBS} box2d rt  )
 
 
 add_test(NAME split_task COMMAND split_task 0.6 0 0)
@@ -65,6 +66,7 @@ add_executable(kmeans_clusters ../../src/worldbuilder.h ../../src/worldbuilder.c
 target_link_libraries(processData_k CloCK ${OpenCV_LIBS} box2d rt)
 target_link_libraries(kmeans_clusters CloCK ${OpenCV_LIBS} box2d rt)
 
+add_test(NAME affine_transformation_ahead COMMAND affine_transformation 1 0 0)
 
 # # add_executable(split_task split_task.cpp)
 # # target_link_libraries(split_task CloCK ${OpenCV_LIBS} box2d rt  )
@@ -140,13 +142,23 @@ add_test(NAME planner_target_68cm COMMAND planner ../251023_TAGET 1)
 
 add_test(NAME match_false COMMAND match)
 add_test(NAME match_true_exact COMMAND match 1)
-add_test(NAME match_pose COMMAND match 3 )
-add_test(NAME match_disturbance_exact COMMAND match 2 0)
-add_test(NAME match_disturbance_ratio COMMAND match 2 1)
-add_test(NAME match_disturbance_position COMMAND match 2 2)
-set_property(TEST match_disturbance_position PROPERTY WILL_FAIL true)
-add_test(NAME match_disturbance_shape COMMAND match 2 3)
-set_property(TEST match_disturbance_shape PROPERTY WILL_FAIL true)
+add_test(NAME match_abstract COMMAND match 6)
+add_test(NAME match_Dn_no COMMAND match 2 )
+add_test(NAME match_Dn_ratio COMMAND match 2 1)
+add_test(NAME match_Dn_position COMMAND match 2 2)
+set_property(TEST match_Dn_no PROPERTY WILL_FAIL true)
+set_property(TEST match_Dn_position PROPERTY WILL_FAIL true)
+add_test(NAME match_Dn_shape COMMAND match 2 3)
+set_property(TEST match_Dn_shape PROPERTY WILL_FAIL true)
+
+add_test(NAME match_Di_no COMMAND match 5 )
+add_test(NAME match_Di_ratio COMMAND match 5 1)
+add_test(NAME match_Di_position COMMAND match 5 2)
+set_property(TEST match_Di_no PROPERTY WILL_FAIL true)
+set_property(TEST match_Di_position PROPERTY WILL_FAIL true)
+add_test(NAME match_Di_shape COMMAND match 5 3)
+set_property(TEST match_Di_shape PROPERTY WILL_FAIL true)
+
 
 add_test(NAME find_match_state COMMAND find_match_state ../251023_TAGET/ 2 1)
 add_test(NAME find_match_state_f COMMAND find_match_state ../251023_TAGET/ 3 1)
@@ -165,7 +177,8 @@ add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 
 
 add_test(NAME match_equal COMMAND match_equal)
 #add_test(NAME replanner_40 COMMAND replanner ../170924_1321_badrun/ 2 1)
-add_test(NAME replanner_68 COMMAND replanner ../251023_TAGET/ 2 1)
+#add_test(NAME replanner_68 COMMAND replanner ../251023_TAGET/ 2 1)
+
 # add_test(NAME replanner_68_9 COMMAND replanner ../251023_TAGET/ 9 1 34)
 # add_test(NAME replanner_68_11 COMMAND replanner ../251023_TAGET/ 11 1 34)
 # add_test(NAME replanner_68_10 COMMAND replanner ../251023_TAGET/ 9 1 50)

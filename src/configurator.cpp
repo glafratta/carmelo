@@ -2,6 +2,16 @@
 #include <chrono>
 
 
+void math::applyAffineTrans(const b2Transform& deltaPose, Task* task){
+	math::applyAffineTrans(-deltaPose, task->start);
+	// if (task.disturbance.getAffIndex()!=NONE){
+	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
+	// }
+	applyAffineTrans(-deltaPose, task->disturbance);
+}
+
+
+
 
 void ConfiguratorInterface::setReady(bool b){
 	ready = b;
@@ -479,7 +489,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
-						applyAffineTrans(-g[task_start].start, controlGoal_adjusted);
+						math::applyAffineTrans(-g[task_start].start, &controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
 						shift= start-g[task_start].start;
@@ -897,7 +907,7 @@ bool Configurator::checkPlan(b2World& world, std::vector <vertexDescriptor> &p, 
 		}
 		else{
 			d_adjusted=g[t_start_v].Di;
-			applyAffineTrans(shift, d_adjusted);
+			math::applyAffineTrans(shift, d_adjusted);
 		}
 		Task t= Task(d_adjusted, g[ep.first].direction, start, true);
 		float stepDistance=BOX2DRANGE;
@@ -1499,7 +1509,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 	printf("shift\n");
 	//debug::print_pose(o_shift);
 	Task controlGoal_adjusted= controlGoal;
-	applyAffineTrans(o_shift, controlGoal_adjusted);
+	math::applyAffineTrans(o_shift, &controlGoal_adjusted);
 	bool ctrl_finished=false;
 	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted, &ctrl_finished); //been.second, been.first
 	//printf("provisional plan from v%i\n", v);
@@ -1841,29 +1851,6 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-void Configurator::applyAffineTrans(const b2Transform& deltaPose, Task& task){
-	math::applyAffineTrans(deltaPose, task.start);
-	// if (task.disturbance.getAffIndex()!=NONE){
-	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
-	// }
-	applyAffineTrans(deltaPose, task.disturbance);
-}
-
-void Configurator::applyAffineTrans(const b2Transform& deltaPose, TransitionSystem& g){
-	auto vPair =boost::vertices(g);
-	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
-	if (*vIt!=movingVertex){
-		math::applyAffineTrans(deltaPose, g[*vIt]);
-	}
-}
-}
-
-void Configurator::applyAffineTrans(const b2Transform& deltaPose, Disturbance& d){
-	if (d.getAffIndex()!=NONE){
-		math::applyAffineTrans(deltaPose, d.bf.pose);
-	}
-}
-
 
 void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 	b2Transform deltaPose;
@@ -1874,10 +1861,10 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 					ydistance), 
 					b2Rot(angularDisplacement));
 	printf("displacement: ");
-	debug::print_pose(deltaPose);
+	debug::print_pose(-deltaPose);
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
-	applyAffineTrans(deltaPose, g);
-	applyAffineTrans(deltaPose, controlGoal);
+	math::applyAffineTrans(-deltaPose, g);
+	math::applyAffineTrans(-deltaPose, &controlGoal);
 }
 
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
