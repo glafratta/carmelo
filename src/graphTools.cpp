@@ -112,9 +112,9 @@ void StateDifference::init(const State& s1, const State& s2){ //observed, desire
 	pose.p.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	pose.p.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
 	pose.q.Set(angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle()));
-	if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
-		return;
-	}
+	// if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
+	// 	return;
+	// }
 	if (s1.Dn.getAffIndex()!= s2.Dn.getAffIndex()){
 		fill_invalid_bodyfeatures(Dn);
 	}
@@ -141,12 +141,18 @@ void StateDifference::fill_invalid_bodyfeatures(BodyFeatures & bf){
 void StateDifference::fill_valid_bodyfeatures(BodyFeatures & bf, const State& s1, const State& s2, WHAT_D_FLAG flag){
 	b2Transform p1=b2Transform_zero, p2=b2Transform_zero;
 	if (flag==DI){
+		if (s1.Di.getAffIndex()==NONE && s2.Di.getAffIndex()==NONE){
+			return;
+		}
 		p1=s1.start_from_Di();
 		p2=s2.start_from_Di();
 		bf.halfWidth=(s1.Di.bodyFeatures().halfWidth-s2.Di.bodyFeatures().halfWidth);
 		bf.halfLength=(s1.Di.bodyFeatures().halfLength-s2.Di.bodyFeatures().halfLength);
 	}
 	else if (flag==DN){
+		if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
+			return;
+		}
 		p1=s1.end_from_Dn();
 		p2=s2.end_from_Dn();
 		bf.halfWidth=(s1.Dn.bodyFeatures().halfWidth-s2.Dn.bodyFeatures().halfWidth);
