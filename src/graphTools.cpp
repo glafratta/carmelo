@@ -43,6 +43,7 @@ float angle_subtract(float a1, float a2){
 		}
 	}
 	result=a1-a2;
+	return result;
 }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
