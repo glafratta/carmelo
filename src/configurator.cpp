@@ -232,8 +232,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
-		//if (oe.empty()){
-			if (visited.first){
+			//if (visited.first){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
 					//b2World world_tmp(b2Vec2_zero);
@@ -251,11 +250,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				}
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
-			}
-			// else {
-			// 	std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
-			// 	return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
-			// }
+			//}
 		//}
 	}
 	return g[v].Dn;
@@ -468,7 +463,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				}
 				bool closest_match=false;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
-				match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
+				//match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false); //, new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
