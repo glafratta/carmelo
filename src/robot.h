@@ -36,7 +36,7 @@ const float FORGET_THRESHOLD=0.05;
 const float D_POSE_MARGIN=0.065;
 const float D_DIMENSIONS_MARGIN=0.03;
 const b2Transform b2Transform_zero=b2Transform(b2Vec2_zero, b2Rot(0));
-const float ANGLE_RESOLUTION=M_PI/4; 
+const float ANGLE_RESOLUTION=M_PI/HZ; 
 
 //camera filtering
 const int POS_IT=2;
