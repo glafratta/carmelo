@@ -550,7 +550,7 @@ bool operator==(Transform const &t1, Transform const& t2){
 void operator-=(Transform & t1, Transform const&t2){
 	t1.p.x-=t2.p.x;
 	t1.p.y-=t2.p.y;
-	t1.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+	t1.q.Set(angle_subtract(t1.q.GetAngle(), t2.q.GetAngle()));
 }
 
 void operator+=(Transform & t1, Transform const&t2){
@@ -571,7 +571,7 @@ Transform operator-(Transform const & t1, Transform const&t2){
 	b2Transform result;
 	result.p.x=t1.p.x-t2.p.x;
 	result.p.y=t1.p.y-t2.p.y;
-	result.q.Set(t1.q.GetAngle()-t2.q.GetAngle());
+	result.q.Set(angle_subtract(t1.q.GetAngle(), t2.q.GetAngle()));
 	return result;
 
 }
