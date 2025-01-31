@@ -14,10 +14,16 @@ orientation subtract(orientation o1, orientation o2){
 }
 
 b2Transform State::start_from_Di()const{
+	if (Di.getAffIndex()==NONE){
+		return b2Transform_inf;
+	}
 	return Di.pose()-start; //START
 }
 
 b2Transform State::end_from_Dn()const{
+	if (Dn.getAffIndex()==NONE){
+		return b2Transform_inf;
+	}
 	return Dn.pose()-endPose; //START
 }
 
@@ -120,6 +126,7 @@ void StateDifference::init(const State& s1, const State& s2){ //observed, desire
 	else{
 		fill_valid_bodyfeatures(Di, s1, s2, DI);
 	}
+	
 }
 
 void StateDifference::fill_invalid_bodyfeatures(BodyFeatures & bf){

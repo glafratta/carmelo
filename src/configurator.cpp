@@ -470,7 +470,6 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
 				match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
 				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
-				// std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, NULL, t.direction, desired_match, NULL, closest_match);		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false); //, new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
@@ -1580,11 +1579,11 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		StateDifference sd(s, g[v]);
 		bool condition=0;
-		StateMatcher::MATCH_TYPE m;
+		StateMatcher::MATCH_TYPE m=StateMatcher::_FALSE;
 		float sum_tmp=sd.get_sum(match_type);
 		if (!relax){
 			//m= matcher.isMatch(s, g[v], src, &sd);
-			m=matcher.isMatch(s, g[v]);
+			m=matcher.isMatch(sd, s.endPose.p.Length());
 			condition=matcher.match_equal(m, match_type);
 		}
 		else{
