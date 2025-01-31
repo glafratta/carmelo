@@ -109,7 +109,7 @@ struct StateDifference{
 
 	StateDifference()=default;
 
-	StateDifference(const State& s1, const State& s2, bool match_outcome=false, bool match_start=true){
+	StateDifference(const State& s1, const State& s2){
 		init(s1, s2);
 	}
 

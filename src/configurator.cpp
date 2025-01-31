@@ -1583,7 +1583,8 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		StateMatcher::MATCH_TYPE m;
 		float sum_tmp=sd.get_sum(match_type);
 		if (!relax){
-			m= matcher.isMatch(s, g[v], src, &sd);
+			//m= matcher.isMatch(s, g[v], src, &sd);
+			m=matcher.isMatch(s, g[v]);
 			condition=matcher.match_equal(m, match_type);
 		}
 		else{
@@ -1868,13 +1869,18 @@ void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
 }
 
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
-	float result=angle;
+	float result=angle, decimal, integer;
+;
 	if ((d==LEFT || d==RIGHT)&& outcome!=simResult::crashed){
 		float ratio= angle/ANGLE_RESOLUTION;
-		float decimal, integer;
 		decimal=std::modf(ratio, &integer);
-		if (decimal>=0.5){
-			integer+=1;
+		if (fabs(decimal)>=0.5){
+			if (integer<0){
+				integer-=1;
+			}
+			else{
+				integer+=1;
+			}
 		}		
 		result=integer*ANGLE_RESOLUTION;
 	}

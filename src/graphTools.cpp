@@ -463,7 +463,7 @@ StateMatcher::MATCH_TYPE StateMatcher::isMatch(StateDifference sd, float endDist
 
 StateMatcher::MATCH_TYPE StateMatcher::isMatch(const State & s, const State &candidate, const State *src, StateDifference*_sd,bool match_outcome){
 	//src is the source of candidate
-	StateDifference sd(s, candidate, match_outcome);
+	StateDifference sd(s, candidate);
 	float stray=0;
 	// if (src!=NULL && s.label!=UNDEFINED){
 	// 	b2Vec2 stray_v;
