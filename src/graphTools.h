@@ -13,6 +13,7 @@
 #include <boost/graph/graph_utility.hpp>
 #include <map>
 #include <boost/property_map/property_map.hpp> //property map
+#include <boost/graph/subgraph.hpp>
 //#include <boost/variant/get.hpp> //get function
 #include <boost/graph/copy.hpp>
 #include <utility>
@@ -157,6 +158,7 @@ typedef std::pair<bool, float> orientation;
 orientation subtract(orientation, orientation);
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
+typedef boost::subgraph<TransitionSystem> Subgraph;
 typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
@@ -236,7 +238,6 @@ struct Visited{ //for debug
 
 struct is_not_v{
 	is_not_v(){}
-	//CurrentV(TransitionSystem * ts): g(ts){}
 	is_not_v(vertexDescriptor _cv): cv(_cv){}
 	bool operator()(edgeDescriptor e){
 		return e.m_target!=cv;
@@ -456,12 +457,6 @@ class StateMatcher{
 			bool Dn_shape=false;
 			//bool Dn_type=0;
 		};
-		
-		//float sumVector(DistanceVector);
-
-		//float get_angle_difference(float, float); //adjusts for differences in angle direction
-
-		//FUZZY LOGIC FUNCTIONS USED TO CLASSIFY MATCH
 
 		bool match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired);
 
@@ -470,12 +465,6 @@ class StateMatcher{
 		MATCH_TYPE isMatch(const State &, const State&, const State* src=NULL, StateDifference * _sd=NULL, bool match_outcome=false); //first state: state to find a match for, second state: candidate match
 
 		std::pair<MATCH_TYPE, vertexDescriptor> match_vertex(TransitionSystem, vertexDescriptor, Direction, State, StateMatcher::MATCH_TYPE mt=StateMatcher::_TRUE); //find match amoung vertex out edges
-		
-		//void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
-
-		//std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
-
-		//std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
 
 		float get_coefficient(const float &);
 	private:

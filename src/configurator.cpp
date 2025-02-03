@@ -232,6 +232,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
+		//if (oe.empty()){
 			//if (visited.first){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
@@ -251,6 +252,10 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
 			//}
+			// else {
+			// 	std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
+			// 	return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
+			// }
 		//}
 	}
 	return g[v].Dn;
