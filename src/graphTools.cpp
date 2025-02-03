@@ -356,10 +356,10 @@ bool gt::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, Transi
 }
 
 
-std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, TransitionSystem& g, const int & it, const vertexDescriptor & current_v, std::pair<bool, edgeDescriptor>& ep){
+std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, TransitionSystem& g, const int & it, const vertexDescriptor & current_v, std::pair<bool, edgeDescriptor>* ep){
 	std::vector <vertexDescriptor> result= {v};
 	Direction d=UNDEFINED;
-	std::pair<bool, edgeDescriptor>ep2;
+	std::pair<bool, edgeDescriptor>ep2, _ep;
 	do {
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
 		ep2= visitedEdge(ie, g,v);
@@ -368,12 +368,12 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		}
 		if (ep2.first){
 			if (ep2.second.m_target==result[0]){ //size 1
-				ep=ep2; //assign ep to define direction
-				d= g[ep.second].direction;
+				_ep=ep2; //assign ep to define direction
+				d= g[_ep.second].direction;
 				//if (ie.size()>1){
 				g[ep2.second].it_observed=it;
 				for (edgeDescriptor e: ie){
-					if (g[e].direction==d && e!=ep2.second && g[e.m_source].Di == g[ep.second.m_source].Di &&g[e.m_source].Dn == g[ep.second.m_target].Dn){
+					if (g[e].direction==d && e!=ep2.second && g[e.m_source].Di == g[_ep.second.m_source].Di &&g[e.m_source].Dn == g[_ep.second.m_target].Dn){
 						ep2.second=e;
 						break;
 					}
@@ -381,8 +381,8 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			}
 			}
 			else if (g[ep2.second].direction==d &&
-			 		g[ep2.second.m_target].Di == g[ep.second.m_target].Di &&
-			 		g[ep2.second.m_target].Dn == g[ep.second.m_target].Dn){ //same task!
+			 		g[ep2.second.m_target].Di == g[_ep.second.m_target].Di &&
+			 		g[ep2.second.m_target].Dn == g[_ep.second.m_target].Dn){ //same task!
 				result.push_back(ep2.second.m_target); //source
 			}
 
@@ -400,6 +400,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 	}while(g[ep2.second].direction==d);
 	//ep=boost::edge(ep2.second)
 	std::reverse(result.begin(), result.end());
+	if (NULL!=ep){
+		*ep=_ep;
+	}
 	return result;
 }
 

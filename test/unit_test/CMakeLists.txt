@@ -35,6 +35,7 @@ add_executable(affine_transformation ../test_essentials.h affine_transform.cpp)
 target_link_libraries(affine_transformation CloCK ${OpenCV_LIBS} box2d rt  )
 
 
+
 add_test(NAME split_task COMMAND split_task 0.6 0 0)
 add_test(NAME split_task_-01 COMMAND split_task 0.26 -0.01 -1.570796 0 0 -1.570796 0.265 -0.16 0)
 add_test(NAME split_task_angle COMMAND split_task 0.0 .6 1.57079633)
@@ -194,6 +195,10 @@ add_test(NAME checkPlan_40cm_21 COMMAND checkPlan ../170924_1321_badrun/ 2 1 21)
 
 #set_property(TEST checkPlan_21 PROPERTY WILL_FAIL true)
 
+
+add_executable(subgraph ../test_essentials.h subgraph.cpp)
+target_link_libraries(subgraph CloCK ${OpenCV_LIBS} box2d rt)
+add_test(NAME subgraph COMMAND subgraph)
 
 
 set(CMAKE_BUILD_TYPE Debug)

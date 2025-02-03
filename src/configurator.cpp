@@ -484,8 +484,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 					//}
 					if (plan_prov.empty()&&currentTask.motorStep==0){
 						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
-						std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
-						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex, e_tmp);
+						//std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
+						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
 						math::applyAffineTrans(-g[task_start].start, &controlGoal_adjusted);
@@ -619,7 +619,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 		// }
 		// b2Transform start=g[ep.second.m_source].endPose;
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
-		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, ep); 
+		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, &ep); 
 		//vertexDescriptor src=ep.second.m_source;
 		Direction direction= g[ep.second].direction;
 		if (split.size()<2){
@@ -1577,6 +1577,11 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		bool Tmatch=true;
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
+		//make state representing a whole task, this is inefficient and when i have time should be susbtituted with subgraph
+		State q= g[v];
+		if (auto vertices=gt::task_vertices(v, g, iteration, currentVertex); vertices.size()>1){
+			q.start=g[vertices[0]].start;
+		}
 		StateDifference sd(s, g[v]);
 		bool condition=0;
 		StateMatcher::MATCH_TYPE m=StateMatcher::_FALSE;

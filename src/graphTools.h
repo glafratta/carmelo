@@ -158,11 +158,13 @@ typedef std::pair<bool, float> orientation;
 orientation subtract(orientation, orientation);
 
 typedef boost::adjacency_list<boost::setS, boost::vecS, boost::bidirectionalS, State, Edge> TransitionSystem;
-typedef boost::subgraph<TransitionSystem> Subgraph;
 typedef boost::graph_traits<TransitionSystem>::vertex_iterator vertexIterator; 
 typedef boost::graph_traits<TransitionSystem>::vertex_descriptor vertexDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_descriptor edgeDescriptor;
 typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
+//typedef boost::adjacency_list_traits< boost::vecS, boost::vecS, boost::directedS > Traits;
+// typedef boost::subgraph<boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS>> CognitiveMap;
+
 
 namespace math {
 	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
@@ -316,7 +318,7 @@ namespace gt{
 
 	bool check_edge_direction(const std::pair<edgeDescriptor, bool> &, TransitionSystem&, Direction);
 
-	std::vector <vertexDescriptor> task_vertices(vertexDescriptor, TransitionSystem&, const int &, const vertexDescriptor &, std::pair<bool, edgeDescriptor>&);
+	std::vector <vertexDescriptor> task_vertices(vertexDescriptor, TransitionSystem&, const int &, const vertexDescriptor &, std::pair<bool, edgeDescriptor>* ep=NULL);
 }
 
 
