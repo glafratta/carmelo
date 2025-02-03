@@ -1565,7 +1565,7 @@ void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem 
 // 	return result;
 // }
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor> * others, bool relax){
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(State s, TransitionSystem& g, State * src, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor> * others, bool relax,bool wholeTask){
 	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::MATCH_TYPE::_FALSE, TransitionSystem::null_vertex());
 	auto vs= boost::vertices(g);
 	float prob=0, sum=10000;
@@ -1579,10 +1579,12 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 		Tmatch=!ie.empty()||dir==Direction::UNDEFINED;
 		//make state representing a whole task, this is inefficient and when i have time should be susbtituted with subgraph
 		State q= g[v];
-		if (auto vertices=gt::task_vertices(v, g, iteration, currentVertex); vertices.size()>1){
-			q.start=g[vertices[0]].start;
+		if (wholeTask){
+			if (auto vertices=gt::task_vertices(v, g, iteration, currentVertex); vertices.size()>1){
+				q.start=g[vertices[0]].start;
+			}			
 		}
-		StateDifference sd(s, g[v]);
+		StateDifference sd(s, q);
 		bool condition=0;
 		StateMatcher::MATCH_TYPE m=StateMatcher::_FALSE;
 		float sum_tmp=sd.get_sum(match_type);

@@ -23,22 +23,14 @@ class ConfiguratorInterface{
 public:
 	bool debugOn=0;
 	int iteration=0;
-	//CoordinateContainer data;
 	CoordinateContainer data2fp;
-	//cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
-	//PointCloudProc * pcProc=NULL;
 	bool stop=0;
 
 	void setReady(bool b);
 
 	bool isReady();
-
-	// void updatePCProc(){
-	// 	pcProc->updatePrevious(data);
-	// }
-
 
 
 };
@@ -182,7 +174,7 @@ void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, s
 
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0); //matches to most likely
+std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0, bool wholeTask=false); //matches to most likely
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 

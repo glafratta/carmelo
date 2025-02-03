@@ -359,7 +359,7 @@ bool gt::check_edge_direction(const std::pair<edgeDescriptor, bool> & ep, Transi
 std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, TransitionSystem& g, const int & it, const vertexDescriptor & current_v, std::pair<bool, edgeDescriptor>* ep){
 	std::vector <vertexDescriptor> result= {v};
 	Direction d=UNDEFINED;
-	std::pair<bool, edgeDescriptor>ep2, _ep;
+	std::pair<bool, edgeDescriptor>ep2(false, edgeDescriptor()), _ep=ep2;
 	do {
 		std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
 		ep2= visitedEdge(ie, g,v);
