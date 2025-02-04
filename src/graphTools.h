@@ -179,6 +179,17 @@ namespace math {
 
 };
 
+struct is_not_v{
+	is_not_v(){}
+	is_not_v(vertexDescriptor _cv): cv(_cv){}
+	bool operator()(edgeDescriptor e){
+		return e.m_target!=cv;
+	}	
+
+	private:
+	vertexDescriptor cv;
+};
+
 
 struct Connected{
 	Connected(){}
@@ -202,13 +213,24 @@ struct MoreLikely{
 struct NotSelfEdge{
 	NotSelfEdge(){}
 
-//	NotSelfEdge(TransitionSystem * _g):g(_g){}
-
 	bool operator()(const edgeDescriptor & e) const {
 		bool not_self= e.m_source!=e.m_target;
+		return not_self;
 	}
-// private:
-// TransitionSystem * g=NULL;
+};
+
+struct KeepEdges{
+	KeepEdges(){}
+	KeepEdges(vertexDescriptor _cv): cv(_cv){}
+
+	bool operator()(const edgeDescriptor& e)const{
+		is_not_v not_v(cv);
+		return nse(e) && not_v(e);
+	}
+
+	private:
+	vertexDescriptor cv;
+	NotSelfEdge nse;
 };
 
 struct Remember{
@@ -238,16 +260,6 @@ struct Visited{ //for debug
 	TransitionSystem *g;
 };
 
-struct is_not_v{
-	is_not_v(){}
-	is_not_v(vertexDescriptor _cv): cv(_cv){}
-	bool operator()(edgeDescriptor e){
-		return e.m_target!=cv;
-	}	
-
-	private:
-	vertexDescriptor cv;
-};
 
 struct ExecutionError{
 
@@ -323,7 +335,7 @@ namespace gt{
 
 
 
-typedef boost::filtered_graph<TransitionSystem, NotSelfEdge, Connected> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, KeepEdges, Connected> FilteredTS;
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
 
 

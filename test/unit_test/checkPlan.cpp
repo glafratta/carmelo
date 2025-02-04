@@ -48,26 +48,28 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     int steps= atoi(argv[4]);
-    float distanceTraversed = MOTOR_CALLBACK*conf.getTask()->action.getLinearSpeed()*(steps-conf.getIteration())*2;
-    b2Transform shift;
-    shift.q.Set(MOTOR_CALLBACK*conf.getTask()->action.getOmega()*steps);
-    shift.p.x= cos(shift.q.GetAngle())*distanceTraversed;
-    shift.p.y= sin(shift.q.GetAngle())*distanceTraversed;
-    math::applyAffineTrans(-shift, conf.transitionSystem);    
-    math::applyAffineTrans(-shift, conf.controlGoal.disturbance);
+    //float distanceTraversed = MOTOR_CALLBACK*conf.getTask()->action.getLinearSpeed()*(steps-conf.getIteration());
+    // b2Transform shift;
+    // shift.q.Set(MOTOR_CALLBACK*conf.getTask()->action.getOmega()*steps);
+    // shift.p.x= cos(shift.q.GetAngle())*distanceTraversed;
+    // shift.p.y= sin(shift.q.GetAngle())*distanceTraversed;
+    // math::applyAffineTrans(-shift, conf.transitionSystem);    
+    // math::applyAffineTrans(-shift, conf.controlGoal.disturbance);
+    int ogstep=conf.transitionSystem[conf.currentEdge].step;
+    for (int i=0;i<di.iteration*2; i++){
+        conf.trackTaskExecution(*conf.getTask());
+        conf.changeTask(conf.getTask()->change, ogstep, conf.planVertices);
+    }
     if (argc>4){
         di.iteration=steps;
-        conf.addIteration(steps-conf.getIteration());
+        conf.addIteration(steps-conf.getIteration()+1);
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
     conf.debugOn=1;
   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     
-    conf.addIteration(di.iteration);
-    for (int i=0;i<di.iteration*2; i++){
-      //  conf.trackTaskExecution(*conf.getTask());
-    }
+
    // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
     //int og_step=0;
