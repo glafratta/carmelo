@@ -40,7 +40,7 @@ class WorldBuilder{
     std::pair <Pointf, Pointf> bounds(Direction, b2Transform t, float boxLength, float halfWindowWidth); //returns bottom and top of bounding box
 
     template <class Pt>
-    std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pt>nb){//gets bounding box of points
+    std::pair<bool,BodyFeatures> bounding_box(std::vector <Pt>nb){//gets bounding box of points
     float  l=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
     // cv::Rect2f rect(x_loc,y_loc,w, h);
@@ -70,6 +70,9 @@ class WorldBuilder{
     result.first=true;
     return result;
 }
+
+std::pair <bool, BodyFeatures> bounding_rotated_box(std::vector <cv::Point2f>nb);
+
     std::vector <std::vector<cv::Point2f>> kmeans_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
 
     std::vector <std::vector<cv::Point2f>> partition_clusters( std::vector <cv::Point2f>);

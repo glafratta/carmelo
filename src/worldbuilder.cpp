@@ -28,36 +28,25 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     return result;
     }
 
-// template <typename Pt>
-// std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pt>nb){//gets bounding box of points
-//     float  l=(0.0005*2), w=(0.0005*2) ;
-//     float x_glob=0.0f, y_glob=0.0f;
-//     // cv::Rect2f rect(x_loc,y_loc,w, h);
-//     // b2Transform pose;
-//     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
-//     if (nb.empty()){
-//         return result;
-//     }
-//     CompareX compareX;
-//     CompareY compareY;
-//     //Pointf maxx, minx, miny, maxy;
-// 	typename std::vector<Pt>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
-// 	typename std::vector<Pt>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
-// 	typename std::vector<Pt>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
-// 	typename std::vector<Pt>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
-//     if (minx->x!=maxx->x){
-//         w= fabs((*maxx).x-(*minx).x);
-//     }
-//     if (miny->y!=maxy->y){
-//         l=fabs((*maxy).y-(*miny).y);
-//     }
-//     x_glob= ((*maxx).x+(*minx).x)/2;
-//     y_glob= ((*maxy).y+(*miny).y)/2;
-//     result.second.halfLength=l/2;
-//     result.second.halfWidth=w/2;
-//     result.second.pose.p=b2Vec2(x_glob, y_glob);
-//     result.first=true;
-// }
+std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <cv::Point2f>nb){
+    float  l=(0.0005*2), w=(0.0005*2) ;
+    float x_glob=0.0f, y_glob=0.0f;
+    // cv::Rect2f rect(x_loc,y_loc,w, h);
+    // b2Transform pose;
+    std::pair <bool, BodyFeatures> result(0, BodyFeatures());
+    if (nb.empty()){
+        return result;
+    }
+    cv::RotatedRect rotated_rect = cv::minAreaRect(nb);
+
+    result.second.halfLength=rotated_rect.size.height/2;
+    result.second.halfWidth=rotated_rect.size.width/2;
+    result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
+    result.second.pose.q.Set(rotated_rect.angle);
+    result.first=true;
+    return result;
+}
+
 
 std::vector <std::vector<cv::Point2f>> WorldBuilder::kmeans_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
     
@@ -108,7 +97,7 @@ std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, 
         clusters=partition_clusters(points);
     }
     for (int c=0; c<clusters.size(); c++){
-        if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
+        if (std::pair<bool,BodyFeatures>feature=bounding_rotated_box(clusters[c]); feature.first){
             feature.second.pose.q.Set(start.q.GetAngle());
             result.push_back(feature.second);
         }
