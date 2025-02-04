@@ -1197,14 +1197,17 @@ void Configurator::transitionMatrix(State& state, Direction d, vertexDescriptor 
 			}
 		}
 		else {
-			if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
+			if (src==TransitionSystem::null_vertex()){
+				state.options={currentTask.direction};
+			}
+			else if (temp.getAction().getOmega()!=0){ //if the task chosen is a turning task
 				state.options.push_back(temp.direction);
 				state.options.push_back(getOppositeDirection(temp.direction).second);
 				state.options.push_back(DEFAULT);
 			}
-			else if (src==TransitionSystem::null_vertex()){
-				state.options={currentTask.direction};
-			}
+			// else if (src==TransitionSystem::null_vertex()){
+			// 	state.options={currentTask.direction};
+			// }
 			else{
 				state.options={DEFAULT};
 			}
