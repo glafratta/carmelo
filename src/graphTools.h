@@ -212,26 +212,16 @@ struct MoreLikely{
 
 struct NotSelfEdge{
 	NotSelfEdge(){}
+	NotSelfEdge(TransitionSystem * _g): g(_g){}
 
 	bool operator()(const edgeDescriptor & e) const {
-		bool not_self= e.m_source!=e.m_target;
+		bool not_self= e.m_source!=e.m_target && (*g)[e].step!=0; 
 		return not_self;
 	}
-};
-
-struct KeepEdges{
-	KeepEdges(){}
-	KeepEdges(vertexDescriptor _cv): cv(_cv){}
-
-	bool operator()(const edgeDescriptor& e)const{
-		is_not_v not_v(cv);
-		return nse(e) && not_v(e);
-	}
-
 	private:
-	vertexDescriptor cv;
-	NotSelfEdge nse;
+	TransitionSystem * g;
 };
+
 
 struct Remember{
 	Remember(){}
@@ -335,7 +325,7 @@ namespace gt{
 
 
 
-typedef boost::filtered_graph<TransitionSystem, KeepEdges, Connected> FilteredTS;
+typedef boost::filtered_graph<TransitionSystem, NotSelfEdge, Connected> FilteredTS;
 typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> VisitedTS;
 
 

@@ -129,12 +129,7 @@ bool Configurator::Spawner(){
 		resetPhi(transitionSystem);
 		toRemove=explorer(src, transitionSystem, currentTask, world);
 		clearFromMap(toRemove, transitionSystem, errorMap);
-		Connected connected(&transitionSystem);
-		FilteredTS fts(transitionSystem, KeepEdges(), connected); //boost::keep_all()
-		TransitionSystem tmp;
-		boost::copy_graph(fts, tmp);
-		transitionSystem.clear();
-		transitionSystem.swap(tmp);		
+		ts_cleanup(&transitionSystem);
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
@@ -143,7 +138,7 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
 		printPlan();
-		boost::remove_out_edge_if(movingVertex, not_cv, transitionSystem);
+		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		explored=1;
 //	}
 
@@ -1884,3 +1879,16 @@ float Configurator::approximate_angle(const float & angle, const Direction & d, 
 // 	}
 
 // }
+
+void Configurator::ts_cleanup(TransitionSystem * g){
+	Connected connected(g);
+	NotSelfEdge nse(g);
+	FilteredTS fts(*g, nse, connected); //boost::keep_all()
+	TransitionSystem tmp;
+	boost::copy_graph(fts, tmp);
+	g->clear();
+	g->swap(tmp);		
+
+
+}
+ 

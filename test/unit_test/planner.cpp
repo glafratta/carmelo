@@ -56,7 +56,14 @@ int main(int argc, char** argv){
     boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.dummy_vertex(conf.currentVertex);
     conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-    debug::graph_file(conf.getIteration(), conf.transitionSystem, conf.controlGoal.disturbance, conf.planVertices, conf.currentVertex);
+    Connected connected(&conf.transitionSystem);
+    NotSelfEdge nse(&conf.transitionSystem);
+	FilteredTS fts(conf.transitionSystem, nse, connected); //boost::keep_all()
+	TransitionSystem tmp;
+    boost::copy_graph(fts, tmp);
+	conf.transitionSystem.clear();
+	conf.transitionSystem.swap(tmp);	
+    //debug::graph_file(conf.getIteration(), conf.transitionSystem, conf.controlGoal.disturbance, conf.planVertices, conf.currentVertex);
     std::vector <vertexDescriptor> plan=conf.planner(conf.transitionSystem, conf.currentVertex);
     std::vector <Direction> plan_d=getPlan(conf.transitionSystem, plan, conf.currentVertex);
     conf.printPlan(&plan);
