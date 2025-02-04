@@ -301,6 +301,8 @@ void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescript
 
 float approximate_angle(const float &, const Direction &, const simResult::resultType &);
 
+void ts_cleanup(TransitionSystem *);
+
 };
 
 
