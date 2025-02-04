@@ -10,7 +10,7 @@ int main(int argc, char** argv){
         y+=0.01;
     }
     WorldBuilder wb;
-    std::pair<bool,BodyFeatures> feature= wb.getOneFeature(pts);
+    std::pair<bool,BodyFeatures> feature= wb.bounding_box(pts);
     feature.second.halfLength=round(feature.second.halfLength*1000)/1000;
     feature.second.halfWidth=round(feature.second.halfWidth*1000)/1000;
 

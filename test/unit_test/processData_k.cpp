@@ -19,7 +19,7 @@ std::vector <BodyFeatures> WorldBuilder::processData( const CoordinateContainer 
         fclose(f);
     }
     for (int c=0; c<clusters.size(); c++){
-        if (std::pair<bool,BodyFeatures>feature=getOneFeature(clusters[c]); feature.first){
+        if (std::pair<bool,BodyFeatures>feature=bounding_box(clusters[c]); feature.first){
             feature.second.pose.q.Set(start.q.GetAngle());
             result.push_back(feature.second);
         }

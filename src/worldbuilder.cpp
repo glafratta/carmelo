@@ -39,8 +39,8 @@ std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <c
     }
     cv::RotatedRect rotated_rect = cv::minAreaRect(nb);
 
-    result.second.halfLength=rotated_rect.size.height/2;
-    result.second.halfWidth=rotated_rect.size.width/2;
+    result.second.halfLength=rotated_rect.size.length/2;
+    result.second.halfWidth=rotated_rect.size.height/2;
     result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
     result.second.pose.q.Set(rotated_rect.angle);
     result.first=true;

@@ -88,7 +88,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <Pointf> ptset= set2vec(points);
-    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
+    std::pair<bool,BodyFeatures> feature= bounding_box(ptset);
     if (feature.first){
         feature.second.pose.q.Set(start.q.GetAngle());
         result.push_back(feature.second);
