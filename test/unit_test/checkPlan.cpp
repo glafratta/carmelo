@@ -70,12 +70,7 @@ int main(int argc, char** argv){
     //int og_step=0;
     //conf.changeTask(true, og_step, conf.planVertices);
     conf.explorer(conf.movingVertex, conf.transitionSystem, *conf.getTask(), world);
-    connected=Connected(&conf.transitionSystem);
-    FilteredTS fts2(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
-    tmp.clear();
-    boost::copy_graph(fts2, tmp);
-    conf.transitionSystem.clear();
-    conf.transitionSystem.swap(tmp);	
+    conf.ts_cleanup(&conf.transitionSystem);
     bool finished=false;	
     plan=conf.planner(conf.transitionSystem, conf.currentVertex,TransitionSystem::null_vertex(), false, NULL, &finished);
     conf.planVertices=plan;
