@@ -371,7 +371,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 				_ep=ep2; //assign ep to define direction
 				d= g[_ep.second].direction;
 				//if (ie.size()>1){
-				g[ep2.second].it_observed=it;
+				if (ep!=NULL){
+					g[_ep.second].it_observed=it;
+				}
 				for (edgeDescriptor e: ie){
 					if (g[e].direction==d && e!=ep2.second && g[e.m_source].Di == g[_ep.second.m_source].Di &&g[e.m_source].Dn == g[_ep.second.m_target].Dn){
 						ep2.second=e;

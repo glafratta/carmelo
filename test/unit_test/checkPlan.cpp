@@ -48,15 +48,15 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     int steps= atoi(argv[4]);
-    float distanceTraversed = MOTOR_CALLBACK*conf.getTask()->action.getLinearSpeed()*steps;
+    float distanceTraversed = MOTOR_CALLBACK*conf.getTask()->action.getLinearSpeed()*(steps-conf.getIteration())*2;
     b2Transform shift;
     shift.q.Set(MOTOR_CALLBACK*conf.getTask()->action.getOmega()*steps);
     shift.p.x= cos(shift.q.GetAngle())*distanceTraversed;
     shift.p.y= sin(shift.q.GetAngle())*distanceTraversed;
-    math::applyAffineTrans(shift, conf.transitionSystem);    
-    math::applyAffineTrans(shift, conf.controlGoal.disturbance);
+    math::applyAffineTrans(-shift, conf.transitionSystem);    
+    math::applyAffineTrans(-shift, conf.controlGoal.disturbance);
     if (argc>4){
-        di.iteration=atoi(argv[4]);
+        di.iteration=steps;
         conf.addIteration(steps-conf.getIteration());
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
@@ -68,7 +68,7 @@ int main(int argc, char** argv){
     for (int i=0;i<di.iteration*2; i++){
       //  conf.trackTaskExecution(*conf.getTask());
     }
-    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+   // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
     conf.resetPhi(conf.transitionSystem);
     //int og_step=0;
     //conf.changeTask(true, og_step, conf.planVertices);

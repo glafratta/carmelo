@@ -228,22 +228,22 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	return result;
 }
 Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World & world, const Direction& dir){
-	std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
+	//std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
 		//if (oe.empty()){
-			//if (visited.first){
+			if (visited.first){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
 					//potentially if dir=DEF start from g[v].start
 					//b2World world_tmp(b2Vec2_zero);
 					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
 					Robot robot(&world);
 					robot.body->SetTransform(task.start.p, task.start.q.GetAngle());
-					b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
+					//b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
 					b2AABB box =worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 					b2Fixture *sensor =GetSensor(robot.body);
-					bool overlap=overlaps(robot.body, d) && sensor;
+					bool overlap=overlaps(robot.body, &g[v].Di) && sensor;
 					worldBuilder.world_cleanup(&world);
 					if (overlap){
 						return g[v].Di;
@@ -251,14 +251,16 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				}
 				//check if Di was eliminated 
 				return controlGoal.disturbance;
-			//}
-			// else {
+			}
+			else if (v==movingVertex){
 			// 	std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
 			// 	return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
-			// }
+			return g[v].Di;
+			}
 		//}
 	}
 	return g[v].Dn;
+	//return controlGoal.disturbance;
 }
 
 
@@ -466,10 +468,10 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				else{
 					source=g[v0].ID;
 				}
-				bool closest_match=false;
+				bool closest_match=false, match_task=true;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
 				//match_setup(closest_match, desired_match, v0, plan_prov, t.direction, g);
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match);		//, closest_match	
+				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match, match_task );		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false); //, new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
@@ -531,7 +533,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	}
 	backtrack(evaluationQueue, priorityQueue, closed, g);
 	bestNext=priorityQueue[0];
-		if (controlGoal.getAffIndex()==PURSUE){
+	if (controlGoal.getAffIndex()==PURSUE){
 			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
 	}
 	std::vector <edgeDescriptor> best_in_edges= gt::inEdges(g,bestNext);
