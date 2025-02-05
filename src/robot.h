@@ -39,6 +39,7 @@ const b2Transform b2Transform_zero=b2Transform(b2Vec2_zero, b2Rot(0));
 const b2Transform b2Transform_inf=b2Transform(b2Vec2(10000, 10000), b2Rot(MAX_ANGLE_ERROR));
 const float ANGLE_RESOLUTION=M_PI/(2*HZ); 
 const float MIN_BODY_DIMENSION=0.0005;
+const float DEG_TO_RAD_K=0.01745329252;
 
 //camera filtering
 const int POS_IT=2;

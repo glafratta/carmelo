@@ -29,24 +29,19 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
 
 std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <cv::Point2f>nb){
-    float  l=(0.0005*2), w=(0.0005*2) ;
-    float x_glob=0.0f, y_glob=0.0f;
-    std::vector <cv::Point2d> nb_double;
     for (cv::Point2f & p: nb){
-        float x=round(p.x*100)/100;
-        float y=round(p.y*100)/100;
-        nb_double.push_back(cv::Point2d(x, y));
+        p.x= round(p.x*100)/100;
+        p.y=round(p.y*100)/100;
     }
     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
     if (nb.empty()){
         return result;
     }
-    cv::RotatedRect rotated_rect = cv::minAreaRect(nb_double);
-
-    result.second.setHalfLength(rotated_rect.size.width/2); //THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
-    result.second.setHalfWidth(rotated_rect.size.height/2);
+    cv::RotatedRect rotated_rect = cv::minAreaRect(nb);
+    result.second.setHalfLength(rotated_rect.size.height/2); //NVM THIS ///THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
+    result.second.setHalfWidth(rotated_rect.size.width/2);
     result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
-    result.second.pose.q.Set(rotated_rect.angle);
+    result.second.pose.q.Set(rotated_rect.angle*DEG_TO_RAD_K);
     result.first=true;
     return result;
 }
@@ -115,7 +110,8 @@ b2Body* WorldBuilder::makeBody(b2World&w, BodyFeatures features){
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
 	bodyDef.type = features.bodyType;	
-    bodyDef.position.Set(features.pose.p.x, features.pose.p.y); 
+    bodyDef.position.Set(features.pose.p.x, features.pose.p.y);
+    bodyDef.angle=features.pose.q.GetAngle(); 
 	body = w.CreateBody(&bodyDef);
     switch(features.shape){
         case b2Shape::e_polygon: {
