@@ -22,8 +22,8 @@ int main(int argc, char** argv){
     std::pair<bool,BodyFeatures> feature_rot= wb.bounding_rotated_box(pts);
     feature_rot.second.halfLength=round(feature_rot.second.halfLength*1000)/1000;
     feature_rot.second.halfWidth=round(feature_rot.second.halfWidth*1000)/1000;
-    auto rr= cv::minAreaRect(pts);
-    cv::boxPoints(rr, box_points);
+    //auto rr= cv::minAreaRect(pts);
+    //cv::boxPoints(rr, box_points);
 
     if (fabs(feature_rot.second.halfLength-0.05)>0.001){
         throw std::logic_error("wrong half length\n");

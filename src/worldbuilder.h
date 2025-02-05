@@ -73,6 +73,9 @@ class WorldBuilder{
 
 std::pair <bool, BodyFeatures> bounding_rotated_box(std::vector <cv::Point2f>nb);
 
+std::pair <bool, BodyFeatures> bounding_approx_poly(std::vector <cv::Point2f>nb);
+
+
     std::vector <std::vector<cv::Point2f>> kmeans_clusters( std::vector <cv::Point2f>, std::vector <cv::Point2f>&);
 
     std::vector <std::vector<cv::Point2f>> partition_clusters( std::vector <cv::Point2f>);
