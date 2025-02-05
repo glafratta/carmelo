@@ -38,8 +38,20 @@ std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <c
         return result;
     }
     cv::RotatedRect rotated_rect = cv::minAreaRect(nb);
-    result.second.setHalfLength(rotated_rect.size.height/2); //NVM THIS ///THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
-    result.second.setHalfWidth(rotated_rect.size.width/2);
+    if (rotated_rect.size.width>rotated_rect.size.height){
+        result.second.setHalfLength(rotated_rect.size.width/2); //NVM THIS ///THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
+        result.second.setHalfWidth(rotated_rect.size.height/2);
+        if (rotated_rect.angle>90){
+            rotated_rect.angle-=90;
+        }
+        else{
+            rotated_rect.angle+=90;
+        }
+    }
+    else{
+        result.second.setHalfLength(rotated_rect.size.height/2); //NVM THIS ///THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
+        result.second.setHalfWidth(rotated_rect.size.width/2);
+    }
     result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
     result.second.pose.q.Set(rotated_rect.angle*DEG_TO_RAD_K);
     result.first=true;
@@ -97,7 +109,7 @@ std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, 
     }
     for (int c=0; c<clusters.size(); c++){
         if (std::pair<bool,BodyFeatures>feature=bounding_rotated_box(clusters[c]); feature.first){
-            feature.second.pose.q.Set(start.q.GetAngle());
+            //feature.second.pose.q.Set(start.q.GetAngle());
             result.push_back(feature.second);
         }
     }
