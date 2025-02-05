@@ -36,8 +36,8 @@ class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
    // b2Transform pose_local=pose;
-    float halfLength=0.0005; //x
-    float halfWidth=0.0005; //y
+    float halfLength=MIN_BODY_DIMENSION;//x
+    float halfWidth=MIN_BODY_DIMENSION; //y
     float shift=0.0f;
     b2BodyType bodyType = b2_dynamicBody;
 
@@ -49,12 +49,22 @@ class BodyFeatures{
 
     BodyFeatures(b2Transform _pose):pose(_pose){}
 
-    void setHalfLength(float f){
-        halfLength=f;
+    void setHalfLength(const float & f){
+        if (f<MIN_BODY_DIMENSION){
+            halfLength=MIN_BODY_DIMENSION;
+        }
+        else{
+            halfLength=f;
+        }
     }
 
-    void setHalfWidth(float f){
-        halfWidth=f;
+    void setHalfWidth(const float & f){
+        if (f<MIN_BODY_DIMENSION){
+            halfWidth=MIN_BODY_DIMENSION;
+        }
+        else{
+            halfWidth=f;
+        }
     }
 
     bool match(const BodyFeatures&);

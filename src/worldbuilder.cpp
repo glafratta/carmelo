@@ -31,16 +31,18 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
 std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <cv::Point2f>nb){
     float  l=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
-    // cv::Rect2f rect(x_loc,y_loc,w, h);
-    // b2Transform pose;
+    for (cv::Point2f & p: nb){
+        p.x=round(p.x*100)/100;
+        p.y=round(p.y*100)/100;
+    }
     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
     if (nb.empty()){
         return result;
     }
     cv::RotatedRect rotated_rect = cv::minAreaRect(nb);
 
-    result.second.halfLength=rotated_rect.size.length/2;
-    result.second.halfWidth=rotated_rect.size.height/2;
+    result.second.setHalfLength(rotated_rect.size.width/2); //THEY ARE SWAPPED IN OPENCV DO NOT TOUCH
+    result.second.setHalfWidth(rotated_rect.size.height/2);
     result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
     result.second.pose.q.Set(rotated_rect.angle);
     result.first=true;
