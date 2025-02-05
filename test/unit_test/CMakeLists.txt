@@ -179,7 +179,7 @@ add_test(NAME state_difference_turn COMMAND state_difference ../251023_TAGET/ 1 
 
 add_test(NAME match_equal COMMAND match_equal)
 #add_test(NAME replanner_40 COMMAND replanner ../170924_1321_badrun/ 2 1)
-#add_test(NAME replanner_68 COMMAND replanner ../251023_TAGET/ 2 1)
+add_test(NAME replanner_68 COMMAND replanner ../251023_TAGET/ 2 1)
 
 # add_test(NAME replanner_68_9 COMMAND replanner ../251023_TAGET/ 9 1 34)
 # add_test(NAME replanner_68_11 COMMAND replanner ../251023_TAGET/ 11 1 34)
