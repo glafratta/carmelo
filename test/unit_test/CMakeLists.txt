@@ -127,7 +127,8 @@ add_test(NAME get_disturbance_3r COMMAND get_disturbance 3 1)
 add_test(NAME get_disturbance_4r COMMAND get_disturbance 4)
 add_test(NAME get_disturbance_4dr COMMAND get_disturbance 4 2 1)
 
-add_test(NAME disturbance_dimensions_0 COMMAND disturbance_dimensions)
+add_test(NAME disturbance_dimensions_1d COMMAND disturbance_dimensions)
+add_test(NAME disturbance_dimensions_2d COMMAND disturbance_dimensions 2)
 
 
 add_test(NAME explorer_no COMMAND explorer)

@@ -3,17 +3,27 @@
 
 int main(int argc, char** argv){
     //generate points
-    std::vector <cv::Point2f> pts;
-    float x=0, y=-0.05, width=0, length=0;
-    for (int i=0; i<11; i++){
-        pts.push_back(Pointf(x, y));
-        y+=0.01;
+    int n_dimensions=1;
+    if (argc>1){
+        n_dimensions=atoi(argv[1]);
     }
+    std::vector <cv::Point2f> pts, box_points;
+    float x=0, y=-0.05, width=0, length=0;
+    for (int j=0; j<n_dimensions; j++){
+        for (int i=0; i<11; i++){
+            pts.push_back(Pointf(x, y));
+            y+=0.01;
+        }
+        x+=0.05;        
+    }
+
     WorldBuilder wb;
     std::pair<bool,BodyFeatures> feature_bb= wb.bounding_box(pts);
     std::pair<bool,BodyFeatures> feature_rot= wb.bounding_rotated_box(pts);
     feature_rot.second.halfLength=round(feature_rot.second.halfLength*1000)/1000;
     feature_rot.second.halfWidth=round(feature_rot.second.halfWidth*1000)/1000;
+    auto rr= cv::minAreaRect(pts);
+    cv::boxPoints(rr, box_points);
 
     if (fabs(feature_rot.second.halfLength-0.05)>0.001){
         throw std::logic_error("wrong half length\n");
