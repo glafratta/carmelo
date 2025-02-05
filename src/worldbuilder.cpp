@@ -53,7 +53,9 @@ std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <c
         result.second.setHalfWidth(rotated_rect.size.width/2);
     }
     result.second.pose.p=b2Vec2(rotated_rect.center.x, rotated_rect.center.y);
-    result.second.pose.q.Set(rotated_rect.angle*DEG_TO_RAD_K);
+    float angle_rad=rotated_rect.angle*DEG_TO_RAD_K;
+    result.second.pose.q.Set(angle_rad);
+    result.second.pose.q.Set(atan(result.second.pose.q.s/result.second.pose.q.c));
     result.first=true;
     return result;
 }
