@@ -161,7 +161,11 @@ void StateDifference::fill_valid_bodyfeatures(BodyFeatures & bf, const State& s1
 	}
 	bf.pose.p.x= p1.p.x - p2.p.x; //disturbance x
 	bf.pose.p.y= p1.p.y - p2.p.y; //disturbance y
-	bf.pose.q.Set(angle_subtract(p1.q.GetAngle(), p2.q.GetAngle()));
+	float pose_q= angle_subtract(p1.q.GetAngle(), p2.q.GetAngle());
+	if (pose_q>M_PI_2){
+		pose_q-=3.14;
+	}
+	bf.pose.q.Set(pose_q);
 
 }
 

@@ -37,10 +37,10 @@ int main(int argc, char** argv){
     //auto rr= cv::minAreaRect(pts);
     //cv::boxPoints(rr, box_points);
 
-    if (fabs(feature_rot.second.halfLength-min_d*(n_dimensions-1))>0.001){
+    if (fabs(feature_rot.second.halfLength*2-min_d*n_dimensions*10)>0.001){
         throw std::logic_error("wrong half length\n");
     }
-    if (fabs(feature_rot.second.halfWidth*2-min_d*n_dimensions*10)>0.001){
+    if (fabs(feature_rot.second.halfWidth-min_d*(n_dimensions-1))>0.001){
         throw std::logic_error("wrong half width\n");
     }
     // if (feature_rot.second.pose.p.x != x*x_incr*10 || feature_rot.second.pose.p.y!=0){

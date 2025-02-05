@@ -1622,37 +1622,33 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(S
 // 	return result;
 // }
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(vertexDescriptor v, TransitionSystem& g, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor>* others){
-	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::_FALSE, TransitionSystem::null_vertex());
-	auto vs= boost::vertices(g);
-	//float prob=0;
-	int nObs=0;
-	for (auto vi=vs.first; vi!= vs.second; vi++){
-		if (*vi!=v){
-			std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
-			bool Tmatch=true;
-			//if (dir!=Direction::UNDEFINED){
-			Tmatch= !ie.empty()||dir==Direction::UNDEFINED;
-			//}
-			if (StateMatcher::MATCH_TYPE m=matcher.isMatch(g[v], g[*vi]); matcher.match_equal(m, match_type) && *vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>=ie.size()){ //
-			//std::pair<bool, edgeDescriptor> most_likely=gt::getMostLikely(g, ie);
-			//if (!most_likely.first){
-			//}
-			//else if (g[most_likely.second].probability>prob){
-				if(g[v].nObs>nObs){
-				result.first=matcher.isMatch(g[v], g[*vi]);
-				result.second=*vi;
-				//prob=g[most_likely.second].probability;
-				nObs=g[v].nObs;
-				if (NULL!=others){
-					others->push_back(result.first);
-				}
-			}
-		}
-		}
-	}
-	return result;
-}
+// std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> Configurator::findMatch(vertexDescriptor v, TransitionSystem& g, Direction dir, StateMatcher::MATCH_TYPE match_type, std::vector <vertexDescriptor>* others){
+// 	std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> result(StateMatcher::_FALSE, TransitionSystem::null_vertex());
+// 	auto vs= boost::vertices(g);
+// 	//float prob=0;
+// 	int nObs=0;
+// 	for (auto vi=vs.first; vi!= vs.second; vi++){
+// 		if (*vi!=v){
+// 			std::vector <edgeDescriptor> ie=gt::inEdges(g, v, dir);
+// 			bool Tmatch=true;
+// 			//if (dir!=Direction::UNDEFINED){
+// 			Tmatch= !ie.empty()||dir==Direction::UNDEFINED;
+// 			//}
+// 			if (StateMatcher::MATCH_TYPE m=matcher.isMatch(g[v], g[*vi]); matcher.match_equal(m, match_type) && *vi!=movingVertex &Tmatch & boost::in_degree(*vi, g)>=ie.size()){ //
+// 				if(g[v].nObs>nObs){
+// 				result.first=matcher.isMatch(g[v], g[*vi]);
+// 				result.second=*vi;
+// 				//prob=g[most_likely.second].probability;
+// 				nObs=g[v].nObs;
+// 				if (NULL!=others){
+// 					others->push_back(result.first);
+// 				}
+// 			}
+// 		}
+// 		}
+// 	}
+// 	return result;
+// }
 
 void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
