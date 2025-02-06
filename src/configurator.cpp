@@ -204,7 +204,7 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World & world, const Direction& dir){
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
-		std::vector <edgeDescriptor> out=gt::outEdges(g, v, DEFAULT);
+		std::vector <edgeDescriptor> out=gt::outEdges(g, v, UNDEFINED);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
 			if (visited.first ||out.empty()){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){

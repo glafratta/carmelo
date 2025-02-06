@@ -176,6 +176,7 @@ void gt::fill(simResult sr, State* s, Edge* e){
 	}
 	if (NULL!=e){
 		e->step = gt::simToMotorStep(sr.step);
+
 	}
 }
 
@@ -220,10 +221,14 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
+	g[e.m_target].filled=g[e.m_target].filled;
 	g[e].it_observed=it;
 }
 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
+	if (g[e.m_target].filled){
+		return;
+	}
 	update(e, sk, g, current, errorMap, it);
 	g[e.m_target].outcome = sk.first.outcome;
 }
