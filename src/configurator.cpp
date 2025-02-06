@@ -202,19 +202,15 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	return result;
 }
 Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World & world, const Direction& dir){
-	//std::vector <edgeDescriptor> oe=gt::outEdges(g, v, DEFAULT);
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
+		std::vector <edgeDescriptor> out=gt::outEdges(g, v, DEFAULT);
 		std::pair <bool,edgeDescriptor> visited= gt::visitedEdge(in,g, v);
-		//if (oe.empty()){
-			if (visited.first){
+			if (visited.first ||out.empty()){
 				if (g[v].Di.isValid() && g[v].Di.affordanceIndex==AVOID && g[visited.second].direction!=dir){
-					//potentially if dir=DEF start from g[v].start
-					//b2World world_tmp(b2Vec2_zero);
 					Task task(g[v].Di, DEFAULT, g[v].endPose, true);
 					Robot robot(&world);
 					robot.body->SetTransform(task.start.p, task.start.q.GetAngle());
-					//b2Body * d=worldBuilder.makeBody(world, g[v].Di.bf);
 					b2AABB box =worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 					b2Fixture *sensor =GetSensor(robot.body);
 					bool overlap=overlaps(robot.body, &g[v].Di) && sensor;
@@ -227,11 +223,8 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				return controlGoal.disturbance;
 			}
 			else if (v==movingVertex){
-			// 	std::pair< bool, edgeDescriptor> e=gt::getMostLikely(g, oe, iteration);
-			// 	return g[e.second.m_target].Dn; //IS THIS GOING TO GIVE ME PROBLEMS
 			return g[v].Di;
 			}
-		//}
 	}
 	return g[v].Dn;
 	//return controlGoal.disturbance;

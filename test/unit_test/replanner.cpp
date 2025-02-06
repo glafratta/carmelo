@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> options_src;
     State state_tmp;
     b2Transform shift= b2Transform(b2Vec2(1,0), b2Rot(0));
-    math::applyAffineTrans(shift, conf.transitionSystem);    
+    math::applyAffineTrans(-shift, conf.transitionSystem);    
     if (argc>4){
         di.iteration=atoi(argv[4]);
         di.newScanAvail();          
