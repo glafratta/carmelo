@@ -27,6 +27,13 @@ b2Transform State::end_from_Dn()const{
 	return Dn.pose()-endPose; //START
 }
 
+b2Transform State::end_from_Di()const{
+	if (Di.getAffIndex()==NONE){
+		return b2Transform_inf;
+	}
+	return Di.pose()-endPose; //START
+}
+
 float State::distance(){
 	return (start-endPose).p.Length();
 }

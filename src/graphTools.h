@@ -89,6 +89,8 @@ struct State{
 
 	b2Transform end_from_Dn()const;
 
+	b2Transform end_from_Di()const;
+
 	float distance();
 
 };

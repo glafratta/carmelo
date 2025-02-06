@@ -138,7 +138,7 @@ void dummy_vertex(vertexDescriptor src);
 float taskRotationError(); // returns lateral displacement error (local y)
 
 //inputs: g, src vertex, b2d world, direction of the task to be created
-Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &, const Direction &);
+Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &, const Direction &, const b2Transform&);
 
 Task task_to_execute(const TransitionSystem &, const edgeDescriptor&);
 

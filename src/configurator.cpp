@@ -202,7 +202,7 @@ std::pair <bool, Direction> Configurator::getOppositeDirection(Direction d){
 	}
 	return result;
 }
-Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World & world, const Direction& dir){
+Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescriptor& v, b2World & world, const Direction& dir, const b2Transform& start){
 	if (!g[v].Dn.isValid() ){
 		std::vector <edgeDescriptor> in=gt::inEdges(g, v, UNDEFINED);
 		std::vector <edgeDescriptor> out=gt::outEdges(g, v, UNDEFINED);
@@ -217,7 +217,9 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					bool overlap=overlaps(robot.body, &g[v].Di) && sensor;
 					worldBuilder.world_cleanup(&world);
 					if (overlap){
-						return g[v].Di;
+						Disturbance Di= g[v].Di;
+						g[v].Di.bf.pose=start+g[v].end_from_Di();
+						return Di;
 					}
 				}
 				//check if Di was eliminated 
