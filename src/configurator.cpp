@@ -340,7 +340,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
-						math::applyAffineTrans(-g[task_start].start, &controlGoal_adjusted);
+						math::applyAffineTrans(g[task_start].start, &controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
 						shift= start-g[task_start].start;
@@ -381,7 +381,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		evaluationQueue.push_back(v1);
 		}
 	}
-	backtrack(evaluationQueue, priorityQueue, closed, g);
+	backtrack(evaluationQueue, priorityQueue, closed, g, plan_prov);
 	bestNext=priorityQueue[0];
 	if (controlGoal.getAffIndex()==PURSUE){
 			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
@@ -462,7 +462,7 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 }
 
 
-void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g){
+void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g, std::vector <vertexDescriptor>& plan){
 	for (vertexDescriptor v:evaluation_q){
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, &ep); 
@@ -483,7 +483,7 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			}
 			EndedResult local_er=estimateCost(g[split_v],g[split_v].start, direction);
 			g[split_v].phi=evaluationFunction(local_er);
-			applyTransitionMatrix(g, split_v, direction, local_er.ended,src, planVertices);
+			applyTransitionMatrix(g, split_v, direction, local_er.ended,src, plan);
 			addToPriorityQueue(split_v, priority_q, g, closed);
 			src=split_v;
 		}
