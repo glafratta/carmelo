@@ -218,7 +218,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					worldBuilder.world_cleanup(&world);
 					if (overlap){
 						Disturbance Di= g[v].Di;
-						Di.bf.pose=start+g[v].end_from_Di();
+						Di.bf.pose+= start-g[v].endPose;
 						return Di;
 					}
 				}
@@ -393,7 +393,8 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		direction=currentTask.direction;
 	}
 	else{
-	direction = g[best_in_edges[0]].direction;
+		direction = g[best_in_edges[0]].direction;
+		g[best_in_edges[0]].it_observed=iteration;
 	}
 }while(g[bestNext].options.size()>0);
 printf("finished exploring\n");

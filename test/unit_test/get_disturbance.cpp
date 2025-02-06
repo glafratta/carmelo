@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 // std::pair <edgeDescriptor, bool> edge=conf.add_vertex_now(src, v, conf.transitionSystem, obstacle);
     //conf.transitionSystem[v].options.push_back(curr_d);
 
-    Disturbance result = conf.getDisturbance(conf.transitionSystem, conf.currentVertex, world, curr_d);
+    Disturbance result = conf.getDisturbance(conf.transitionSystem, conf.currentVertex, world, curr_d, b2Transform_zero);
     //debug_draw(world, 43);
     if (result==solution){
         return 0;
