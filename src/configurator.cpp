@@ -282,9 +282,9 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
-		if (er.ended){
-			break;
-		}
+		// if (er.ended){
+		// 	break;
+		// }
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
@@ -1671,7 +1671,7 @@ void Configurator::updateGraph(TransitionSystem&g, b2Transform * _deltaPose){
 	debug::print_pose(deltaPose);
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
 	math::applyAffineTrans(deltaPose, g);
-	math::applyAffineTrans(deltaPose, &controlGoal);
+	math::applyAffineTrans(-deltaPose, &controlGoal);
 }
 
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){

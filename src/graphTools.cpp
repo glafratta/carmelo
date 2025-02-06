@@ -53,8 +53,8 @@ void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
 	// pose.p.x= og_x* cos(pose.q.GetAngle())+ og_y*sin(pose.q.GetAngle());
 	// pose.p.y= og_y* cos(pose.q.GetAngle())- og_x*sin(pose.q.GetAngle());
-	pose.p.x+=deltaPose.p.x; //-
-	pose.p.y+=deltaPose.p.y; //-
+	pose.p.x-=deltaPose.p.x; //-
+	pose.p.y-=deltaPose.p.y; //-
 }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
