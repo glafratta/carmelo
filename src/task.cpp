@@ -340,7 +340,7 @@ EndedResult Task::checkEnded(b2Transform robotTransform, Direction dir,bool rela
 				//pos_local=robot->GetLocalPoint(pos_local);
 				std::vector <b2Vec2> local_vertices=GetLocalPoints(disturbance.vertices(), robot);
 				b2Vec2 pos_local=*(std::min_element(local_vertices.begin(), local_vertices.end(), CompareX()));
-				r.ended=fabs(round(pos_local.x*100)/100)<=((endCriteria.distance.get()-0.001)/2); //-0.001 //was /2
+				r.ended=fabs(round(pos_local.x*100)/100)<=(round((endCriteria.distance.get()-0.001)/2)*1000/1000); //-0.001 //was /2
 			}
 			else if (relax){
 				Distance _d(RELAXED_DIST_ERROR_TOLERANCE);
