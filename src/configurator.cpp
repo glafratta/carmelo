@@ -277,12 +277,14 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
 	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
-	printf("EXPLORING\n");
 	do{
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
+		if (er.ended){
+			break;
+		}
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
@@ -462,20 +464,12 @@ std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, Tran
 
 void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::vector <vertexDescriptor>&priority_q, const std::set<vertexDescriptor>& closed, TransitionSystem&g){
 	for (vertexDescriptor v:evaluation_q){
-		// std::vector <edgeDescriptor> ie=gt::inEdges(g, v);
-		// std::pair<bool, edgeDescriptor> ep= gt::visitedEdge(ie, g,currentVertex);
-		// if (!ep.first){
-		// 	ep=gt::getMostLikely(g, ie, iteration);
-		// }
-		// b2Transform start=g[ep.second.m_source].endPose;
 		std::pair<bool, edgeDescriptor> ep(false, edgeDescriptor());
 		std::vector <vertexDescriptor> split = gt::task_vertices(v, g, iteration, currentVertex, &ep); 
-		//vertexDescriptor src=ep.second.m_source;
 		Direction direction= g[ep.second].direction;
 		if (split.size()<2){
 			split =splitTask(v, g, DEFAULT, ep.second.m_source);
 		}
-		//else if (split.size())
 		for (int i=0; i<split.size(); i++){ //
 			vertexDescriptor split_v=split[i], src=TransitionSystem::null_vertex();
 			if (i<1){
@@ -493,10 +487,6 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 			addToPriorityQueue(split_v, priority_q, g, closed);
 			src=split_v;
 		}
-		// if (ep.second.m_source!=split[0]){
-		// 	boost::remove_edge(ep.second.m_source, v, g);
-		// 	boost::add_edge(ep.second.m_source, split[0], g);
-		// }
 	}
 	evaluation_q.clear();
 
@@ -1108,9 +1098,9 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
 		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		auto e=boost::edge(src, v0, g);
-		if (v0!=currentVertex){
+	//	if (v0!=currentVertex){
 			skip_reduced(e.first, g, plan_prov, it);
-		}
+	//	}
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
 		}
