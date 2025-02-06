@@ -66,7 +66,7 @@ int main(int argc, char** argv){
     std::vector <vertexDescriptor> evaluationQ={v1, v2, v3}, priorityQ;
     std::set <vertexDescriptor> closed;
     //backtrack
-    conf.backtrack(evaluationQ, priorityQ, closed, conf.transitionSystem);
+    conf.backtrack(evaluationQ, priorityQ, closed, conf.transitionSystem, conf.planVertices);
     boost::print_graph(conf.transitionSystem);
     auto vs=boost::vertices(conf.transitionSystem);
     for (auto vi=vs.first; vi!=vs.second;vi++){
