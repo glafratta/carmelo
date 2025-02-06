@@ -218,7 +218,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 					worldBuilder.world_cleanup(&world);
 					if (overlap){
 						Disturbance Di= g[v].Di;
-						g[v].Di.bf.pose=start+g[v].end_from_Di();
+						Di.bf.pose=start+g[v].end_from_Di();
 						return Di;
 					}
 				}
