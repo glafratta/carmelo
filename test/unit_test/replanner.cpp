@@ -81,7 +81,7 @@ int main(int argc, char** argv){
     //     conf.recall_plan_from(o, conf.transitionSystem, world, plan_provisional, plan_works, &state_tmp.Dn);
     // }
     if (conf.transitionSystem.m_vertices.size() > n_v){
-        printf("size error = %i\n", conf.transitionSystem.m_vertices.size());
+        printf("size error = %i\n", conf.transitionSystem.m_vertices.size()-n_v);
         return 2;
     }
 

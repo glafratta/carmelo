@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <math.h>
 #include<vector>
+#include <map>
 const float SAFE_ANGLE =M_PI_2;
 const float MAX_TURN =M_PI;
 const float ROBOT_HALFWIDTH =0.135; //uncomment for robot
@@ -50,7 +51,16 @@ const int DC=0; //HZ
 const int cutoff_frequency=4; //HZ
 const float band_width=0.5;
 const uintptr_t ROBOT_FLAG=0x1, DISTURBANCE_FLAG=0x2;
-//delete
+//KINEMATICS
+
+const float WHEEL_SPEED_DEFAULT=0.5f;
+const float WHEEL_SPEED_TURN=float((M_PI_4*BETWEEN_WHEELS)/(MAX_SPEED*2)); //0.353429f; //0.218182f;
+ 
+const std::map <Direction, std::pair<float, float>> default_kinematics={{DEFAULT, std::pair<float, float>(WHEEL_SPEED_DEFAULT, 0)},
+                                                                         {LEFT, std::pair<float, float>(0, WHEEL_SPEED_TURN)},
+                                                                         {RIGHT, std::pair<float, float>(0, -WHEEL_SPEED_TURN)}};
+
+
 
 class Robot {
 private: 

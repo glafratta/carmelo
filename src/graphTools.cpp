@@ -346,6 +346,11 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 		}
 	}
 	result=boost::add_edge(u, v, g);
+	if (d==DEFAULT){
+		float delta=0;
+		auto values =(*default_kinematics.find(d)).second;
+		g[result.first].step=distanceToSimStep(g[v].distance(), values.first);
+	}
 	g[result.first].it_observed=it;
 	return result;
 }
@@ -429,51 +434,12 @@ bool StateMatcher::match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& de
 				result=true;
 			}
 			break;
-		// case D_POSE:
-		// 	if (candidate==_TRUE || candidate==DISTURBANCE || candidate==D_POSE){
-		// 		result=true;
-		// 	}
-		// 	break;
 		default:
 			result =int(candidate)==int(desired);
 		break;
 	}
 	return result;
 }
-
-// StateDifference StateMatcher::get_state_difference(State s1, State s2){
-// 	StateDifference result;
-// 	result.D_position.x= s1.disturbance.getPosition().x - s2.disturbance.getPosition().x; //disturbance x
-// 	result.D_position.y= s1.disturbance.getPosition().y - s2.disturbance.getPosition().y; //disturbance y
-// 	result.D_type= s1.disturbance.getAffIndex()-s2.disturbance.getAffIndex(); //disturbance type
-// 	result.r_position.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
-// 	result.r_position.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
-// 	//adjusting for angles with different signs close to pi
-// 	// float candidate_angle=s2.endPose.q.GetAngle();
-// 	// if (fabs(s1.endPose.q.GetAngle())> 3*M_PI_4 || fabs(candidate_angle)> 3*M_PI_4){
-// 	// 	if (s1.endPose.q.GetAngle()<0 & candidate_angle>0){
-// 	// 		candidate_angle-=2*M_PI;
-// 	// 	}
-// 	// 	else if(candidate_angle<0 & s1.endPose.q.GetAngle()>0){
-// 	// 		candidate_angle+=2*M_PI;
-// 	// 	}
-// 	// }
-// 	// result.ppse.q.=s1.endPose.q.GetAngle()-candidate_angle;
-// 	result.r_angle= get_angle_difference(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle());
-// 	result.D_angle=get_angle_difference(s1.disturbance.pose().q.GetAngle(), s2.disturbance.pose().q.GetAngle());
-// 	result.D_width=(s1.disturbance.bodyFeatures().halfWidth-s2.disturbance.bodyFeatures().halfWidth)*2;
-// 	result.D_length=(s1.disturbance.bodyFeatures().halfLength-s2.disturbance.bodyFeatures().halfLength)*2;
-// 	return result;
-// }
-
-
-// float StateMatcher::sumVector(DistanceVector vec){
-// 	float result=0;
-// 	for (float i:vec){
-// 		result+=abs(i);
-// 	}
-// 	return result;
-// }
 
 
 

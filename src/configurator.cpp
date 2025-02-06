@@ -286,11 +286,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
 	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
+	EndedResult er;
 	do{
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
-		EndedResult er = controlGoal.checkEnded(g[v], t.direction);
+		er = controlGoal.checkEnded(g[v], t.direction);
 		// if (er.ended){
 		// 	break;
 		// }
@@ -355,9 +356,9 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						shift= start-g[task_start].start;
 						if (finished){
 							plan_prov=plan_tmp;
+							plan_prov.insert(plan_prov.begin(), task_start);
 							boost::remove_edge(edge.first, g);
 							edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
-							//edge=new_edge;
 							if (t.direction== g[edge.first].direction){
 								g[v0].options.clear();
 							}
@@ -374,27 +375,19 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
 					gt::adjustProbability(g, edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
-					// if (edge.first!= new_edge.first && new_edge.first!=edgeDescriptor()){
-					// 	boost::remove_edge(edge.first, g);
-					// }
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
 				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
-				v0=v1;			
-				//pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
-			
+				v0=v1;						
 			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
 		evaluationQueue.push_back(v1);
 		}
 	}
 	backtrack(evaluationQueue, priorityQueue, closed, g, plan_prov);
 	bestNext=priorityQueue[0];
-	if (controlGoal.getAffIndex()==PURSUE){
-			//printf("best=%i, options=%i\n", bestNext, g[bestNext].options);
-	}
 	std::vector <edgeDescriptor> best_in_edges= gt::inEdges(g,bestNext);
 	if (best_in_edges.empty()){
 		direction=currentTask.direction;
@@ -403,7 +396,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		direction = g[best_in_edges[0]].direction;
 		g[best_in_edges[0]].it_observed=iteration;
 	}
-}while(g[bestNext].options.size()>0);
+}while(g[bestNext].options.size()>0 && !er.ended);
 printf("finished exploring\n");
 return plan_prov;
 }
