@@ -187,10 +187,7 @@ void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Tran
 void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, std::vector<vertexDescriptor>&, const Direction&, TransitionSystem &);
 
 
-
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer_old(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
-
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
+std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
 
 std::pair <bool, Direction> getOppositeDirection(Direction);
 

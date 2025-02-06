@@ -112,13 +112,14 @@ bool Configurator::Spawner(){
 		// }
 	// bool 	plan_works=false;
 	// // }
-	 std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 //	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		//boost::clear_vertex(movingVertex, transitionSystem);
 		if (transitionSystem.m_vertices.size()==1){
 			dummy_vertex(currentVertex);//currentEdge.m_source
 			currentTask.change=1;
 		}
+		//ro remove fr
+		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
 		if (!planVertices.empty() && currentTask.motorStep!=0){
 			src=movingVertex;
@@ -127,18 +128,22 @@ bool Configurator::Spawner(){
 			src=currentVertex;
 		}
 		resetPhi(transitionSystem);
-		toRemove=explorer(src, transitionSystem, currentTask, world);
+		
+		planVertices=explorer(src, transitionSystem, currentTask, world);
 		clearFromMap(toRemove, transitionSystem, errorMap);
 		ts_cleanup(&transitionSystem);
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
-		planVertices= planner(transitionSystem, src);
+		if (planVertices.empty()){
+			planVertices= planner(transitionSystem, src);
+		}
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
 		printPlan();
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
+		
 		explored=1;
 //	}
 
@@ -229,7 +234,9 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 			return g[v].Di;
 			}
 	}
-	return g[v].Dn;
+	Disturbance Dn= g[v].Dn;
+	Dn.bf.pose+= start-g[v].endPose;
+	return Dn;
 	//return controlGoal.disturbance;
 }
 
@@ -272,13 +279,13 @@ simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ /
 	}
 
 
-std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
+std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, TransitionSystem& g, Task t, b2World & w){
 	vertexDescriptor v1=v, v0=v, bestNext=v, v0_exp=v;
 	Direction direction=currentTask.direction;
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
-	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
+	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	do{
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
@@ -377,7 +384,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;			
-				pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
+				//pruneEdges(toPrune,g, v, v0_exp, priorityQueue, toRemove);
 			
 			}while(t.direction !=DEFAULT & int(g[v0].options.size())!=0);
 		evaluationQueue.push_back(v1);
@@ -398,7 +405,7 @@ std::vector <std::pair<vertexDescriptor, vertexDescriptor>>Configurator::explore
 	}
 }while(g[bestNext].options.size()>0);
 printf("finished exploring\n");
-return toRemove;
+return plan_prov;
 }
 
 std::vector <vertexDescriptor> Configurator::splitTask( vertexDescriptor v, TransitionSystem& g, Direction d, vertexDescriptor src){
