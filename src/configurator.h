@@ -144,7 +144,7 @@ Task task_to_execute(const TransitionSystem &, const edgeDescriptor&);
 
 simResult simulate(Task, b2World &, float _simulationStep=BOX2DRANGE);
 
-void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&);
+void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&, std::vector <vertexDescriptor>&);
 
 std::vector <vertexDescriptor> splitTask(vertexDescriptor v, TransitionSystem&, Direction, vertexDescriptor src=TransitionSystem::null_vertex());
 
@@ -185,11 +185,8 @@ std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescripto
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end
 
 void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, std::vector<vertexDescriptor>&, const Direction&, TransitionSystem &);
-//bool edgeExists(vertexDescriptor, vertexDescriptor, TransitionSystem&);
 
-//void backtrackingBuildTree(vertexDescriptor v, TransitionSystem&g, Task s, b2World & w, std::vector <vertexDescriptor>&); //builds the whole tree and finds the best solution
 
-//void DFIDBuildTree(vertexDescriptor, TransitionSystem&, Task, b2World &, vertexDescriptor &); //only expands after the most optimal node
 
 std::vector<std::pair<vertexDescriptor, vertexDescriptor>> explorer_old(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
 
