@@ -186,6 +186,7 @@ void Configurator::resetPhi(TransitionSystem&g){
 	auto vs=boost::vertices(g);
 	for (auto vi=vs.first; vi!=vs.second; vi++){
 		g[*vi].resetVisited();
+		g[*vi].options.clear();
 	}
 }
 
