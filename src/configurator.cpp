@@ -1668,10 +1668,10 @@ void Configurator::updateGraph(TransitionSystem&g, b2Transform * _deltaPose){
 		deltaPose=*_deltaPose;
 	}
 	printf("displacement: ");
-	debug::print_pose(-deltaPose);
+	debug::print_pose(deltaPose);
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
-	math::applyAffineTrans(-deltaPose, g);
-	math::applyAffineTrans(-deltaPose, &controlGoal);
+	math::applyAffineTrans(deltaPose, g);
+	math::applyAffineTrans(deltaPose, &controlGoal);
 }
 
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){
