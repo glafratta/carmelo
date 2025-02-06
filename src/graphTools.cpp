@@ -208,15 +208,6 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!current){
 		g[e].step = sk.second.step;
 	}
-	// else if (g[e].direction==DEFAULT& g[e.m_target].disturbance.isValid()){
-	// 	result.setR(g[e.m_target].disturbance.getPosition().x-sk.first.disturbance.getPosition().x);
-	// 	errorMap.insert_or_assign(g[e.m_target].ID, result);
-	// }
-	// else if ((g[e.m_target].direction==LEFT || g[e.m_target].direction==RIGHT )& g[e.m_target].disturbance.isValid()){
-	// 	orientation o=subtract(g[e.m_target].disturbance.getOrientation(),sk.first.disturbance.getOrientation());
-	// 	result.setTheta(o.second);
-	// 	errorMap.insert_or_assign(g[e.m_target].ID, result);
-	// }
 	g[e.m_target].Dn = sk.first.Dn;
 	if(sk.first.label==g[e.m_target].label){
 		g[e.m_target].endPose = sk.first.endPose;
@@ -235,7 +226,6 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
 	update(e, sk, g, current, errorMap, it);
 	g[e.m_target].outcome = sk.first.outcome;
-	//g[e.m_target].label=sk.first.label;
 }
 
 std::vector <edgeDescriptor> gt::outEdges(TransitionSystem&g, vertexDescriptor v, Direction d){

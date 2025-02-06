@@ -1686,15 +1686,11 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
-	// if (planVertices.empty() & planning){
-	// 	return error;
-	// }
-	//PROLONGING DURATION OF TASK IF NEEDED
-	std::unordered_map<State*, ExecutionError>::iterator it;
-	// if (it=errorMap.find(transitionSystem[currentVertex].ID); it!=errorMap.end()){
-	// 	error=it->second;
-	// 	it->second=ExecutionError();
-	// }
+	//sensor: get points of disturbance
+	//get min area rect
+	//compare pos/orientation	
+
+	//STEP STUFF, TO BE DELETED
 	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
 		t.motorStep--;
 		//printf("step =%i\n", t.motorStep);
@@ -1708,7 +1704,7 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 		t.motorStep+=correction; //reflex
 	}		
 
-	updateGraph(transitionSystem, error);//lateral error is hopefully noise and is ignored
+	updateGraph(transitionSystem);//lateral error is hopefully noise and is ignored
 	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
 	if(t.motorStep==0){
 		t.change=1;
@@ -1833,15 +1829,19 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-
-void Configurator::updateGraph(TransitionSystem&g, ExecutionError error){
+void Configurator::updateGraph(TransitionSystem&g, b2Transform * _deltaPose){
 	b2Transform deltaPose;
-	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK +error.theta();
-	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	deltaPose=b2Transform(b2Vec2(xdistance,
+	if (NULL==_deltaPose){
+		float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK;
+		float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+		float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+		deltaPose=b2Transform(b2Vec2(xdistance,
 					ydistance), 
 					b2Rot(angularDisplacement));
+	}
+	else{
+		deltaPose=*_deltaPose;
+	}
 	printf("displacement: ");
 	debug::print_pose(-deltaPose);
 	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);

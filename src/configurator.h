@@ -158,7 +158,7 @@ void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
 void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
-void updateGraph(TransitionSystem&, ExecutionError error=ExecutionError());
+void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
