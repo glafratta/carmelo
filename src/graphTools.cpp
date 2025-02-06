@@ -221,7 +221,7 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	if (!g[e.m_target].visited()){
 		g[e.m_target].phi=sk.first.phi;
 	}
-	g[e.m_target].filled=g[e.m_target].filled;
+	g[e.m_target].filled=sk.first.filled;
 	g[e].it_observed=it;
 }
 
