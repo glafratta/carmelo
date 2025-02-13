@@ -12,7 +12,7 @@ find_package(OpenCV REQUIRED)
 
 find_package(box2d REQUIRED)
 
-#find_package(PkgConfig)
+find_package(PkgConfig)
 
 add_library(CloCK ${SRC} ${HEAD})
 
