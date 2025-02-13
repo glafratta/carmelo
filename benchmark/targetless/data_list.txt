@@ -1,9 +1,0 @@
-stats161024_1410.txt
-stats161024_1412.txt
-stats161024_1413.txt
-stats161024_1452.txt
-stats161024_1454.txt
-stats161024_1456.txt
-stats161024_1602.txt
-stats161024_1604.txt
-stats161024_1607.txt
