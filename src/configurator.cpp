@@ -336,8 +336,10 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
+					printf("match with %i\n", v1);
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
 						if (edge.second){
+							printf("added edge: %i -> %i, step=%i\n", v0, v1, sk.second.step);
 							g[edge.first]=sk.second; //doesn't update motorstep
 						}
 					if (plan_prov.empty()&&currentTask.motorStep==0){
@@ -352,7 +354,9 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						if (finished){
 							plan_prov=plan_tmp;
 							plan_prov.insert(plan_prov.begin(), task_start);
+							printf("pre-removed edge\n");
 							boost::remove_edge(edge.first, g);
+							printf("removed edge\n");
 							edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
 							if (t.direction== g[edge.first].direction){
 								g[v0].options.clear();
