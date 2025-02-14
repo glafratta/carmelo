@@ -52,9 +52,12 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
+		mapCount++;
+		if (mapCount<5){
+			return;
+		}
 		//ci->data.clear();
 		ci->data2fp.clear();
-		mapCount++;
 		Pointf p, p2f;
 		FILE *f;
 		char name[256];
