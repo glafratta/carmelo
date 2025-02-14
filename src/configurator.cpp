@@ -114,13 +114,14 @@ bool Configurator::Spawner(){
 	// // }
 //	if (!plan_works){	// boost::out_degree(src, transitionSystem) <1		
 		//boost::clear_vertex(movingVertex, transitionSystem);
+		vertexDescriptor src=movingVertex; //ve=TransitionSystem::null_vertex(),
 		if (transitionSystem.m_vertices.size()==1){
-			dummy_vertex(currentVertex);//currentEdge.m_source
+			//dummy_vertex(currentVertex);//currentEdge.m_source
 			currentTask.change=1;
+			src=currentVertex;
 		}
 		//ro remove fr
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-		vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
 		if (!planVertices.empty() && currentTask.motorStep!=0){
 			src=movingVertex;
 		}
@@ -285,7 +286,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
-	printf("hello");
+	printf("hello\n");
 	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	EndedResult er;
 	do{
@@ -1008,7 +1009,7 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			c->ci->ready=0;
 			c->data2fp= CoordinateContainer(c->ci->data2fp);
-			printf("spawn");
+			printf("spawn\n");
 			c->Spawner();
 		}
 	}
