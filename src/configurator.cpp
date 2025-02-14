@@ -61,10 +61,10 @@ std::pair <edgeDescriptor, bool> Configurator::add_vertex_retro(vertexDescriptor
 
 bool Configurator::Spawner(){ 
 	//PREPARE VECTORS TO RECEIVE DATA
-	if (data2fp.empty()){
-		printf("data empty!\n");
-		return 1;
-	}
+	// if (data2fp.empty()){
+	// 	printf("data empty!\n");
+	// 	return 1;
+	// }
 	//currentBox2D = CoordinateContainer(data2fp);
 	iteration++; //iteration set in getVelocity
 	worldBuilder.iteration++;
