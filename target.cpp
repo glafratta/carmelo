@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 		configurator.planning= atoi(argv[2]);
 	}
 	if (configurator.planning){
-		configurator.setBenchmarking(1, "forward-recycle");
+		configurator.setBenchmarking(1, "rt-update", "/tmp");
 	}
 	if (argc>1){
 		configurator.debugOn= atoi(argv[1]);

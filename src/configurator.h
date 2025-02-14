@@ -83,11 +83,16 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
 
-void setBenchmarking(bool b, char * new_folder){
+void setBenchmarking(bool b, char * new_folder, char * _dir=NULL){
 	benchmark =b;
 		if (benchmark){
 		char dirName[50];
-		sprintf(dirName, "benchmark");
+		if (_dir==NULL){
+			sprintf(dirName, "benchmark");
+		}
+		else{
+			sprintf(dirName, _dir);
+		}
 		if (!opendir(dirName)){
 			mkdir(dirName, 0777);
 		}

@@ -1,9 +1,0 @@
-stats151024_1922.txt
-stats151024_1928.txt
-stats151024_1935.txt
-stats151024_1936.txt
-stats151024_1939.txt
-stats151024_1941.txt
-stats151024_1946.txt
-stats151024_1952.txt
-stats151024_2017.txt
