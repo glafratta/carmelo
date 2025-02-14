@@ -655,6 +655,8 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			}
 			//printf("inner loop v %i \t", end);
 			debug::print_pose(g[end].endPose);	
+			auto now_time=std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float, std::milli>time_elapsed= start_time- now_time;
 		}
 //		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
