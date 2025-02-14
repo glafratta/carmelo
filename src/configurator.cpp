@@ -653,10 +653,14 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				//printf("new empty path\n");
 				break;
 			}
-			//printf("inner loop v %i \t", end);
+			printf("inner loop v %i \t", end);
 			debug::print_pose(g[end].endPose);	
 			auto now_time=std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float, std::milli>time_elapsed= start_time- now_time;
+			if (abs(time_elapsed.count()) >100){
+			printf("stuck planning, exiting\n");
+			return plan;
+		}
 		}
 //		priorityQueue.erase(priorityQueue.begin());
 		for (vertexDescriptor c:add){
@@ -692,7 +696,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			final_phi=g[end_plan].phi;
 		}
 	}
-	//printf("PLANNED!\n");
+	printf("PLANNED!\n");
 	// if (_finished && g[plan[plan.size()-1]].Dn.getAffIndex()==NONE){
 	// 	g[plan[plan.size()-1]].Dn=controlGoal.disturbance;
 	// 	g[plan[plan.size()-1]].Dn.invalidate();
