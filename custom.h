@@ -53,9 +53,6 @@ public:
 			return;
 		}
 		mapCount++;
-		if (mapCount<5){
-			return;
-		}
 		//ci->data.clear();
 		ci->data2fp.clear();
 		Pointf p, p2f;
