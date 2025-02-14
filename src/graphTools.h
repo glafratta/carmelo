@@ -200,7 +200,7 @@ struct Connected{
 	bool operator()(const vertexDescriptor& v)const{
 	 	bool in= boost::in_degree(v, *g)>0;
 		bool out =boost::out_degree(v, *g)>0;
-	 	return in || out;
+	 	return (in || out) || v==0;
 	}
 private:
 TransitionSystem * g;
