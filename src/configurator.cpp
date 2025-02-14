@@ -1008,6 +1008,7 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			c->ci->ready=0;
 			c->data2fp= CoordinateContainer(c->ci->data2fp);
+			printf("spawn");
 			c->Spawner();
 		}
 	}

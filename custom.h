@@ -59,7 +59,7 @@ public:
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
-		//printf("%s\n", name);
+		printf("%s\n", name);
 		if (ci->debugOn){
 			f=fopen(name, "w");
 		}
