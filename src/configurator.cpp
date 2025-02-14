@@ -336,17 +336,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
 					v1=match.second; //frontier
-					//if ((v0!=v1)){
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
-						//new_edge=edge;
-						//edge.second=true; //just means that the edge is valid
 						if (edge.second){
 							g[edge.first]=sk.second; //doesn't update motorstep
 						}
-					//}
 					if (plan_prov.empty()&&currentTask.motorStep==0){
 						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
-						//std::pair<bool, edgeDescriptor> e_tmp(edge.second, edge.first);
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
@@ -369,8 +364,17 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					}
 				}
 				else{
+					auto out_expected=gt::outEdges(g, v0, t.direction);
 					edge= add_vertex_now(v0, v1,g,sk.first.Di, sk.second); //addVertex
 					g[edge.first.m_target].label=sk.first.label; //new edge, valid
+					if (!out_expected.empty()){
+						printf("thought it'd be vertex %i \t", out_expected[0]);
+						printf("difference in d: ");
+						debug::print_pose(g[out_expected[0].m_target].Dn.pose()-g[v1].Dn.pose());
+					}
+					auto d_print=dirmap.find(t.direction);
+					printf("added v %i to %i, direction %s\n", v1, v0, (*d_print).second);
+
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
