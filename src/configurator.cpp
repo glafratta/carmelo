@@ -116,9 +116,9 @@ bool Configurator::Spawner(){
 		//boost::clear_vertex(movingVertex, transitionSystem);
 		vertexDescriptor src=movingVertex; //ve=TransitionSystem::null_vertex(),
 		if (transitionSystem.m_vertices.size()==1){
-			//dummy_vertex(currentVertex);//currentEdge.m_source
+			dummy_vertex(currentVertex);//currentEdge.m_source
 			currentTask.change=1;
-			src=currentVertex;
+			//src=currentVertex;
 		}
 		//ro remove fr
 		std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
@@ -144,9 +144,7 @@ bool Configurator::Spawner(){
 		}
 		printPlan();
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
-		
-		explored=1;
-//	}
+		//	}
 
 
 	}
@@ -1595,14 +1593,14 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		}
 		//printf("change plan\n");
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-	//	printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
+		printf("ep exists=%i, src=%i, tgt=%i\n", !ep.second, ep.first.m_source, ep.first.m_target);
 		currentVertex= pv[0];
 		pv.erase(pv.begin());
 		currentEdge=ep.first;
 		transitionSystem[movingVertex].Di=transitionSystem[currentVertex].Di;
 		boost::clear_vertex(movingVertex, transitionSystem);
 		transitionSystem[movingVertex].outcome=simResult::successful;
-	//	printf("changed current %i + cleared 0\n", currentVertex);
+		printf("changed current %i + cleared 0\n", currentVertex);
 		movingEdge=boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
 		transitionSystem[movingEdge].direction=transitionSystem[ep.first].direction;
 		transitionSystem[movingEdge].step=currentTask.motorStep;
