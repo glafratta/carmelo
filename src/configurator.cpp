@@ -602,6 +602,7 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	std::vector <vertexDescriptor> add;
 	std::vector<std::vector<vertexDescriptor>>::reverse_iterator path= paths.rbegin();
 	vertexDescriptor path_end=src;
+	auto start_time=std::chrono::high_resolution_clock::now();
 	do{
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
 		if (src==currentVertex){
@@ -669,6 +670,12 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			goal=path_end;
 		}
 		//printf("outer loop\n");
+		auto now_time=std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float, std::milli>time_elapsed= start_time- now_time;
+		if (abs(time_elapsed.count()) >100){
+			printf("stuck planning, exiting\n");
+			return plan;
+		}
 	}while(!priorityQueue.empty() && (path_end!=goal && !(_finished)));
 	auto vs=boost::vertices(g);
 	float final_phi=10000;
