@@ -313,7 +313,13 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
+				if (data2fp.empty()){
+					printf("data empty\n");
+				}
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
+				if (data2fp.empty()){
+					printf("finished empty data\n");
+				}
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
 				sk.second.it_observed=iteration;
