@@ -1586,6 +1586,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			//if (currentVertex!=movingVertex){
 				printf("I DON'T KNOW WHAT TO DO NOW\n");
 				currentTask=Task(STOP);
+				currentTask.change=1;
 			//}
 			//printf("no plan, bas\n");
 			return pv;
