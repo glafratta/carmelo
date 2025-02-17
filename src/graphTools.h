@@ -217,9 +217,10 @@ struct NotSelfEdge{
 	NotSelfEdge(TransitionSystem * _g): g(_g){}
 
 	bool operator()(const edgeDescriptor & e) const {
-		bool not_self= e.m_source!=e.m_target && (*g)[e].step!=0; 
+		bool not_self= e.m_source!=e.m_target && (*g)[e].step!=0 ; 
 		if (e.m_source==e.m_target){
-			printf("p = %i, step=%i, keep=%i\n",  e.m_source,  (*g)[e].step, not_self);
+			not_self=(*g)[e].step>gt::distanceToSimStep(BOX2DRANGE-DISTANCE_ERROR_TOLERANCE);
+			printf("p = %i, step=%i is not 0 =%i, keep=%i\n",  e.m_source,  (*g)[e].step, (*g)[e].step!=0, not_self);
 		}
 		return not_self;
 	}
