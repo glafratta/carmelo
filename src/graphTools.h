@@ -218,8 +218,8 @@ struct NotSelfEdge{
 
 	bool operator()(const edgeDescriptor & e) const {
 		bool not_self= e.m_source!=e.m_target && (*g)[e].step!=0; 
-		if (e.m_source!=e.m_target){
-			printf("step=%i, keep=%i\n", (*g)[e].step, not_self);
+		if (e.m_source==e.m_target){
+			printf("p = %i, step=%i, keep=%i\n",  e.m_source,  (*g)[e].step, not_self);
 		}
 		return not_self;
 	}
