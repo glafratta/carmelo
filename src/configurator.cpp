@@ -1359,8 +1359,8 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 					if (ei3!=ei2 && ei2!=ei){
 						if (ei2!=es2.second){
 							ei2++;
-						ei3=ei2;
-						es3=es2;						}
+							ei3=ei2;
+							es3=es2;						}
 					}					
 				}
 				//printf("is stuck, ei3=%i ->%i\n", (*ei).m_source, (*ei).m_target);

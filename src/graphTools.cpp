@@ -13,25 +13,35 @@ orientation subtract(orientation o1, orientation o2){
 	return result;
 }
 
+
+
 b2Transform State::start_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Di.pose()-start; //START
+	//return Di.pose()-start; //START
+	//return b2MulT(start, Di.pose());
+	return math::transpose_transform(Di.pose(), start);
 }
 
 b2Transform State::end_from_Dn()const{
 	if (Dn.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Dn.pose()-endPose; //START
+	//return Dn.pose()-endPose; //START
+	//b2Vec2 v= b2MulT(endPose, Dn.pose().p);
+	//float theta= Dn.pose().q.GetAngle()-endPose.q.GetAngle();
+	return math::transpose_transform(Dn.pose(), endPose);
+
 }
 
 b2Transform State::end_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Di.pose()-endPose; //START
+	//return Di.pose()-endPose; //START
+	//return b2MulT(endPose, Di.pose());
+	return math::transpose_transform(Di.pose(), endPose);
 }
 
 float State::distance(){
@@ -52,6 +62,14 @@ float angle_subtract(float a1, float a2){
 	result=a1-a2;
 	return result;
 }
+
+b2Transform math::transpose_transform(const b2Transform & wp, const b2Transform & self){
+	b2Vec2 v= b2MulT(self, wp.p);
+	float theta= angle_subtract(wp.q.GetAngle(), self.q.GetAngle());
+	return b2Transform(v, b2Rot(theta));
+
+}
+
 
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
 	pose.q.Set(pose.q.GetAngle()+deltaPose.q.GetAngle());

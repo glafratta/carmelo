@@ -19,6 +19,10 @@
 #include <utility>
 #include "disturbance.h"
 
+namespace math{
+	b2Transform transpose_transform(const b2Transform & wp, const b2Transform & self);
+};
+
 const float NAIVE_PHI=10.0;
 // enum M_CODES {THREE_M=3, FOUR_M=4};
 
