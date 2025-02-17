@@ -131,11 +131,11 @@ bool Configurator::Spawner(){
 		resetPhi(transitionSystem);
 		
 		planVertices=explorer(src, transitionSystem, currentTask, world);
-		clearFromMap(toRemove, transitionSystem, errorMap);
-		ts_cleanup(&transitionSystem);
+		//clearFromMap(toRemove, transitionSystem, errorMap);
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
-		}
+		}		
+		ts_cleanup(&transitionSystem);
 		if (planVertices.empty()){
 			printf("no plan, searchign from %i\n", src);
 			planVertices= planner(transitionSystem, src);
@@ -144,9 +144,9 @@ bool Configurator::Spawner(){
 			printf("recycled plan in explorer:\n");
 			printPlan();
 		}
-		if (debugOn){
-			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
-		}
+		// if (debugOn){
+		// 	debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
+		// }
 		printPlan();
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		//	}
