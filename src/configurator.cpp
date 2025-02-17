@@ -137,7 +137,12 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
 		if (planVertices.empty()){
+			printf("empty plan, searching\n");
 			planVertices= planner(transitionSystem, src);
+		}
+		else{
+			printf("plan in explorer\n");
+			printPlan();
 		}
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
@@ -159,7 +164,7 @@ bool Configurator::Spawner(){
 		}
 		float _simulationStep=simulationStep;
 		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
-		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
+		worldBuilder.buildWorld(world, data2fp,gi transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(currentTask, world, _simulationStep); //transitionSystem[currentVertex],transitionSystem[currentVertex],
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
@@ -1368,30 +1373,30 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 }
 
 void Configurator::recall_plan_from(const vertexDescriptor& v, TransitionSystem & g, b2World &world,  std::vector <vertexDescriptor>& plan_provisional, bool & plan_works, Disturbance *dist){
-   // printf("recalling\n");
-	auto srcs= gt::inEdges(g, v);
-    vertexDescriptor src=v;
-    if(!srcs.empty()){
-		src= srcs[0].m_source;
-	}
-	b2Transform o_shift= -g[v].start;
-	printf("shift\n");
-	//debug::print_pose(o_shift);
-	Task controlGoal_adjusted= controlGoal;
-	math::applyAffineTrans(o_shift, &controlGoal_adjusted);
-	bool ctrl_finished=false;
-	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted, &ctrl_finished); //been.second, been.first
-	//printf("provisional plan from v%i\n", v);
-	printPlan(&plan_provisional);
-	auto vi= (plan_provisional.end()-1);
-	vertexDescriptor end =*(vi);
-	if (ctrl_finished){
-		plan_works= checkPlan(world, plan_provisional, g, *dist,  g[movingVertex].start,src);
-		if (plan_works){
-			return;
-		}
-	}
-	plan_provisional.clear();
+//    // printf("recalling\n");
+// 	auto srcs= gt::inEdges(g, v);
+//     vertexDescriptor src=v;
+//     if(!srcs.empty()){
+// 		src= srcs[0].m_source;
+// 	}
+// 	b2Transform o_shift= -g[v].start;
+// 	printf("shift\n");
+// 	//debug::print_pose(o_shift);
+// 	Task controlGoal_adjusted= controlGoal;
+// 	math::applyAffineTrans(o_shift, &controlGoal_adjusted);
+// 	bool ctrl_finished=false;
+// 	plan_provisional=planner(g, src, TransitionSystem::null_vertex(), false, &controlGoal_adjusted, &ctrl_finished); //been.second, been.first
+// 	//printf("provisional plan from v%i\n", v);
+// 	printPlan(&plan_provisional);
+// 	auto vi= (plan_provisional.end()-1);
+// 	vertexDescriptor end =*(vi);
+// 	if (ctrl_finished){
+// 		plan_works= checkPlan(world, plan_provisional, g, *dist,  g[movingVertex].start,src);
+// 		if (plan_works){
+// 			return;
+// 		}
+// 	}
+// 	plan_provisional.clear();
 
 }
 
