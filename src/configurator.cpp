@@ -137,11 +137,11 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
 		if (planVertices.empty()){
-			printf("empty plan, searching from %i\n", src);
+			printf("no plan, searchign from %i\n", src);
 			planVertices= planner(transitionSystem, src);
 		}
 		else{
-			printf("plan in explorer\n");
+			printf("recycled plan in explorer:\n");
 			printPlan();
 		}
 		if (debugOn){
@@ -164,7 +164,7 @@ bool Configurator::Spawner(){
 		}
 		float _simulationStep=simulationStep;
 		adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
-		worldBuilder.buildWorld(world, data2fp,gi transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
+		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
 		simResult result = simulate(currentTask, world, _simulationStep); //transitionSystem[currentVertex],transitionSystem[currentVertex],
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
