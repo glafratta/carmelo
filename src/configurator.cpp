@@ -7,7 +7,7 @@ void math::applyAffineTrans(const b2Transform& deltaPose, Task* task){
 	// if (task.disturbance.getAffIndex()!=NONE){
 	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
 	// }
-	applyAffineTrans(-deltaPose, task->disturbance);
+	applyAffineTrans(deltaPose, task->disturbance);
 }
 
 
@@ -357,7 +357,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
-						shift= start-g[task_start].start;
+						shift= b2MulT(g[task_start].start, start);
 						if (finished){
 							plan_prov=plan_tmp;
 							plan_prov.insert(plan_prov.begin(), task_start);
