@@ -62,7 +62,10 @@ int main(int argc, char** argv){
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
-    
+    if (argc > 5){
+        conf.controlGoal.disturbance.bf.pose = -shift;
+        printf("back");
+    }
     conf.planVertices.clear();
     conf.Spawner();
     conf.printPlan(&conf.planVertices);
