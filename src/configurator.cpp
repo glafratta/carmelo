@@ -610,10 +610,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 	auto start_time=std::chrono::high_resolution_clock::now();
 	do{
 		frontier_v=frontierVertices(src, g, DEFAULT, been);
-		if (src==currentVertex){
-		}
+		// if (src==currentVertex){
+		// }
 		priorityQueue.erase(priorityQueue.begin());
 		for (Frontier f: frontier_v){ //add to priority queue
+			printf("frontier count:%i\n", frontier_v.size());
 			planPriority(g, f.first);
 			addToPriorityQueue(f, priorityQueue, g);
 		}
@@ -655,10 +656,8 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 			if ( path==paths.rend()) { //if there are no other paths
 				paths.push_back(std::vector<vertexDescriptor>()); //make a new one
 				path=paths.rbegin();
-				//printf("new empty path\n");
 				break;
 			}
-			//printf("inner loop v %i \t", end);
 			debug::print_pose(g[end].endPose);	
 			auto now_time=std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float, std::milli>time_elapsed= now_time - start_time;
