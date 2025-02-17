@@ -114,6 +114,7 @@ void step( AlphaBot &motors){
 	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended && c->getTask()->motorStep==0){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		//printf("goal reached\n");
+		run++;
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
 		c->controlGoal = Task(new_goal, UNDEFINED);
 		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
