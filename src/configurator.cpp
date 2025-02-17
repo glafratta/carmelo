@@ -1303,9 +1303,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 	std::pair<edgeDescriptor, bool> ep=boost::edge(movingVertex, v, g); 
 	vertexDescriptor v0=v, v1=v, v0_exp;
 	//do{
-		if ((controlGoal.disturbance.getPosition()-g[v].endPose.p).Length() < DISTANCE_ERROR_TOLERANCE){
-		}
-		else{
+		if ((controlGoal.disturbance.getPosition()-g[v].endPose.p).Length() >= DISTANCE_ERROR_TOLERANCE){
 			auto es=boost::out_edges(v, g);
 			for (auto ei=es.first; ei!=es.second; ei++){
 			std::vector <vertexDescriptor>connecting;
@@ -1313,8 +1311,9 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 			auto es2=boost::out_edges((*ei).m_target, g);
 			auto es3=es2;
 			std::vector <vertexDescriptor>connecting2;
+			NotSelfEdge not_self_edge(&g);
 			do {
-				if ((g[(*ei3).m_target].visited() || been)&& (*ei3).m_source!=(*ei3).m_target){
+				if ((g[(*ei3).m_target].visited() || been)&& not_self_edge(*ei3)){ //(*ei3).m_source!=(*ei3).m_target
 					if (!g[(*ei3).m_target].visited()){
 						EndedResult er = estimateCost(g[(*ei3).m_target], g[(*ei3).m_source].endPose, g[*ei3].direction);
 						g[(*ei3).m_target].phi=evaluationFunction(er);
