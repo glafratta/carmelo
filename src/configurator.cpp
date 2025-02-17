@@ -653,12 +653,13 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				//printf("new empty path\n");
 				break;
 			}
-			printf("inner loop v %i \t", end);
+			//printf("inner loop v %i \t", end);
 			debug::print_pose(g[end].endPose);	
 			auto now_time=std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float, std::milli>time_elapsed= start_time- now_time;
+			printf("inner loop count= %i\n", time_elapsed.count());
 			if (abs(time_elapsed.count()) >100){
-			printf("stuck planning, exiting\n");
+				printf("stuck planning, exiting\n");
 			return plan;
 		}
 		}
@@ -675,9 +676,9 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		if (_finished){
 			goal=path_end;
 		}
-		//printf("outer loop\n");
 		auto now_time=std::chrono::high_resolution_clock::now();
 		std::chrono::duration<float, std::milli>time_elapsed= start_time- now_time;
+		printf("outer loop count= %i\n", time_elapsed.count());
 		if (abs(time_elapsed.count()) >100){
 			printf("stuck planning, exiting\n");
 			return plan;
