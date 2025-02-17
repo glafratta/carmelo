@@ -137,7 +137,7 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}
 		if (planVertices.empty()){
-			printf("empty plan, searching\n");
+			printf("empty plan, searching from %i\n", src);
 			planVertices= planner(transitionSystem, src);
 		}
 		else{
