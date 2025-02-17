@@ -20,7 +20,10 @@
 #include "disturbance.h"
 
 namespace math{
-	b2Transform transpose_transform(const b2Transform & wp, const b2Transform & self);
+	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
+
+
+	b2Transform returnAffineTrans(const b2Transform & dp, b2Transform pose);
 };
 
 const float NAIVE_PHI=10.0;
@@ -173,7 +176,6 @@ typedef boost::graph_traits<TransitionSystem>::edge_iterator edgeIterator;
 
 
 namespace math {
-	void applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose);
 
 	void applyAffineTrans(const b2Transform&, State& );
 
