@@ -131,9 +131,6 @@ void StateDifference::init(const State& s1, const State& s2){ //observed, desire
 	pose.p.x= s1.endPose.p.x-s2.endPose.p.x; //endpose x
 	pose.p.y=s1.endPose.p.y-s2.endPose.p.y; //endpose y
 	pose.q.Set(angle_subtract(s1.endPose.q.GetAngle(), s2.endPose.q.GetAngle()));
-	// if (s1.Dn.getAffIndex()==NONE && s2.Dn.getAffIndex()==NONE){
-	// 	return;
-	// }
 	if (s1.Dn.getAffIndex()!= s2.Dn.getAffIndex()){
 		fill_invalid_bodyfeatures(Dn);
 	}
@@ -210,15 +207,6 @@ int gt::distanceToSimStep(const float& s, const float& ds){
 	return sim_step;
 }
 
-// simResult State::getSimResult(){
-// 	simResult result;
-// 	result.collision= disturbance;
-// 	result.endPose=endPose;
-// 	//result.step= step;
-// 	result.valid = filled;
-// 	result.resultCode=outcome;
-// 	return result;
-// }
 
 void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
 	if (e==edgeDescriptor()){

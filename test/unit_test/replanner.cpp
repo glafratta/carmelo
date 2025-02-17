@@ -64,6 +64,7 @@ int main(int argc, char** argv){
     }
     if (argc > 5){
         conf.controlGoal.disturbance.bf.pose = -shift;
+        conf.controlGoal.disturbance.bf.pose.q.Set(-M_PI);
         printf("back");
     }
     conf.planVertices.clear();

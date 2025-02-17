@@ -353,7 +353,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
-						math::applyAffineTrans(g[task_start].start, &controlGoal_adjusted);
+						math::applyAffineTrans(-g[task_start].start, &controlGoal_adjusted);
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
 						shift= start-g[task_start].start;
