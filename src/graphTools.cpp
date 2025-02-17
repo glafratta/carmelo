@@ -19,17 +19,16 @@ b2Transform State::start_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Di.pose()-start; //START
-	//return b2MulT(start, Di.pose());
+	//return Di.pose()-start; //START
+	return b2MulT(start, Di.pose());
 }
 
 b2Transform State::end_from_Dn()const{
 	if (Dn.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Dn.pose()-endPose; //START
-	//return b2MulT(endPose, Dn.pose());
-	//float theta= Dn.pose().q.GetAngle()-endPose.q.GetAngle();
+	//return Dn.pose()-endPose; //START
+	return b2MulT(endPose, Dn.pose());
 
 }
 
@@ -37,8 +36,8 @@ b2Transform State::end_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	return Di.pose()-endPose; //START
-	//return b2MulT(endPose, Di.pose());
+	//return Di.pose()-endPose; //START
+	return b2MulT(endPose, Di.pose());
 }
 
 float State::distance(){
@@ -63,20 +62,19 @@ float angle_subtract(float a1, float a2){
 
 
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
-	pose.q.Set(pose.q.GetAngle()+deltaPose.q.GetAngle());
-	pose.p.x-=deltaPose.p.x; //-
-	pose.p.y-=deltaPose.p.y; //-
-	float og_x= pose.p.x, og_y=pose.p.y;
-	pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
-	pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
-	// pose.p.x= og_x* cos(pose.q.GetAngle())+ og_y*sin(pose.q.GetAngle());
-	// pose.p.y= og_y* cos(pose.q.GetAngle())- og_x*sin(pose.q.GetAngle());
+	// pose.q.Set(pose.q.GetAngle()+deltaPose.q.GetAngle());
+	// pose.p.x-=deltaPose.p.x; //-
+	// pose.p.y-=deltaPose.p.y; //-
+	// float og_x= pose.p.x, og_y=pose.p.y;
+	// pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
+	// pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
+	pose =b2MulT(deltaPose, pose);
 }
 
-b2Transform math::returnAffineTrans(const b2Transform & dp, b2Transform pose){
-	applyAffineTrans(dp, pose);
-	return pose;
-}
+// b2Transform math::returnAffineTrans(const b2Transform & dp, b2Transform pose){
+// 	applyAffineTrans(dp, pose);
+// 	return pose;
+// }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	applyAffineTrans(deltaPose, state.endPose);
