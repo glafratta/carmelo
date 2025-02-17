@@ -20,7 +20,7 @@ b2Transform State::start_from_Di()const{
 		return b2Transform_inf;
 	}
 	//return Di.pose()-start; //START
-	return b2MulT(-start, Di.pose());
+	return b2MulT(start, Di.pose());
 }
 
 b2Transform State::end_from_Dn()const{
@@ -28,7 +28,7 @@ b2Transform State::end_from_Dn()const{
 		return b2Transform_inf;
 	}
 	//return Dn.pose()-endPose; //START
-	return b2MulT(-endPose, Dn.pose());
+	return b2MulT(endPose, Dn.pose());
 
 }
 
@@ -37,7 +37,7 @@ b2Transform State::end_from_Di()const{
 		return b2Transform_inf;
 	}
 	//return Di.pose()-endPose; //START
-	return b2MulT(-endPose, Di.pose());
+	return b2MulT(endPose, Di.pose());
 }
 
 float State::distance(){
