@@ -97,7 +97,7 @@ bool Configurator::Spawner(){
 		}
 		//ro remove fr
 		//std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
-		if (currentTask.motorStep!=0){ //!planVertices.empty() && 
+		if (!planVertices.empty() || currentTask.motorStep!=0){ //
 			src=movingVertex;
 			printf("set src=%i\n", src);
 		}
