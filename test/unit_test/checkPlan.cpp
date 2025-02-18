@@ -61,11 +61,18 @@ int main(int argc, char** argv){
         di.newScanAvail();          
         conf.data2fp = ci.data2fp;
     }
-    conf.debugOn=1;
-  //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
+//     conf.debugOn=1;
+//   //  bool plan_works= conf.checkPlan(world,conf.planVertices, conf.transitionSystem, conf.transitionSystem[solution].Dn, conf.transitionSystem[conf.movingVertex].start);
     
 
-   // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+    boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
+    vertexDescriptor src; //ve=TransitionSystem::null_vertex(),
+    if (!conf.planVertices.empty() && conf.getTask()->motorStep!=0){
+        src=conf.movingVertex;
+    }
+    else {
+        src=conf.currentVertex;
+    }
     conf.resetPhi(conf.transitionSystem);
     //int og_step=0;
     //conf.changeTask(true, og_step, conf.planVertices);
