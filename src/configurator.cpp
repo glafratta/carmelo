@@ -1137,11 +1137,11 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		transitionMatrix(g[v0], d, src);
 	}
 	if (v0==currentVertex){
-		printf("options before unexplored= %i \t", g[v0].options);
+		printf("options before unexplored= %i \t", g[v0].options.size());
 	}
 	unexplored_transitions(g, v0);
 	if (v0==currentVertex){
-		printf("options after unexplored= %i \t", g[v0].options);
+		printf("options after unexplored= %i \t", g[v0].options.size());
 	}
 
 }
