@@ -1120,7 +1120,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	//if (v0!=currentVertex &&  uint(src)<(g.m_vertices.size()-1)){
 		auto e=boost::edge(src, v0, g); //not adding options to vertices which don't cover a distance unless they're current v
 		if (e.second){
-			if (g[e.first].step==0){
+			if (g[e.first].step==0 && g[v0].outcome!=simResult::crashed){
 				printf("bypassing\n");
 				return;
 			}			
