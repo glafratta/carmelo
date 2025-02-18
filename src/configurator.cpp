@@ -278,6 +278,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		// 	break;
 		// }
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
+		printf("v options: %i\n", g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
 			std::vector <Direction> options=g[v0_exp].options;
@@ -296,6 +297,9 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				adjustStepDistance(v0, g, &t, _simulationStep);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
+				if (v==0 && sim.resultCode==sim.crashed){
+					printf("IM GONNA CRASH!!!!\n");
+				}
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
 				sk.second.it_observed=iteration;
@@ -321,7 +325,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					printf("match with %i\n", v1);
 						edge= gt::add_edge(v0, v1, g, iteration, t.direction); //assumes edge added
 						if (edge.second){
-							printf("added edge: %i -> %i, step=%i\n", v0, v1, sk.second.step);
+							//printf("added edge: %i -> %i, step=%i\n", v0, v1, sk.second.step);
 							g[edge.first]=sk.second; //doesn't update motorstep
 						}
 					if (plan_prov.empty()&&currentTask.motorStep==0){

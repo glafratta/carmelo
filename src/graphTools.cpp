@@ -346,7 +346,7 @@ std::pair <edgeDescriptor, bool> gt::add_edge(const vertexDescriptor & u, const 
 		}
 	}
 	result=boost::add_edge(u, v, g);
-	if (d==DEFAULT){
+	if (d==DEFAULT && result.second){
 		float delta=0;
 		auto values =(*default_kinematics.find(d)).second;
 		g[result.first].step=distanceToSimStep(g[v].distance(), values.first);
