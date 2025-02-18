@@ -99,9 +99,11 @@ bool Configurator::Spawner(){
 		//std::vector <std::pair <vertexDescriptor, vertexDescriptor>> toRemove;
 		if (!planVertices.empty() && currentTask.motorStep!=0){
 			src=movingVertex;
+			printf("set src=%i\n", src);
 		}
 		else {
 			src=currentVertex;
+			printf("set src=%i\n", src);
 		}
 		resetPhi(transitionSystem);
 		planVertices=explorer(src, transitionSystem, currentTask, world);
