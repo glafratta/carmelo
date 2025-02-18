@@ -66,6 +66,7 @@ int main(int argc, char** argv){
         return 2;
     }
     if (og_plan!=conf.planVertices){
+        printf("wrong plan\n");
         return 1;
     }
      
