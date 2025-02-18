@@ -267,6 +267,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	EndedResult er;
 	printf("v=%i\n",v);
+	printf("GOAL IS: ");
+	debug::print_pose(controlGoal.disturbance.pose());
 	do{
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
