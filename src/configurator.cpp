@@ -357,8 +357,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
-						shift= b2MulT(g[task_start].start, start); //Mult()
-						//shift=start-g[task_start].start;
+						shift= b2MulT(g[task_start].start, start);
 						if (finished){
 							plan_prov=plan_tmp;
 							plan_prov.insert(plan_prov.begin(), task_start);
@@ -394,7 +393,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
-				//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
+				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;						
@@ -1537,7 +1536,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 	else{
 		start=g[v].endPose +shift;
 	}
-	shift=b2Transform_zero;
+	//shift=b2Transform_zero;
 }
 
 
