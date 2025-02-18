@@ -1115,7 +1115,7 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 		return;
 	}
 	//if (src!=movingVertex  && uint(src)<(g.m_vertices.size()-1)){ //src< v size is to check that src isn't a garbage value (was giving throuble with tests)
-	if (v0!=currentVertex){
+	if (v0!=currentVertex &&  uint(src)<(g.m_vertices.size()-1)){
 		auto e=boost::edge(src, v0, g); //not adding options to vertices which don't cover a distance unless they're current v
 		if (e.second){
 			if (g[e.first].step==0){
