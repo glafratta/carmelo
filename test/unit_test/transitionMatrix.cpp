@@ -102,6 +102,7 @@ int main(int argc, char** argv){
     conf.dummy_vertex(conf.currentVertex);
     vertexDescriptor v1=boost::add_vertex(conf.transitionSystem);
     auto e=boost::add_edge(conf.currentVertex, v1, conf.transitionSystem);
+    conf.transitionSystem[e.first].step=1;
     Direction direction=DEFAULT;
     simResult::resultType outcome=simResult::successful;
     if (argc>2){

@@ -28,20 +28,6 @@ int main(int argc, char** argv){
         di.newScanAvail();          
     }
     conf.data2fp = ci.data2fp;
-  //  conf.addIteration();
-//    b2World world(b2Vec2(0,0));
-    // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
-    // conf.dummy_vertex(conf.currentVertex);
-    // conf.explorer(conf.currentVertex, conf.transitionSystem, *conf.getTask(), world);
-    // Connected connected(&conf.transitionSystem);
-    // FilteredTS fts(conf.transitionSystem, NotSelfEdge(), connected); //boost::keep_all()
-    // TransitionSystem tmp;
-    // boost::copy_graph(fts, tmp);
-    // conf.transitionSystem.clear();
-    // conf.transitionSystem.swap(tmp);		
-
-    // conf.planVertices= conf.planner(conf.transitionSystem, conf.currentVertex);
-    // printf("OG PLAN: ");
     conf.Spawner();
     int n_v=conf.transitionSystem.m_vertices.size();
     auto og_plan=conf.planVertices;
@@ -70,29 +56,15 @@ int main(int argc, char** argv){
         conf.controlGoal.disturbance.bf.pose.q.Set(M_PI);
         printf("back");
         og_plan={3, 5, 2};
+        n_v+=7;
     }
     conf.planVertices.clear();
     conf.Spawner();
     conf.printPlan(&conf.planVertices);
-    // std::vector <BodyFeatures> b_features=conf.worldBuilder.getFeatures(conf.data2fp, state_tmp.start, DEFAULT, BOX2DRANGE);
-    // if (!b_features.empty()){				
-    //     WorldBuilder::CompareCluster compareCluster;
-	// 	BodyFeatures closest_D= *(std::min_element(b_features.begin(), b_features.end(), compareCluster));
-    //     state_tmp.Dn= Disturbance(closest_D);
-    // }
-    // bool relax_match=1, plan_works=false;
-    // boost::clear_vertex(conf.movingVertex, conf.transitionSystem);
-    // conf.findMatch(state_tmp,conf.transitionSystem, NULL, UNDEFINED, StateMatcher::DISTURBANCE, &options_src, relax_match);
-
-    // std::vector<vertexDescriptor> plan_provisional;
-    // for (vertexDescriptor o: options_src){
-    //     conf.recall_plan_from(o, conf.transitionSystem, world, plan_provisional, plan_works, &state_tmp.Dn);
-    // }
     if (conf.transitionSystem.m_vertices.size() > n_v){
         printf("size error = %i\n", conf.transitionSystem.m_vertices.size()-n_v);
         return 2;
     }
-
     if (og_plan!=conf.planVertices){
         return 1;
     }

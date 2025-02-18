@@ -1124,19 +1124,21 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	if (src!=movingVertex && g[boost::edge(src, v0, g).first].step==0){
-		return;
+	if (src!=movingVertex  && uint(src)<(g.m_vertices.size()-1)){ //src< v size is to check that src isn't a garbage value (was giving throuble with tests)
+		auto e=boost::edge(src, v0, g);
+		if (e.second){
+			if (g[e.first].step==0){
+				return;
+			}			
+		}
 	}
 	if (v0==movingVertex || src==TransitionSystem::null_vertex()){
 		transitionMatrix(g[v0], DEFAULT, TransitionSystem::null_vertex());	
 		//return;
 	}
 	else if (auto it =check_vector_for(plan_prov, v0); it!=plan_prov.end() && it!=(plan_prov.end()-1)){
-		//auto e =boost::edge(v0, *(it+1), g); //assuming there is an edge!
 		auto e=boost::edge(src, v0, g);
-	//	if (v0!=currentVertex){
-			skip_reduced(e.first, g, plan_prov, it);
-	//	}
+		skip_reduced(e.first, g, plan_prov, it);
 		if ((g[e.first.m_target].visited()&& g[e.first].it_observed<iteration)|| !g[e.first.m_target].visited()){ // 
 			g[v0].options={g[e.first].direction};
 		}
