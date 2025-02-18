@@ -278,7 +278,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		// 	break;
 		// }
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
-		printf("v options: %i\n", g[v].options.size());
+		printf("v %i options: %i\n", v,  g[v].options.size());
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
 			std::vector <Direction> options=g[v0_exp].options;
@@ -1114,11 +1114,12 @@ void Configurator::applyTransitionMatrix(TransitionSystem&g, vertexDescriptor v0
 	else if(round(g[v0].endPose.p.Length()*100)/100>=BOX2DRANGE){ // OR g[vd].totDs>4
 		return;
 	}
-	//if (src!=movingVertex  && uint(src)<(g.m_vertices.size()-1)){ //src< v size is to check that src isn't a garbage value (was giving throuble with tests)
-	if (v0!=currentVertex &&  uint(src)<(g.m_vertices.size()-1)){
+	if (src!=movingVertex  && uint(src)<(g.m_vertices.size()-1)&& v0!=movingVertex){ //src< v size is to check that src isn't a garbage value (was giving throuble with tests)
+	//if (v0!=currentVertex &&  uint(src)<(g.m_vertices.size()-1)){
 		auto e=boost::edge(src, v0, g); //not adding options to vertices which don't cover a distance unless they're current v
 		if (e.second){
 			if (g[e.first].step==0){
+				printf("bypassing\n");
 				return;
 			}			
 		}
