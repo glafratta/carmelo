@@ -385,7 +385,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					}
 					auto d_print=dirmap.find(t.direction);
 					printf("added v %i to %i, direction %s\n", v1, v0, (*d_print).second);
-
+					shift=b2Transform_zero;
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, errorMap, iteration);
@@ -393,7 +393,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
-				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
+				propagateD(v1, v0, g,&propagated, &closed); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;						
@@ -510,17 +510,15 @@ void Configurator::backtrack(std::vector <vertexDescriptor>& evaluation_q, std::
 
 }
 
-std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed,StateMatcher::MATCH_TYPE match){
-	std::vector<std::pair<vertexDescriptor, vertexDescriptor>> deletion;
+void Configurator::propagateD(vertexDescriptor v1, vertexDescriptor v0,TransitionSystem&g, std::vector<vertexDescriptor>*propagated, std::set <vertexDescriptor>*closed,StateMatcher::MATCH_TYPE match){
 	if (g[v1].outcome == simResult::successful){
-		return deletion;
+		return;
 	}
 	vertexDescriptor p=TransitionSystem::null_vertex();
 	std::pair <edgeDescriptor, bool> ep= boost::edge(v0, v1, g);
 	Disturbance dist = g[v1].Dn;
-	//while (ep.second){
 	if (!ep.second){
-		return deletion;
+		return;
 	}
 	Direction dir= g[ep.first].direction;
 	bool same_Di=g[ep.first.m_source].Di==g[ep.first.m_target].Di;
@@ -533,7 +531,7 @@ std::vector<std::pair<vertexDescriptor, vertexDescriptor>> Configurator::propaga
 	if (v1==currentVertex){
 		g[v0].outcome=simResult::safeForNow;
 	}
-	return deletion;
+	return;
 }
 
 void Configurator::pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>> vertices, TransitionSystem& g, vertexDescriptor& src, vertexDescriptor& active_src, std::vector <vertexDescriptor>& pq, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&toRemove){ //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
@@ -1528,7 +1526,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 }
 
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, b2Transform& shift){
+void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
 		start = g[e.m_source].endPose + shift;
