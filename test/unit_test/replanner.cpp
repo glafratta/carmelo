@@ -45,6 +45,9 @@ int main(int argc, char** argv){
     conf.Spawner();
     int n_v=conf.transitionSystem.m_vertices.size();
     auto og_plan=conf.planVertices;
+    if (argv[1]=="empty"){
+        og_plan={2};
+    }
     conf.printPlan(&conf.planVertices);
     conf.addIteration();
     int og_step=0;
@@ -64,8 +67,9 @@ int main(int argc, char** argv){
     }
     if (argc > 5){
         conf.controlGoal.disturbance.bf.pose = -shift;
-        conf.controlGoal.disturbance.bf.pose.q.Set(-M_PI);
+        conf.controlGoal.disturbance.bf.pose.q.Set(M_PI);
         printf("back");
+        og_plan={3, 5, 2};
     }
     conf.planVertices.clear();
     conf.Spawner();

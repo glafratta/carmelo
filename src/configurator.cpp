@@ -7,7 +7,7 @@ void math::applyAffineTrans(const b2Transform& deltaPose, Task* task){
 	// if (task.disturbance.getAffIndex()!=NONE){
 	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
 	// }
-	applyAffineTrans(deltaPose, task->disturbance);
+	applyAffineTrans(-deltaPose, task->disturbance);
 }
 
 
@@ -353,11 +353,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
 						Task controlGoal_adjusted= controlGoal;
-						b2Transform shift_start= b2MulT(controlGoal.start, g[task_start].start);
+						b2Transform shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
 						math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
 						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
-						shift= b2MulT(g[task_start].start, start);
+						shift= b2MulT(g[task_start].start, start); //Mult()
+						//shift=start-g[task_start].start;
 						if (finished){
 							plan_prov=plan_tmp;
 							plan_prov.insert(plan_prov.begin(), task_start);
@@ -393,7 +394,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
-				std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
+				//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toPrune =(propagateD(v1, v0, g,&propagated, &closed)); //og v1 v0
 				v0_exp=v0;
 				options=g[v0_exp].options;
 				v0=v1;						
@@ -1528,7 +1529,7 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 }
 
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
+void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, b2Transform& shift){
 	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
 		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
 		start = g[e.m_source].endPose + shift;
@@ -1536,6 +1537,7 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 	else{
 		start=g[v].endPose +shift;
 	}
+	shift=b2Transform_zero;
 }
 
 
