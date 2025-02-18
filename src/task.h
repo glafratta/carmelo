@@ -189,45 +189,26 @@ class Listener : public b2ContactListener {
             }       
         }
 
-    //     void EndContact(b2Contact * contact) {
-    //     b2Fixture * fixtureA= contact->GetFixtureA();
-    //     b2BodyUserData bodyData = fixtureA->GetBody()->GetUserData();
-    //     if (bodyData.pointer==ROBOT_FLAG) { //if fixtureA belongs to robot
-    //         b2Body * other = contact->GetFixtureB()->GetBody();
-    //         if (fixtureA->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
-    //             d_ptr->invalidate();
-    //         }
-    //     }
-    //     b2Fixture * fixtureB= contact->GetFixtureB();
-    //     bodyData = fixtureB->GetBody()->GetUserData();
-    //     if (bodyData.pointer==ROBOT_FLAG) {//WAS IF BODYDATA.POINTER if fixtureB belongs to robot
-    //         b2Body * other = contact->GetFixtureA()->GetBody();
-    //         if (fixtureB->IsSensor() &&other->GetUserData().pointer==DISTURBANCE_FLAG){
-    //             d_ptr->invalidate();
-    //         }
-    //     }       
-    // }
         
 	};
 	
-    class Query : public b2QueryCallback {
-		Disturbance * d_ptr=NULL;
-        public:
-            Query(Disturbance * _d_ptr):d_ptr(_d_ptr){}
-            std::vector<b2Body*> d;
+    // class Query : public b2QueryCallback {
+	// 	Disturbance * d_ptr=NULL;
+    //     public:
+    //         Query(Disturbance * _d_ptr):d_ptr(_d_ptr){}
+    //         std::vector<b2Body*> d;
             
-            bool ReportFixture(b2Fixture* fixture) {
-                if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
-                    //d.push_back( fixture->GetBody() ); 
-                    if (d_ptr==NULL){
-                        return false;
-                    }
-                    d_ptr->invalidate();
-                    return true;//keep going to find all fixtures in the query area
-                }
-                return false;
-            }
-    };
+    //         bool ReportFixture(b2Fixture* fixture) {
+    //             if (fixture->GetBody()->GetUserData().pointer==DISTURBANCE_FLAG){
+    //                 if (d_ptr==NULL){
+    //                     return false;
+    //                 }
+    //                 d_ptr->invalidate();
+    //                 return true;//keep going to find all fixtures in the query area
+    //             }
+    //             return false;
+    //         }
+    // };
 
 
 struct Correct{

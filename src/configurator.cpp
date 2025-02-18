@@ -337,7 +337,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						}
 						if (finished){
 							plan_prov=plan_tmp;
-							if (matcher.isMatch(StateDifference(g[currentVertex], g[task_start]))!=matcher.ABSTRACT){
+							auto loop= matcher.isMatch(StateDifference(g[currentVertex], g[task_start]));
+							if ( (!matcher.match_equal(loop, matcher.ABSTRACT) && currentTask.motorStep==0)){
 								plan_prov.insert(plan_prov.begin(), task_start);
 							}
 							printf("pre-removed edge\n");

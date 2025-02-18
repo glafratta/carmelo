@@ -1,6 +1,7 @@
 #include "../callbacks.h"
 
 int main(int argc, char** argv){
+    printf("lin 4\n");
     bool debug=1;
     Disturbance target1;
     vertexDescriptor solution=TransitionSystem::null_vertex();
@@ -54,10 +55,11 @@ int main(int argc, char** argv){
     if (argc > 5){
         conf.controlGoal.disturbance.bf.pose = -shift;
         conf.controlGoal.disturbance.bf.pose.q.Set(M_PI);
-        printf("back");
+        printf("back\n");
         og_plan={3, 5, 2};
         n_v+=7;
     }
+    printf("wohoo 61\n");
     conf.planVertices.clear();
     conf.Spawner();
     conf.printPlan(&conf.planVertices);
@@ -69,6 +71,6 @@ int main(int argc, char** argv){
         printf("wrong plan\n");
         return 1;
     }
-     
+    printf("wohoo\n");
     return 0;
 }

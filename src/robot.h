@@ -56,7 +56,7 @@ const uintptr_t ROBOT_FLAG=0x1, DISTURBANCE_FLAG=0x2;
 const float WHEEL_SPEED_DEFAULT=0.5f;
 const float WHEEL_SPEED_TURN=float((M_PI_4*BETWEEN_WHEELS)/(MAX_SPEED*2)); //0.353429f; //0.218182f;
  
-const std::map <Direction, std::pair<float, float>> default_kinematics={{DEFAULT, std::pair<float, float>(WHEEL_SPEED_DEFAULT, 0)},
+const std::map <Direction, std::pair<float, float>> default_kinematics={{DEFAULT, std::pair<float, float>(WHEEL_SPEED_DEFAULT*MAX_SPEED, 0)},
                                                                          {LEFT, std::pair<float, float>(0, WHEEL_SPEED_TURN)},
                                                                          {RIGHT, std::pair<float, float>(0, -WHEEL_SPEED_TURN)}};
 
