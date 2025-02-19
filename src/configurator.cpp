@@ -1550,32 +1550,19 @@ void Configurator::changeStart(b2Transform& start, vertexDescriptor v, Transitio
 
 ExecutionError Configurator::trackTaskExecution(Task & t){
 	ExecutionError error;
-	//sensor: get points of disturbance
-	//get min area rect
-	//compare pos/orientation	
+	b2Transform deltaPose=worldBuilder.wb_bridger.get_transform(&t, data2fp); //track using obstacle OR dead reckoning
+	//here can insert something for wb.bridger, wheel speed control (for step)
 
 	//STEP STUFF, TO BE DELETED
-	if (t.motorStep>0 & fabs(error.r())<TRACKING_ERROR_TOLERANCE & fabs(error.theta())<TRACKING_ANGLE_TOLERANCE){
-		t.motorStep--;
-		//printf("step =%i\n", t.motorStep);
-	}
-	else if (fabs(error.r())>=TRACKING_ERROR_TOLERANCE){
-		int correction=-std::floor(error.r()/(t.action.getLinearSpeed()*LIDAR_SAMPLING_RATE)+0.5);
-		t.motorStep+=correction; //reflex
-	}
-	else if (fabs(error.theta())>=TRACKING_ANGLE_TOLERANCE & t.action.getOmega()!=0){
-		int correction=-std::floor(error.theta()/(t.action.getOmega()*MOTOR_CALLBACK)+0.5);
-		t.motorStep+=correction; //reflex
-	}		
 
-	updateGraph(transitionSystem);//lateral error is hopefully noise and is ignored
-	//printf("deltapose= %f, %f, %f\n", deltaPose.p.x, deltaPose.p.y, deltaPose.q.GetAngle());
+	updateGraph(transitionSystem, deltaPose);//lateral error is hopefully noise and is ignored
+
+	//here need to update end criteria for current task
+
 	if(t.motorStep==0){
 		t.change=1;
 	}
-	// else{
-	// 	error.setTheta(taskRotationError()); //will be rest at the next callback
-	// }
+
 	return error;
 }
 
@@ -1680,9 +1667,6 @@ void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float er
 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
 }
 
-void Configurator::track_disturbance_cl(b2Transform & pose, Task::Action a, float error){
-
-}
 
 
 void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
@@ -1694,24 +1678,25 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
     } 
 }
 
-void Configurator::updateGraph(TransitionSystem&g, b2Transform * _deltaPose){
-	b2Transform deltaPose;
-	if (NULL==_deltaPose){
-		float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK;
-		float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-		float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-		deltaPose=b2Transform(b2Vec2(xdistance,
-					ydistance), 
-					b2Rot(angularDisplacement));
-	}
-	else{
-		deltaPose=*_deltaPose;
-	}
-	printf("displacement: ");
-	debug::print_pose(deltaPose);
-	printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
+void Configurator::updateGraph(TransitionSystem&g, const b2Transform & deltaPose){
+	// b2Transform deltaPose;
+	// if (NULL==_deltaPose){
+	// 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK;
+	// 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+	// 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
+	// 	deltaPose=b2Transform(b2Vec2(xdistance,
+	// 				ydistance), 
+	// 				b2Rot(angularDisplacement));
+	// }
+	// else{
+	// 	deltaPose=*_deltaPose;
+	// }
+	//printf("displacement: ");
+	//debug::print_pose(deltaPose);
+	//printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
 	math::applyAffineTrans(deltaPose, g);
 	math::applyAffineTrans(-deltaPose, &controlGoal);
+	math::applyAffineTrans(-deltaPose, getTask()->start); //d update happens in get_transform
 }
 
 float Configurator::approximate_angle(const float & angle, const Direction & d, const simResult::resultType & outcome){

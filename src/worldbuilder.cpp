@@ -28,7 +28,7 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     return result;
     }
 
-std::pair <bool, BodyFeatures> WorldBuilder::bounding_rotated_box(std::vector <cv::Point2f>nb){
+std::pair <bool, BodyFeatures> WorldBuilder::Bridger::bounding_rotated_box(std::vector <cv::Point2f>nb){
     for (cv::Point2f & p: nb){
         p.x= round(p.x*100)/100;
         p.y=round(p.y*100)/100;
@@ -96,10 +96,10 @@ std::vector <std::vector<cv::Point2f>> WorldBuilder::partition_clusters( std::ve
     return result;
 }
 
-std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, const b2Transform& start, CLUSTERING clustering){
+std::vector <BodyFeatures> WorldBuilder::cluster_data( const CoordinateContainer & pts, const b2Transform& start, CLUSTERING clustering){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
-    for (Pointf p:pts){
+    for (const Pointf & p:pts){
         points.push_back(cv::Point2f(float(p.x), float(p.y)));
     }
     std::vector<std::vector<cv::Point2f>> clusters;
@@ -110,7 +110,7 @@ std::vector <BodyFeatures> WorldBuilder::cluster_data( CoordinateContainer pts, 
         clusters=partition_clusters(points);
     }
     for (int c=0; c<clusters.size(); c++){
-        if (std::pair<bool,BodyFeatures>feature=bounding_rotated_box(clusters[c]); feature.first){
+        if (std::pair<bool,BodyFeatures>feature=wb_bridger.bounding_rotated_box(clusters[c]); feature.first){
             //feature.second.pose.q.Set(start.q.GetAngle());
             result.push_back(feature.second);
         }
@@ -161,7 +161,7 @@ b2Body* WorldBuilder::makeBody(b2World&w, BodyFeatures features){
     return body;
 }
 
-std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, CoordinateContainer current, std::pair<Pointf, Pointf> bt){
+std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform start, const CoordinateContainer &current, std::pair<Pointf, Pointf> bt){
     std::pair <CoordinateContainer, bool> result(CoordinateContainer(), 0);
     float qBottomH=0, qTopH=0, qBottomP=0, qTopP=0, mHead=0, mPerp=0, ceilingY=0, floorY=0, frontX=0, backX=0;
     if (sin(start.q.GetAngle())!=0 && cos(start.q.GetAngle())!=0){
@@ -180,9 +180,6 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY){
                 result.first.insert(p);
             }
-            // if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
-            //     dCloud->insert(p);
-            // }
         }
 
     }
@@ -194,17 +191,14 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
         for (Pointf p: current){
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
-            }
-            // if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
-            //     dCloud->insert(p);
-            // }      
+            }  
         }
     }
     return result;
 }
 
 
-std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, CLUSTERING clustering){
+std::vector <BodyFeatures> WorldBuilder::getFeatures(const CoordinateContainer & current, b2Transform start, Direction d, float boxLength, float halfWindowWidth, CLUSTERING clustering){
     std::vector <BodyFeatures> features;
     std::pair<Pointf, Pointf> bt = bounds(d, start, boxLength, halfWindowWidth);
     std::pair <CoordinateContainer, bool> salient = salientPoints(start,current, bt);
@@ -222,18 +216,13 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 
 
 
- std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering, Task * task){
+ std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world, const CoordinateContainer & current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering, Task * task){
   //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     std::vector <cv::Point2f> points_to_track, *pointer_to_track;
     if (NULL!=task){
         pointer_to_track=&points_to_track;
     }
-    //std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
-    // if (occluded(current, disturbance)){
-    //     salient.first.emplace(getPointf(disturbance.getPosition()));
-    //     features.push_back(disturbance.bodyFeatures());
-    // }
     bool has_D=false;
     if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
         std::vector <b2Vec2> d_vertices=disturbance.vertices();
@@ -245,8 +234,6 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
         boxLength=ROBOT_HALFLENGTH*2-ROBOT_BOX_OFFSET_X+maxx;
     }
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
-    
-   // bool has_D=false;
 
     for (BodyFeatures f: features){
         makeBody(world, f);
@@ -260,9 +247,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 		}
 		fclose(file);
 	}
-    //result.first = salient.second;
     return features;
-   // return result;
 }
 
 bool WorldBuilder::checkDisturbance(Pointf p, bool& obStillThere, Task * curr, float range){
@@ -280,9 +265,9 @@ bool WorldBuilder::checkDisturbance(Pointf p, bool& obStillThere, Task * curr, f
     return result;
 }
 
-b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
+b2Vec2 averagePoint(const CoordinateContainer & c, Disturbance & d, float rad = 0.025){
     b2Vec2 result(0,0), centroid(0,0);
-    for (Pointf p: c){
+    for (const Pointf & p: c){
        centroid.x+=p.x;
        centroid.y +=p.y; 
     }
@@ -293,38 +278,38 @@ b2Vec2 averagePoint(CoordinateContainer c, Disturbance & d, float rad = 0.025){
     return result;
 }
 
-bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
-    bool result=false;
-    if (!expectedD.isValid()){
-        return result;
-    }
-    cv::Rect2f rect;
-    std::vector <Pointf> occluding; 
-    for (Pointf p:cc){
-        Pointf tl(expectedD.getPosition().x-expectedD.halfWidth(), expectedD.getPosition().y+expectedD.halfWidth());
-        Pointf br(expectedD.getPosition().x+expectedD.halfWidth(), expectedD.getPosition().y-expectedD.halfWidth());
-        // rect=cv::Rect2f(expectedD.getPosition().x+expectedD.halfWidth(), 
-        //                 expectedD.getPosition().y-expectedD.halfWidth(), 
-        //                 expectedD.getPosition().x+expectedD.halfWidth(), 
-        //                 expectedD.halfLength()*2);
-        // if (p.inside(rect)){
-        if (p.isin(tl, br)){
-            occluding.push_back(p);
-        }
-    }
-    if (occluding.empty()){
-        return result;
-    }
-    CompareY compareY;
-    std::vector<Pointf>::iterator miny=std::min_element(occluding.begin(), occluding.end(), compareY);
-    std::vector<Pointf>::iterator maxy=std::max_element(occluding.begin(), occluding.end(), compareY);
-    float length = (*maxy).y-(*miny).y;
-    if (length>=rect.height*0.75 & occluding.size()>= rect.height*75){
-        result=true;
-    }
-    //to finish
-    return result;
-}
+// bool WorldBuilder::occluded(consCoordinateContainer cc, Disturbance expectedD){
+//     bool result=false;
+//     if (!expectedD.isValid()){
+//         return result;
+//     }
+//     cv::Rect2f rect;
+//     std::vector <Pointf> occluding; 
+//     for (Pointf p:cc){
+//         Pointf tl(expectedD.getPosition().x-expectedD.halfWidth(), expectedD.getPosition().y+expectedD.halfWidth());
+//         Pointf br(expectedD.getPosition().x+expectedD.halfWidth(), expectedD.getPosition().y-expectedD.halfWidth());
+//         // rect=cv::Rect2f(expectedD.getPosition().x+expectedD.halfWidth(), 
+//         //                 expectedD.getPosition().y-expectedD.halfWidth(), 
+//         //                 expectedD.getPosition().x+expectedD.halfWidth(), 
+//         //                 expectedD.halfLength()*2);
+//         // if (p.inside(rect)){
+//         if (p.isin(tl, br)){
+//             occluding.push_back(p);
+//         }
+//     }
+//     if (occluding.empty()){
+//         return result;
+//     }
+//     CompareY compareY;
+//     std::vector<Pointf>::iterator miny=std::min_element(occluding.begin(), occluding.end(), compareY);
+//     std::vector<Pointf>::iterator maxy=std::max_element(occluding.begin(), occluding.end(), compareY);
+//     float length = (*maxy).y-(*miny).y;
+//     if (length>=rect.height*0.75 & occluding.size()>= rect.height*75){
+//         result=true;
+//     }
+//     //to finish
+//     return result;
+// }
 
 void WorldBuilder::world_cleanup(b2World * world){
     int ct=world->GetBodyCount();
@@ -386,8 +371,39 @@ b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
 	fixtureDef.shape=&shape;
 	robotBody->CreateFixture(&fixtureDef);
 	shape.ComputeAABB(&result, robotBody->GetTransform(), 0);
+    
 	return result;
 	
+}
+
+cv::Rect2f WorldBuilder::Bridger::real_world_focus(const Task * t){
+    std::vector <cv::Point2f> vertices;
+    if (t->disturbance.getAffIndex()!=NONE){
+        return cv::Rect2f(0, 0, 0, 0);
+    }
+    for (std::vector<b2Vec2> box2d_v =t->disturbance.vertices(); b2Vec2 & v: box2d_v){
+        vertices.push_back(cv::Point2f(v.x, v.y));
+    }   
+    return cv::boundingRect(vertices); 
+}
+
+
+b2Transform WorldBuilder::Bridger::get_transform(Task * t, const CoordinateContainer & pts){
+    if (t->disturbance.getAffIndex()!=AVOID){
+        return t->action.getTransform(LIDAR_SAMPLING_RATE);
+    }
+    cv::Rect2f focus=real_world_focus(t);
+    std::vector <cv::Point2f> focus_points;
+    for (auto p: pts){
+        cv::Point2f p_cv=cv::Point2f(p.x, p.y);
+        if (focus.contains(p_cv)){
+            focus_points.push_back(p_cv);
+        }
+    }
+    std::pair <bool, BodyFeatures> new_d=bounding_rotated_box(focus_points);
+    t->disturbance.bf=new_d.second; //update task
+    return new_d.second.pose- t->disturbance.pose();
+    //what's the most likely angle??
 }
 
 

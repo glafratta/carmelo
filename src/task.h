@@ -71,7 +71,7 @@ public:
     setVelocities(L, R);
     }
 
-void setVelocities(float l, float r){
+void setVelocities(const float & l,const float &r){
     omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(l+r)/2;
@@ -79,15 +79,15 @@ void setVelocities(float l, float r){
     valid=1;
 }
 
-    b2Vec2 getLinearVelocity(){
+    b2Vec2 getLinearVelocity(const float &dt=1)const{ //dt integrates
         b2Vec2 velocity;
-        velocity.x = linearSpeed *cos(omega);
-        velocity.y = linearSpeed *sin(omega);
+        velocity.x = linearSpeed *cos(omega)*dt;
+        velocity.y = linearSpeed *sin(omega)*dt;
         return velocity;
     }
 
-    b2Transform getTransform(){
-    return b2Transform(getLinearVelocity(), b2Rot(omega));
+    b2Transform getTransform(const float &dt=1)const{ //dt integrates
+    return b2Transform(getLinearVelocity(dt), b2Rot(getOmega(dt)));
 }
 
     float getRWheelSpeed(){
@@ -107,28 +107,28 @@ void setVelocities(float l, float r){
         return linearSpeed;
     }
 
-    float getOmega(){
-    return omega;
+    float getOmega(const float &dt=1)const{
+    return omega*dt;
     }
 
-    float getOmega(float l, float r){
-        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION;
+    float getOmega(const float l, const float r, float dt=1)const{
+        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION*dt;
         return result;
     }
 
-    void setOmega(float o){
+    void setOmega(const float &o){
         omega =o;
     }
 
-    void setLinearSpeed(float s){
+    void setLinearSpeed(const float & s){
         linearSpeed =s;
     }
 
-    void setRecSpeed(float s){
+    void setRecSpeed(const float &s){
         recordedSpeed =s;
     }
 
-    void setRecOmega(float w){
+    void setRecOmega(const float &w){
         recordedOmega=w;
     }
 
@@ -140,7 +140,7 @@ void setVelocities(float l, float r){
         return recordedOmega;
     }
     //friend class Configurator;
-    void setRec(float _speed, float _omega){
+    void setRec(const float& _speed, const float & _omega){
         recordedSpeed=_speed;
         recordedOmega=_omega;
     }
@@ -217,7 +217,7 @@ struct Correct{
 
     void operator()( Action&, int);
 
-    float errorCalc(Action, double);
+    float errorCalc(Action , double);
 
     float getError(){
         return p();

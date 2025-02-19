@@ -163,7 +163,7 @@ void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
 void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
-void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
+void updateGraph(TransitionSystem&, const b2Transform & _deltaPose);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
@@ -294,7 +294,7 @@ void setSimulationStep(float f){
 	//worldBuilder.simulationStep=f;
 }
 
-void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
+//void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
 //bool current_task_equivalent(const Task &,const  Task &, const vertexDescriptor&);
 
