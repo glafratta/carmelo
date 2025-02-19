@@ -51,7 +51,7 @@ bool debug_draw(b2World & w, int file){
 }
 
 
-void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
+//void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
 	// 	//std::pair<bool, vertexDescriptor> been(false, TransitionSystem::null_vertex());
 	// 	//was ve instead of src
 	// 	std::vector <vertexDescriptor> options_src;
@@ -83,7 +83,7 @@ void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World &
 	// 		}
 	// 	}
 
-}
+//}
 
 std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
     std::vector <BodyFeatures> result;
