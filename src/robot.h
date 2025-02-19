@@ -61,8 +61,6 @@ const std::map <Direction, std::pair<float, float>> default_kinematics={{DEFAULT
                                                                          {RIGHT, std::pair<float, float>(0, -WHEEL_SPEED_TURN)}};
 
 
-const enum POINT_FLAGS {BOX2D, OPENCV, CLOCK};
-
 class Robot {
 private: 
 	b2FixtureDef fixtureDef;
