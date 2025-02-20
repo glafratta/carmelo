@@ -40,7 +40,6 @@ class Configurator;
 class BodyFeatures{
     public:
     b2Transform pose {b2Transform(b2Vec2(0,0), b2Rot(0))} ;
-   // b2Transform pose_local=pose;
     float halfLength=0.0005; //x
     float halfWidth=0.0005; //y
     float shift=0.0f;
