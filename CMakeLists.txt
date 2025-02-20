@@ -9,18 +9,17 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(Threads)
 find_package(PkgConfig)
 find_package(OpenCV REQUIRED)
-
+find_package(box2d REQUIRED)
 
 add_subdirectory(src "${CMAKE_CURRENT_BINARY_DIR}/src")
 
 
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") # for Raspberry Pi
-  include(GNUInstallDirs)
   add_executable(target custom.h target.cpp)
   add_executable(targetless custom.h targetless.cpp)
   target_link_libraries(target ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio)
-  target_link_libraries(targetless ${OpenCV_LIBS}box2d alphabot a1lidarrpi CloCK pigpio)
+  target_link_libraries(targetless ${OpenCV_LIBS} box2d alphabot a1lidarrpi CloCK pigpio)
   message("detected architecture aarch64, building executables")
 else()
   add_subdirectory(test/unit_test "${CMAKE_CURRENT_BINARY_DIR}/test/unit_test")

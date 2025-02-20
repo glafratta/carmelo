@@ -5,13 +5,9 @@
 #include <filesystem>
 #include <ncurses.h>
 #include <fstream>
-//#include "worldbuilder.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include "debug.h"
-
-//FOR DEBUG
-//
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
 

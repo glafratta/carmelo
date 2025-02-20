@@ -1,12 +1,13 @@
 #include "configurator.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <bits/stdc++.h>
-#include <iostream>
-#include <sys/stat.h>
-#include <sys/types.h>
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <bits/stdc++.h>
+// #include <iostream>
+// #include <sys/stat.h>
+// #include <sys/types.h>
 #define _USE_MATH_DEFINES
 
 void get_Foldername(char* custom, char name[60]){
@@ -20,12 +21,6 @@ void get_Foldername(char* custom, char name[60]){
 	min = ltm->tm_min;
 	sprintf(name, "%s_%02i%02i%02i_%02i%02i",custom, d,m,y,h,min);
 }
-
-//void forget(Configurator*);
-
-//Disturbance set_target(int&, b2Transform);
-
-
 
 
 class LidarInterface : public A1Lidar::DataInterface{
