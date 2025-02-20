@@ -29,6 +29,9 @@ The indoor robot is equipped with
 * [Box2D v2.4.1](https://github.com/glafratta/box2d)
   ** if not installed automatically, go to `box2d/build` and run `sudo make install`
 
+## Optional: tweak constants
+There are some constants pertaining to our robot's kinematic model (e.g. speed, dimensions...). If you use a different platform than alphabet, you can tweak the robot's model by changning constants in `src/const.h`.
+
 ## Build
 ```
 cd CloCK
