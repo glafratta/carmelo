@@ -4,7 +4,7 @@ set (CMAKE_CXX_STANDARD 17)
 
 set(SRC disturbance.cpp configurator.cpp task.cpp graphTools.cpp measurement.cpp worldbuilder.cpp sensor.cpp debug.cpp)
 
-set(HEAD disturbance.h configurator.h robot.h task.h graphTools.h affordance.h settings.h measurement.h worldbuilder.h sensor.h debug.h)
+set(HEAD const.h disturbance.h configurator.h robot.h task.h graphTools.h measurement.h worldbuilder.h sensor.h debug.h)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -22,7 +22,6 @@ if(box2d_FOUND)
 else()
       set(BOX2D_BIN_DIR ${"/usr/local/lib/aarch64-linux-gnu"})
        target_link_libraries(HICS ${BOX2D_BIN_DIR}/libbox2d.a ${OpenCV_LIBS} pthread)
-       #message("fetching static library from ${BOX2D_BIN_DIR}")
 	message("BOX2D NOT INSTALLED")
 endif()
 set_target_properties(CloCK PROPERTIES POSITION_INDEPENDENT_CODE TRUE 

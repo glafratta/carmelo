@@ -1,9 +1,6 @@
 #include "configurator.h"
-#include "libcam2opencv.h"
 #include "a1lidarrpi.h"
 #include "alphabot.h"
-#include "Iir.h"
-//#include "CppTimer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <bits/stdc++.h>
@@ -24,20 +21,11 @@ void get_Foldername(char* custom, char name[60]){
 	sprintf(name, "%s_%02i%02i%02i_%02i%02i",custom, d,m,y,h,min);
 }
 
-void forget(Configurator*);
+//void forget(Configurator*);
 
-Disturbance set_target(int&, b2Transform);
+//Disturbance set_target(int&, b2Transform);
 
-std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
-    std::vector <BodyFeatures> result;
-    std::vector <Pointf> ptset= set2vec(points);
-    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
-    if (feature.first){
-        feature.second.pose.q.Set(start.q.GetAngle());
-        result.push_back(feature.second);
-    }
-    return result;
-}
+
 
 
 class LidarInterface : public A1Lidar::DataInterface{
@@ -52,14 +40,12 @@ public:
 			printf("null pointer to ci\n");
 			return;
 		}
-		//ci->data.clear();
 		ci->data2fp.clear();
 		mapCount++;
 		Pointf p, p2f;
 		FILE *f;
 		char name[256];
 		sprintf(name,"/tmp/map%04i.dat", mapCount);
-		//printf("%s\n", name);
 		if (ci->debugOn){
 			f=fopen(name, "w");
 		}
@@ -98,7 +84,6 @@ int run=0;
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	printf("graph size=%i\n", c->transitionSystem.m_vertices.size());
 	if (c->getIteration() <=0){
 		return;
 	}
@@ -109,27 +94,15 @@ void step( AlphaBot &motors){
 
 	c->trackTaskExecution(*c->getTask());
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
-	//bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
-	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
-	if (er.ended ){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
-		//printf("goal reached\n");
-		Disturbance new_goal=set_target(run, c->controlGoal.start);
-		c->controlGoal = Task(new_goal, UNDEFINED);
-		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-		//printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
-		if (c->is_benchmarking()){
-			FILE * f = fopen(c->statFile, "a+");
-			fprintf(f, "!");
-			fclose(f);			
-		}
-		forget(c);
+	if (er.ended ){ 
+		c->stop();
 
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	R= c->getTask()->getAction().getRWheelSpeed();
 	L=c->getTask()->getAction().getLWheelSpeed(); //*1.05
 	if (c->getTask()->direction==LEFT){
-		R*=1.37; //23
+		R*=1.37; 
 		L*=1.37;
 	}
 	else if (c->getTask()->direction==RIGHT){
@@ -142,53 +115,5 @@ void step( AlphaBot &motors){
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	//printf(",R=%f\tL=%f\n",c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed());
 }
 };
-
-struct CameraCallback: Libcam2OpenCV::Callback {
-    char dumpname[50];
-    double signal=0;
-    double filtered_signal=0;
-    Iir::Butterworth::LowPass<order>low_pass;
-    Iir::Butterworth::BandStop<order>band_stop;
-	const int reset_hz=10;
-
-    CameraCallback(MotorCallback * _cb):cb(_cb){
-        low_pass.setup(FPS, cutoff_frequency);
-        band_stop.setup(FPS, DC, band_width);
-    }
-
-
-	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
-		if (cb==NULL){
-			printf("null cb\n");
-		}
-		if (cb->c==NULL){
-			printf("null c\n");
-		}
-		if (cb->c->getTask()==NULL){
-			printf("null task\n");
-		}
-        float error=0;
-        cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
-        cv::Vec2d  optic_flow_filtered=optic_flow;
-        signal= signal+optic_flow[0];
-        optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
-        optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
-        filtered_signal=filtered_signal+optic_flow_filtered[0];
-		if (cb->c->getTask()->motorStep!=cb->ogStep & cb->c->getTask()->motorStep!=0){ //, in the future t.motorStepdiscard will be t.change
-																//signal while the robot isn' moving
-        	Task::Action action= cb->c->getTask()->getAction();
-			error= cb->c->getTask()->correct.errorCalc(action, double(optic_flow_filtered[0]));
-		}
-        cb->c->getTask()->correct.update(error); //for now just going straight
-    }
-private:
-ImgProc imgProc;
-MotorCallback *cb=NULL;
-};
-
-float Configurator::taskRotationError(){
-    return 0;
-}

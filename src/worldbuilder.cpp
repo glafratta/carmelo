@@ -1,7 +1,6 @@
 #include "worldbuilder.h"
 
 std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, float boxLength, float halfWindowWidth){
-    //float halfWindowWidth=0.15; //wa .1
     std::pair <Pointf, Pointf>result;
     if (d ==LEFT || d==RIGHT){
         boxLength =ROBOT_HALFLENGTH -ROBOT_BOX_OFFSET_X; //og 16 cm
@@ -27,37 +26,6 @@ std::pair<Pointf, Pointf> WorldBuilder::bounds(Direction d, b2Transform start, f
     }
     return result;
     }
-
-// template <typename Pt>
-// std::pair<bool,BodyFeatures> WorldBuilder::getOneFeature(std::vector <Pt>nb){//gets bounding box of points
-//     float  l=(0.0005*2), w=(0.0005*2) ;
-//     float x_glob=0.0f, y_glob=0.0f;
-//     // cv::Rect2f rect(x_loc,y_loc,w, h);
-//     // b2Transform pose;
-//     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
-//     if (nb.empty()){
-//         return result;
-//     }
-//     CompareX compareX;
-//     CompareY compareY;
-//     //Pointf maxx, minx, miny, maxy;
-// 	typename std::vector<Pt>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
-// 	typename std::vector<Pt>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
-// 	typename std::vector<Pt>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);
-// 	typename std::vector<Pt>::iterator maxy=std::max_element(nb.begin(), nb.end(), compareY);
-//     if (minx->x!=maxx->x){
-//         w= fabs((*maxx).x-(*minx).x);
-//     }
-//     if (miny->y!=maxy->y){
-//         l=fabs((*maxy).y-(*miny).y);
-//     }
-//     x_glob= ((*maxx).x+(*minx).x)/2;
-//     y_glob= ((*maxy).y+(*miny).y)/2;
-//     result.second.halfLength=l/2;
-//     result.second.halfWidth=w/2;
-//     result.second.pose.p=b2Vec2(x_glob, y_glob);
-//     result.first=true;
-// }
 
 std::vector <std::vector<cv::Point2f>> WorldBuilder::kmeans_clusters( std::vector <cv::Point2f> points,std::vector <cv::Point2f> &centers){
     
@@ -177,9 +145,6 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.y >=frontY && p.y<=backY){
                 result.first.insert(p);
             }
-            // if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
-            //     dCloud->insert(p);
-            // }
         }
 
     }
@@ -192,9 +157,7 @@ std::pair <CoordinateContainer, bool> WorldBuilder::salientPoints(b2Transform st
             if (p.y >=floorY && p.y<=ceilingY && p.x >=frontX && p.x<=backX){
                 result.first.insert(p);
             }
-            // if (checkDisturbance(p, result.second, curr) & NULL != dCloud){
-            //     dCloud->insert(p);
-            // }      
+ 
         }
     }
     return result;
@@ -220,7 +183,6 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 
 
  std::vector <BodyFeatures> WorldBuilder::buildWorld(b2World& world,CoordinateContainer current, b2Transform start, Direction d, Disturbance disturbance, float halfWindowWidth, CLUSTERING clustering){
-  //  std::pair<bool, b2Vec2> result(0, b2Vec2(0,0));
     float boxLength=simulationStep-ROBOT_BOX_OFFSET_X;
     if (disturbance.getAffIndex()==AVOID && d==DEFAULT){
         std::vector <b2Vec2> d_vertices=disturbance.vertices();
@@ -232,8 +194,6 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
         boxLength=ROBOT_HALFLENGTH*2-ROBOT_BOX_OFFSET_X+maxx;
     }
     std::vector <BodyFeatures> features=getFeatures(current, start, d, boxLength, halfWindowWidth, clustering);
-    
-   // bool has_D=false;
 
     for (BodyFeatures f: features){
         makeBody(world, f);
@@ -247,9 +207,7 @@ std::vector <BodyFeatures> WorldBuilder::getFeatures(CoordinateContainer current
 		}
 		fclose(file);
 	}
-    //result.first = salient.second;
     return features;
-   // return result;
 }
 
 bool WorldBuilder::checkDisturbance(Pointf p, bool& obStillThere, Task * curr, float range){
@@ -290,11 +248,6 @@ bool WorldBuilder::occluded(CoordinateContainer cc, Disturbance expectedD){
     for (Pointf p:cc){
         Pointf tl(expectedD.getPosition().x-expectedD.halfWidth(), expectedD.getPosition().y+expectedD.halfWidth());
         Pointf br(expectedD.getPosition().x+expectedD.halfWidth(), expectedD.getPosition().y-expectedD.halfWidth());
-        // rect=cv::Rect2f(expectedD.getPosition().x+expectedD.halfWidth(), 
-        //                 expectedD.getPosition().y-expectedD.halfWidth(), 
-        //                 expectedD.getPosition().x+expectedD.halfWidth(), 
-        //                 expectedD.halfLength()*2);
-        // if (p.inside(rect)){
         if (p.isin(tl, br)){
             occluding.push_back(p);
         }
@@ -345,14 +298,10 @@ b2Fixture * WorldBuilder::get_chassis(b2Body * r){
 
 b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
 	b2AABB result;
-	// if (!(goal->getAffIndex()==AVOID)){
-	// 	return result;
-	// }
     if (!goal->isValid()){
         return result;
     }
 	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
-	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
 	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=goal->vertices();
 	for (b2Vec2 p: d_vertices){
 		p =robotBody->GetLocalPoint(p);
@@ -377,4 +326,13 @@ b2AABB WorldBuilder::makeRobotSensor(b2Body* robotBody, Disturbance * goal){
 	
 }
 
-
+std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
+    std::vector <BodyFeatures> result;
+    std::vector <Pointf> ptset= set2vec(points);
+    std::pair<bool,BodyFeatures> feature= getOneFeature(ptset);
+    if (feature.first){
+        feature.second.pose.q.Set(start.q.GetAngle());
+        result.push_back(feature.second);
+    }
+    return result;
+}

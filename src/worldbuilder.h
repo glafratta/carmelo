@@ -22,7 +22,6 @@ class WorldBuilder{
     bool debug =0;
     char bodyFile[100];
     float simulationStep=BOX2DRANGE;
-    //int buildType=0;
     std::pair <CoordinateContainer, bool> salientPoints(b2Transform, CoordinateContainer, std::pair <Pointf, Pointf>); //gets points from the raw data that are relevant to the task based on bounding boxes
                                                                                                                                         //std::pair<points, obstaclestillthere>
     b2Body* makeBody(b2World&, BodyFeatures);
@@ -43,15 +42,12 @@ class WorldBuilder{
     std::pair<bool,BodyFeatures> getOneFeature(std::vector <Pt>nb){//gets bounding box of points
     float  l=(0.0005*2), w=(0.0005*2) ;
     float x_glob=0.0f, y_glob=0.0f;
-    // cv::Rect2f rect(x_loc,y_loc,w, h);
-    // b2Transform pose;
     std::pair <bool, BodyFeatures> result(0, BodyFeatures());
     if (nb.empty()){
         return result;
     }
     CompareX compareX;
     CompareY compareY;
-    //Pointf maxx, minx, miny, maxy;
 	typename std::vector<Pt>::iterator maxx=std::max_element(nb.begin(), nb.end(), compareX);
 	typename std::vector<Pt>::iterator miny=std::min_element(nb.begin(), nb.end(), compareY);
 	typename std::vector<Pt>::iterator minx=std::min_element(nb.begin(), nb.end(), compareX);

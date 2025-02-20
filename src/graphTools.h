@@ -1,7 +1,6 @@
 #ifndef GENERAL_H
 #define GENERAL_H
 #include <set>
-//#include "opencv2/opencv.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp> //LMEDS
 #include <vector>
@@ -13,15 +12,11 @@
 #include <boost/graph/graph_utility.hpp>
 #include <map>
 #include <boost/property_map/property_map.hpp> //property map
-//#include <boost/variant/get.hpp> //get function
 #include <boost/graph/copy.hpp>
 #include <utility>
 #include "disturbance.h"
 
 const float NAIVE_PHI=10.0;
-// enum M_CODES {THREE_M=3, FOUR_M=4};
-
-// enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
@@ -181,13 +176,10 @@ struct MoreLikely{
 struct NotSelfEdge{
 	NotSelfEdge(){}
 
-//	NotSelfEdge(TransitionSystem * _g):g(_g){}
 
 	bool operator()(const edgeDescriptor & e) const {
 		bool not_self= e.m_source!=e.m_target;
 	}
-// private:
-// TransitionSystem * g=NULL;
 };
 
 struct Remember{
@@ -203,7 +195,6 @@ struct Remember{
 
 	private: 
 	TransitionSystem *g;
-	//std::set <edgeDescriptor> forget;
 };
 
 struct Visited{ //for debug
@@ -219,7 +210,6 @@ struct Visited{ //for debug
 
 struct is_not_v{
 	is_not_v(){}
-	//CurrentV(TransitionSystem * ts): g(ts){}
 	is_not_v(vertexDescriptor _cv): cv(_cv){}
 	bool operator()(edgeDescriptor e){
 		return e.m_target!=cv;
@@ -307,10 +297,6 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 class StateMatcher{
 	public:
 		enum MATCH_TYPE {_FALSE=0, DISTURBANCE=2, POSE=3, _TRUE=1, ANY=4, D_POSE=5, D_SHAPE=6};
-        //std::vector <float> weights; //disturbance, position vector, angle
-		//assume mean difference 0
-		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
-
 		struct Error{
 			const float endPosition=0.05;//0.05;
 			const float angle= M_PI/6;
@@ -321,13 +307,6 @@ class StateMatcher{
 
 		float mu=0.001;
 	    StateMatcher()=default;
-		// void initOnes(){
-		// 	for (auto i=weights.begin(); i!= weights.end(); i++){
-		// 		*i=1.0;
-		// 	}
-		// }
-
-	//StateDifference get_state_difference(State, State );
 
 		struct StateMatch{
 
@@ -350,9 +329,6 @@ class StateMatcher{
 			bool disturbance_shape(){
 				return d_type && d_shape;
 			}
-			// bool disturbance(){
-			// 	return d_shape && d_type;
-			// }
 
 			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				r_position = sd.r_position.Length()<(error.endPosition*coefficient);
@@ -396,11 +372,6 @@ class StateMatcher{
 			bool d_type=0;
 		};
 		
-		//float sumVector(DistanceVector);
-
-		//float get_angle_difference(float, float); //adjusts for differences in angle direction
-
-		//FUZZY LOGIC FUNCTIONS USED TO CLASSIFY MATCH
 
 		bool match_equal(const MATCH_TYPE&, const MATCH_TYPE&);
 
@@ -410,11 +381,6 @@ class StateMatcher{
 
 		std::pair<MATCH_TYPE, vertexDescriptor> match_vertex(TransitionSystem, vertexDescriptor, Direction, State, StateMatcher::MATCH_TYPE mt=StateMatcher::_TRUE); //find match amoung vertex out edges
 		
-		//void ICOadjustWeight(DistanceVector, DistanceVector); //simple ICO learning rule
-
-		//std::pair <bool, float> distance_target_s(b2Transform, b2Transform);
-
-		//std::pair <bool, vertexDescriptor> soft_match(TransitionSystem&, b2Transform);
 
 		float get_coefficient(const float &);
 	private:

@@ -56,15 +56,20 @@ typedef std::set<Pointf> CoordinateContainer;
 b2Vec2 getb2Vec2(cv::Point2f );
 
 template <typename T>
-Pointf getPointf(T);
-
-// template <typename T>
-// cv::Point2f getPoint2f(T);
+Pointf getPointf(T v){
+	return Pointf(v.x, v.y);
+}
 
 Pointf Polar2f(float, float);
 
 template <typename T>
-std::vector<T> set2vec(std::set<T>);
+std::vector<T> set2vec(std::set<T> s){
+    std::vector <T> vec;
+    for (T t:s){
+        vec.emplace_back(t);
+    }
+    return vec;
+}
 
 template <typename T>
 std::vector<cv::Point2f> set2vec2f(std::set<T> s){
@@ -74,9 +79,6 @@ std::vector<cv::Point2f> set2vec2f(std::set<T> s){
     }
     return vec;
 }
-
-// template <typename T>
-// std::vector<cv::Point2f> set2vec_cv(std::set<T>);
 
 template <typename T>
 std::set<T> vec2set(std::vector<T> vec){
@@ -88,75 +90,75 @@ std::set<T> vec2set(std::vector<T> vec){
 }
 
 
-class PointCloudProc{
-	friend ConfiguratorInterface;
-	friend Configurator;
-    std::vector <Pointf> previous;
-	const float NEIGHBOURHOOD=0.075;
-    public:
-    PointCloudProc(){};
+// class PointCloudProc{
+// 	friend ConfiguratorInterface;
+// 	friend Configurator;
+//     std::vector <Pointf> previous;
+// 	const float NEIGHBOURHOOD=0.075;
+//     public:
+//     PointCloudProc(){};
 
-    b2Transform affineTransEstimate(std::vector <Pointf>, Task::Action, float timeElapsed=0.2, float range=1.0);
+//     b2Transform affineTransEstimate(std::vector <Pointf>, Task::Action, float timeElapsed=0.2, float range=1.0);
 
-	std::vector<Pointf> neighbours(b2Vec2,float radius, std::vector <Pointf> data= std::vector <Pointf>()); //finds if there are bodies close to a point. Used for 
+// 	std::vector<Pointf> neighbours(b2Vec2,float radius, std::vector <Pointf> data= std::vector <Pointf>()); //finds if there are bodies close to a point. Used for 
 
-	std::pair <bool, b2Vec2>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
+// 	std::pair <bool, b2Vec2>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
 
-	std::pair <bool, cv::Vec4f> findOrientationCV(std::vector<Pointf>);
+// 	std::pair <bool, cv::Vec4f> findOrientationCV(std::vector<Pointf>);
 	
-	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer data=CoordinateContainer());
+// 	std::vector<Pointf> setDisturbanceOrientation(Disturbance&, CoordinateContainer data=CoordinateContainer());
 
-	std::vector <Pointf> find_disturbance(const Disturbance &, const CoordinateContainer &);
+// 	std::vector <Pointf> find_disturbance(const Disturbance &, const CoordinateContainer &);
 
-	void updatePrevious(CoordinateContainer c){
-		previous=set2vec(c);
-	}
-};
+// 	void updatePrevious(CoordinateContainer c){
+// 		previous=set2vec(c);
+// 	}
+// };
 
-class ImgProc{
-	std::vector <cv::Point2f> previousCorners;
-    public:
+// class ImgProc{
+// 	std::vector <cv::Point2f> previousCorners;
+//     public:
 	
-    ImgProc(){}
+//     ImgProc(){}
 
-    cv::Mat cropLeft(cv::Mat);
+//     cv::Mat cropLeft(cv::Mat);
 
-    cv::Mat cropRight(cv::Mat);
+//     cv::Mat cropRight(cv::Mat);
 
-    cv::Vec2d  opticFlow(const cv::Mat&);
+//     cv::Vec2d  opticFlow(const cv::Mat&);
 
-	cv::Vec2d avgOpticFlow(const cv::Mat&);
+// 	cv::Vec2d avgOpticFlow(const cv::Mat&);
 
-	std::vector <cv::Point2f> get_corners();
+// 	std::vector <cv::Point2f> get_corners();
 
-	cv::Mat get_previous();
+// 	cv::Mat get_previous();
 
-	void setPrevious(cv::Mat m){
-		previous=m;
-	}
+// 	void setPrevious(cv::Mat m){
+// 		previous=m;
+// 	}
 
-	void setCorners(std::vector <cv::Point2f> c){
-		corners=c;
-	}
+// 	void setCorners(std::vector <cv::Point2f> c){
+// 		corners=c;
+// 	}
 
-	void reset(){
-		previous= cv::Mat();
-		corners.clear();
-	}
+// 	void reset(){
+// 		previous= cv::Mat();
+// 		corners.clear();
+// 	}
 
 
-    private:
-	int it=0;
-	struct GoodFeaturesParameters{
-		const int MAX_CORNERS=30;
-    	const float QUALITY_LEVEL=0.7;
-   		const int MIN_DISTANCE=7;
-    	const int BLOCK_SIZE=7;
-	}gfp;
+//     private:
+// 	int it=0;
+// 	struct GoodFeaturesParameters{
+// 		const int MAX_CORNERS=30;
+//     	const float QUALITY_LEVEL=0.7;
+//    		const int MIN_DISTANCE=7;
+//     	const int BLOCK_SIZE=7;
+// 	}gfp;
 
-    std::vector <cv::Point2f> corners; //must be single-precision float
-    cv::Mat previous;
-};
+//     std::vector <cv::Point2f> corners; //must be single-precision float
+//     cv::Mat previous;
+// };
 
 
 #endif

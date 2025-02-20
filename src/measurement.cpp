@@ -33,13 +33,6 @@ bool Measurement::operator>=(Measurement &m2){
     return r;
 }
 
-// float Measurement::getError(Measurement m2){
-//     float result =0;
-//     if (m2.isValid() & this->isValid()){
-//         result= this->get()-m2.get();
-//     }
-//     return result;
-// }
 
 float Measurement::getStandardError(Measurement m2, float max){ 
     float result =0;
@@ -53,11 +46,6 @@ float Measurement::getStandardError(Measurement m2, float max){
     return result;
 }
 
-// float EndCriteria::getError(EndCriteria ec){ //not normalised
-//     float result =0;
-//     result = angle.getError(ec.angle) + distance.getError(ec.distance);
-//     return result;
-// }
 
 float EndCriteria::getStandardError(Angle a, Distance d){ //standard error
     float result =0;

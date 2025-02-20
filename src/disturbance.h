@@ -1,9 +1,14 @@
 #ifndef DISTURBANCE_H
 #define DISTURBANCE_H
-#include "settings.h"
+//#include "settings.h"
 #include "robot.h"
 #include <algorithm>
 #include <stdexcept>
+
+typedef unsigned int AffordanceIndex; //was thinking of this being a character but doesn't have to be maybe enum is fine
+enum InnateAffordances {NONE, AVOID, PURSUE}; //for ease of identification, previously also ATTACK and EXPLORE
+enum Direction{LEFT, RIGHT, DEFAULT, BACK, STOP, UNDEFINED};
+
 
 struct CompareY{
 	template <typename T>
@@ -89,37 +94,21 @@ public:
 
     Disturbance(){};
     Disturbance(AffordanceIndex i){
-        if (i>affordances.size()-1){
-            throw std::invalid_argument("Not a valid affordance index\n");
-        }
-        else{
-            affordanceIndex = i;
-        }
+        affordanceIndex = i;    
     }
     Disturbance(AffordanceIndex i, b2Vec2 p){
-        if (i>affordances.size()-1){
-            throw std::invalid_argument("Not a valid affordance index\n");
-        }
-        else{
-            affordanceIndex = i;
-        }
+        affordanceIndex = i;
 		bf.pose.Set(p, 0);
         valid =1;
     }    
 
-        Disturbance(AffordanceIndex i, b2Vec2 p, float a){
-        if (i>affordances.size()-1){
-            throw std::invalid_argument("Not a valid affordance index\n");
-        }
-        else{
-            affordanceIndex = i;
-        }
+    Disturbance(AffordanceIndex i, b2Vec2 p, float a){
+        affordanceIndex = i;
         bf.pose.Set(p,a);
         valid =1;
     }   
 
     Disturbance(BodyFeatures _bf): bf(_bf){
-       // valid=1;
         affordanceIndex=1;
     } 
 
@@ -230,7 +219,6 @@ struct simResult{
     enum resultType {successful =0, crashed =1, safeForNow=2}; //successful means no collisions, finished means target reached, for later
     resultType resultCode= resultType::successful;
     Disturbance collision;
-    //bool valid = 0;
     b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0));
     int step=0;
 
@@ -238,11 +226,9 @@ struct simResult{
     simResult(){}
 
     simResult(resultType code): resultCode(code){
-     //   valid =1;
     }
 
     simResult(resultType code, Disturbance obst): resultCode(code), collision(obst){
-       // valid =1;
     }
 };
 

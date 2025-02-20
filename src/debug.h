@@ -6,9 +6,6 @@
 
 namespace debug{
 	
-// template <class T>
-// void graph_file(const int &, const T&,const Disturbance &, std::vector <vertexDescriptor>,const vertexDescriptor&);
-
 template <class T>
 void print_graph(const T& g, const Disturbance & goal, std::vector <vertexDescriptor>plan, const vertexDescriptor& c){
      std::stringstream os;
