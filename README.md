@@ -8,6 +8,7 @@ The indoor robot is equipped with
 * Raspberry Pi model 3b+
 
 ## Prerequisites
+- Bullseye release of Raspberry Pi OS
 ### Development packages
 
 * G++ compiler
@@ -25,7 +26,7 @@ The indoor robot is equipped with
 * [LIDAR API](https://github.com/berndporr/rplidar_rpi)
 * [Motors API](https://github.com/berndporr/alphabot)
 * [Cpp Timer](https://github.com/berndporr/cppTimer)
-* [Box2D v2.4.1](https://github.com/erincatto/box2d)
+* [Box2D v2.4.1](https://github.com/glafratta/box2d)
   ** if not installed automatically, go to `box2d/build` and run `sudo make install`
 
 ## Build
