@@ -1,7 +1,7 @@
 #include "worldbuilder.h"
 #include <fstream>
 
-std::vector <BodyFeatures> WorldBuilder::processData( const CoordinateContainer &pts, const b2Transform& start){
+std::vector <BodyFeatures> WorldBuilder::processData_test( const CoordinateContainer &pts, const b2Transform& start){
     std::vector <BodyFeatures> result;
     std::vector <cv::Point2f> points, centers;
     for (Pointf p:pts){

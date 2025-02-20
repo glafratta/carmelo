@@ -1,10 +1,5 @@
 #include "worldbuilder.h"
 
-std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer& points, const b2Transform& start){
-    std::vector <BodyFeatures> result;
-    return result;
-
-}
 
 int main(){
     std::vector <cv::Point2f> points, centers;

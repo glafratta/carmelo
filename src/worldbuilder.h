@@ -90,6 +90,8 @@ class WorldBuilder{
 
     b2AABB  makeRobotSensor(b2Body*, Disturbance *goal); //returns bounding box in world coord
 
+    std::vector <BodyFeatures> processData_test( const CoordinateContainer &pts, const b2Transform& start);
+
 
 };
 #endif

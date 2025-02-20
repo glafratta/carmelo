@@ -15,29 +15,18 @@
 
 const std::map<Direction, char*> dirmap={{DEFAULT, "DEFAULT"}, {LEFT, "LEFT"}, {RIGHT, "RIGHT"}, {STOP, "STOP"}, {UNDEFINED, "UNDEFINED"}, {BACK, "BACK"}};
 
-//typedef b2Transform DeltaPose;
-
 class ConfiguratorInterface{
 public:
 	bool debugOn=0;
 	int iteration=0;
-	//CoordinateContainer data;
 	CoordinateContainer data2fp;
-	//cv::Mat visual_field;
 	bool ready=0;
 	bool newData=0;
-	//PointCloudProc * pcProc=NULL;
 	bool stop=0;
 
 	void setReady(bool b);
 
 	bool isReady();
-
-	// void updatePCProc(){
-	// 	pcProc->updatePrevious(data);
-	// }
-
-
 
 };
 
@@ -165,8 +154,6 @@ std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
-//void recall_plan_from(const vertexDescriptor&, TransitionSystem & , b2World &, std::vector <vertexDescriptor>&, bool&);
-
 std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, TransitionSystem&);
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0); //matches to most likely
@@ -263,7 +250,6 @@ void setSimulationStep(float f){
 	simulationStep=f;
 }
 
-void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
 
 
 
