@@ -110,9 +110,9 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}		
 		ts_cleanup(&transitionSystem);
-		if (planVertices.empty() ){ //currentv not visited means that it wasn't observed (&& !transitionSystem[currentVertex].visited())
+		if (planVertices.empty() && !transitionSystem[currentVertex].visited()){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
-			planVertices= planner(transitionSystem, src);
+			planVertices= planner(transitionSystem, currentVertex);
 		}
 		else{
 			printf("recycled plan in explorer:\n");
@@ -695,11 +695,11 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 				return std::vector(_plan.begin()+0, _plan.end());
 			}
 			else{
-				printf("getting plan from index 1\n");
+				//printf("getting plan from index 1\n");
+				printf("plan size before skip %i, first=%i ", _plan.size() , _plan[0]);
 				return std::vector((_plan.begin()+1), _plan.end());
 			}
 		};
-
 		if (end_plan==goal){
 			plan=skip_first(p, currentVertex, g, currentTask.motorStep);
 			break;
