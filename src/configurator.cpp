@@ -110,9 +110,9 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}		
 		ts_cleanup(&transitionSystem);
-		if (planVertices.empty() && !transitionSystem[currentVertex].visited()){ //currentv not visited means that it wasn't observed ()
+		if (planVertices.empty() && (!transitionSystem[currentVertex].visited() || currentTask.motorStep==0)){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
-			planVertices= planner(transitionSystem, currentVertex);
+			planVertices= planner(transitionSystem, currentVertex); //src
 		}
 		else{
 			printf("recycled plan in explorer:\n");
@@ -252,6 +252,7 @@ simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ /
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
 	result =t.bumping_that(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
+	worldBuilder.world_cleanup(&w);
 	//approximate angle to avoid stupid rounding errors
 	float approximated_angle=approximate_angle(result.endPose.q.GetAngle(), t.direction, result.resultCode);
 	result.endPose.q.Set(approximated_angle);
@@ -310,7 +311,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				printf("v0=%i, dir=%s\n", v0, (*dirmap.find(t.direction)).second);
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
 				if (v==0 && sim.resultCode==sim.crashed){
-					printf("IM GONNA CRASH!!!!\n");
+					printf("IM GONNA CRASH!!!! at");
+					debug::print_pose(sim.collision.pose());
 				}
 				gt::fill(sim, &sk.first, &sk.second); //find simulation result
 				sk.second.direction=t.direction;
@@ -1157,12 +1159,12 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 		bool condition=0;
 		StateMatcher::MATCH_TYPE m=StateMatcher::_FALSE;
 		float sum_tmp=sd.get_sum(match_type);
-		if (v==currentVertex){
-			printf("Di difference:");
-			debug::print_pose(sd.Di.pose);
-			printf("Dn difference:");
-			debug::print_pose(sd.Dn.pose);
-		}
+		// if (v==currentVertex){
+		// 	printf("Di difference:");
+		// 	debug::print_pose(sd.Di.pose);
+		// 	printf("Dn difference:");
+		// 	debug::print_pose(sd.Dn.pose);
+		// }
 		if (!relax){
 			m=matcher.isMatch(sd, s.endPose.p.Length());
 			condition=matcher.match_equal(m, match_type);
@@ -1292,7 +1294,7 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		if (pv.empty()){
 			//if (currentVertex!=movingVertex){
 			printf("I DON'T KNOW WHAT TO DO NOW\n");
-			currentTask=controlGoal;
+			currentTask=Task(controlGoal.disturbance, DEFAULT);
 			currentTask.action.L=0;
 			currentTask.action.R=0;
 			currentTask.change=1;

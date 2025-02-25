@@ -122,13 +122,13 @@ simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bo
 		}
 		result.endPose = robot->GetTransform();
 		result.step=stepb2d;
-		for (b2Body * b = _world.GetBodyList(); b; b = b->GetNext()){
-			_world.DestroyBody(b);
-		}
+		// for (b2Body * b = _world.GetBodyList(); b; b = b->GetNext()){
+		// 	_world.DestroyBody(b);
+		// }
 		if (debugOn){
 			fclose(robotPath);
 		}
-		int bodies = _world.GetBodyCount();
+		//int bodies = _world.GetBodyCount();
 		return result;
 	
 }

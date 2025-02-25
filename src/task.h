@@ -55,6 +55,7 @@ public:
         R=-WHEEL_SPEED_TURN;
         break;
         default:
+        direction=DEFAULT;
         L=0;
         R=0;
         break;
