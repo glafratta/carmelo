@@ -265,9 +265,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	Direction direction=currentTask.direction;
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
-	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
-	//printf("hello\n");
-	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
+	b2Transform start= b2Transform_zero, shift=b2Transform_zero, v_shift=shift;
 	EndedResult er;
 	printf("v=%i, initial plan size=%i\n",v, plan_prov.size());
 	printf("GOAL IS: ");
@@ -277,13 +275,10 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		State shifted_state=g[v];
-		printf("shift:");
-		debug::print_pose(shift);
-		math::applyAffineTrans(shift, shifted_state);
-		er = controlGoal.checkEnded(g[v], t.direction);
-		// if (er.ended){
-		// 	break;
-		// }
+		printf("v_shift:");
+		debug::print_pose(v_shift);
+		math::applyAffineTrans(v_shift, shifted_state);
+		er = controlGoal.checkEnded(shifted_state, t.direction);
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
 		//printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
 		//printf("v=%i, dir=%s\n", v, (*dirmap.find(t.direction)).second);
@@ -302,7 +297,6 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					printf("Di pose:");
 					debug::print_pose(Di.pose());
 				}
-				//worldBuilder.world_cleanup(&w);
 				t = Task(Di, g[v0].options[0], start, true);
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
