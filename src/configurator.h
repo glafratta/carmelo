@@ -65,7 +65,7 @@ public:
 	vertexDescriptor movingVertex;
 	vertexDescriptor currentVertex;
 	edgeDescriptor movingEdge, currentEdge;
-	std::unordered_map <State*, ExecutionError> errorMap;
+	// std::unordered_map <State*, ExecutionError> errorMap;
 
 Configurator()=default;
 
@@ -157,17 +157,15 @@ void propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vect
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
+// void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
 
 void trackDisturbance(b2Transform &, Task::Action, float); //open loop
-
-void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
 void updateGraph(TransitionSystem&, const b2Transform & _deltaPose);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
-void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&, std::pair<bool,vertexDescriptor> tgt=std::pair(false,TransitionSystem::null_vertex()));
+void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
 
 std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
@@ -281,7 +279,7 @@ std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance ta
 
 
 
-ExecutionError trackTaskExecution(Task &);
+void trackTaskExecution(Task &);
 
 b2Transform assignDeltaPose(Task::Action, float);
 

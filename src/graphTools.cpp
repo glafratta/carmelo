@@ -208,11 +208,10 @@ int gt::distanceToSimStep(const float& s, const float& ds){
 }
 
 
-void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
+void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, int it){
 	if (e==edgeDescriptor()){
 		return;
 	}
-	ExecutionError result;
 	if (!current){
 		g[e].step = sk.second.step;
 	}
@@ -232,11 +231,11 @@ void gt::update(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& 
 	g[e].it_observed=it;
 }
 
-void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, std::unordered_map<State*, ExecutionError>& errorMap, int it){
+void gt::set(edgeDescriptor e, std::pair <State, Edge> sk, TransitionSystem& g, bool current, int it){
 	if (g[e.m_target].filled){
 		return;
 	}
-	update(e, sk, g, current, errorMap, it);
+	update(e, sk, g, current, it);
 	g[e.m_target].outcome = sk.first.outcome;
 }
 

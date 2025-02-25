@@ -406,4 +406,3 @@ b2Transform WorldBuilder::Bridger::get_transform(Task * t, const CoordinateConta
     //what's the most likely angle??
 }
 
-

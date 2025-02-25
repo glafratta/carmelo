@@ -249,35 +249,6 @@ struct Visited{ //for debug
 };
 
 
-struct ExecutionError{
-
-	ExecutionError(){}
-
-	ExecutionError(float fr, float ft){
-		_r=fr;
-		_theta=ft;
-	}
-
-	float r(){
-		return _r;
-	}
-
-	float theta(){
-		return _theta;
-	}
-
-	void setTheta(float f){
-		_theta=f;
-	}
-
-	void setR(float f){
-		_r=f;
-	}
-	private:
-	float _r=0;
-	float _theta=0;
-};
-
 typedef std::pair<vertexDescriptor, std::vector<vertexDescriptor>> Frontier;
 
 struct ComparePhi{
@@ -298,9 +269,9 @@ namespace gt{
 
 	int distanceToSimStep(const float&, const float&);
 	
-	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, int); //returns disturbance rror based on expected vs observed D
 
-	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, int);
 
 	std::pair< bool, edgeDescriptor> getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>, int);
 
