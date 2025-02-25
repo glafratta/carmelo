@@ -116,8 +116,8 @@ bool Configurator::Spawner(){
 		}
 		else{
 			printf("recycled plan in explorer:\n");
-			//printPlan();
 		}
+		printPlan();
 		// if (!planVertices.empty()){
 		// 	b2Vec2 debug_start=transitionSystem[*planVertices.begin()].start.p;
 		// 	b2Vec2 debug_end=transitionSystem[*(planVertices.end()-1)].endPose.p;
@@ -275,6 +275,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
+		State shifted_state=g[v];
+		math::applyAffineTrans(shift, shifted_state);
 		er = controlGoal.checkEnded(g[v], t.direction);
 		// if (er.ended){
 		// 	break;
@@ -774,16 +776,9 @@ float Configurator::evaluationFunction(EndedResult er){
 
 
 void Configurator::printPlan(std::vector <vertexDescriptor>* p){
-	if (p==NULL){
-		printf("currently executed plan:\t");
-		p=&planVertices;
-	}
-	else{
-		printf("provisional plan:\t");
-	}
 	std::vector <vertexDescriptor> plan= *p;
 	vertexDescriptor pre=currentVertex;
-	//printf("current=%i\t", pre);
+	printf("PLAN:");
 	for (vertexDescriptor v: plan){
 		std::pair <edgeDescriptor, bool> edge=boost::edge(pre, v, transitionSystem);
 		if (!edge.second){
