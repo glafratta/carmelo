@@ -110,7 +110,7 @@ bool Configurator::Spawner(){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}		
 		ts_cleanup(&transitionSystem);
-		if (planVertices.empty() && !transitionSystem[currentVertex].visited()){ //currentv not visited means that it wasn't observed
+		if (planVertices.empty() ){ //currentv not visited means that it wasn't observed (&& !transitionSystem[currentVertex].visited())
 			printf("no plan, searchign from %i\n", src);
 			planVertices= planner(transitionSystem, src);
 		}
@@ -351,7 +351,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						if (finished){
 							plan_prov=plan_tmp;
 							//auto loop= matcher.isMatch(StateDifference(g[currentVertex], g[task_start]));
-							if ( task_start==currentVertex && currentTask.motorStep==0){
+							if (planVertices.empty() && currentTask.motorStep==0){ // task_start==currentVertex instead of pv empty
 								printf("inserting current vertex\n");
 								plan_prov.insert(plan_prov.begin(), task_start);
 							}

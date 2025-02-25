@@ -40,7 +40,7 @@ int main(int argc, char** argv){
     Robot robot(&world);
     b2AABB aabb= conf.worldBuilder.makeRobotSensor(robot.body, &conf.controlGoal.disturbance);
     debug_draw(world, 8);
-    simResult sr= task.willCollide(world, 69, robot.body, true);
+    simResult sr= task.bumping_that(world, 69, robot.body, true);
 
     //linear speed =0.1
     printf("step=%i, expected=%i\n", sr.step, expected);
