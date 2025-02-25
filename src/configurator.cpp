@@ -322,15 +322,15 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				StateMatcher::MATCH_TYPE vm= matcher.isMatch(g[v], g[currentEdge.m_source]); //see if we are at the beginning of the exploration:
 																					//v=0 and currentEdge =src will match so we try to prevent
 																			//changing the movign vertex which is by default the origin
-				if (v0==movingVertex & vm==StateMatcher::_TRUE){
-					source= g[currentEdge.m_source].ID;
-				}
-				else{
-					source=g[v0].ID;
-				}
+				// if (v0==movingVertex & vm==StateMatcher::_TRUE){
+				// 	source= g[currentEdge.m_source].ID;
+				// }
+				// else{
+				// 	source=g[v0].ID;
+				// }
 				bool closest_match=false, match_task=true;
 				StateMatcher::MATCH_TYPE desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
-				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, source, t.direction, desired_match, NULL, closest_match, match_task );		//, closest_match	
+				std::pair<StateMatcher::MATCH_TYPE, vertexDescriptor> match=findMatch(sk.first, g, g[v0].ID, t.direction, desired_match, NULL, closest_match, match_task );		//, closest_match	
 				std::pair <edgeDescriptor, bool> edge(edgeDescriptor(), false); //, new_edge(edgeDescriptor(TransitionSystem::null_vertex(), TransitionSystem::null_vertex(), NULL), false);
 				if (matcher.match_equal(match.first, desired_match)){
 					g[v0].options.erase(g[v0].options.begin());
