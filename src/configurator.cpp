@@ -1415,3 +1415,12 @@ void Configurator::ts_cleanup(TransitionSystem * g){
 
 }
  
+void Configurator::shift_plan(TransitionSystem & g, const std::vector<vertexDescriptor>& p){
+	if (p.empty()){
+		return;
+	}
+	b2Transform shift=g[p[0]].start;
+	for (const vertexDescriptor &v:p){
+		math::applyAffineTrans(shift, g[v]);
+	}
+}
