@@ -117,7 +117,7 @@ bool Configurator::Spawner(){
 		else{
 			printf("recycled plan in explorer:\n");
 		}
-		printPlan();
+		printPlan(&planVertices);
 		// if (!planVertices.empty()){
 		// 	b2Vec2 debug_start=transitionSystem[*planVertices.begin()].start.p;
 		// 	b2Vec2 debug_end=transitionSystem[*(planVertices.end()-1)].endPose.p;
@@ -265,7 +265,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero;
-	printf("hello\n");
+	//printf("hello\n");
 	//std::vector<std::pair<vertexDescriptor, vertexDescriptor>> toRemove;
 	EndedResult er;
 	printf("v=%i, initial plan size=%i\n",v, plan_prov.size());
@@ -276,13 +276,15 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
 		State shifted_state=g[v];
+		printf("shift:");
+		debug::print_pose(shift);
 		math::applyAffineTrans(shift, shifted_state);
 		er = controlGoal.checkEnded(g[v], t.direction);
 		// if (er.ended){
 		// 	break;
 		// }
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
-		printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
+		//printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
 		//printf("v=%i, dir=%s\n", v, (*dirmap.find(t.direction)).second);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
@@ -840,7 +842,6 @@ void Configurator::run(Configurator * c){
 		if (c->ci->isReady()){
 			c->ci->ready=0;
 			c->data2fp= CoordinateContainer(c->ci->data2fp);
-			printf("spawn\n");
 			c->Spawner();
 		}
 	}
@@ -1291,12 +1292,11 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 		if (pv.empty()){
 			//if (currentVertex!=movingVertex){
 			printf("I DON'T KNOW WHAT TO DO NOW\n");
-			//currentTask=Task(STOP);
+			currentTask=controlGoal;
 			currentTask.action.L=0;
 			currentTask.action.R=0;
 			currentTask.change=1;
-			//}
-			//printf("no plan, bas\n");
+			currentVertex=movingVertex;
 			return pv;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
