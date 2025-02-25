@@ -92,10 +92,14 @@ void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 void math::applyAffineTrans(const b2Transform& deltaPose, TransitionSystem& g){
 	auto vPair =boost::vertices(g);
 	for (auto vIt= vPair.first; vIt!=vPair.second; ++vIt){ //each node is adjusted in explorer, so now we update
-	if (*vIt!=0){
-		math::applyAffineTrans(deltaPose, g[*vIt]);
+		if (*vIt!=0){
+			math::applyAffineTrans(deltaPose, g[*vIt]);
+		}
+		else{
+			math::applyAffineTrans(deltaPose, g[*vIt].Di);
+			math::applyAffineTrans(deltaPose, g[*vIt].Dn);
+		}
 	}
-}
 }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, Disturbance& d){

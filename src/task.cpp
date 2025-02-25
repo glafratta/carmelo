@@ -58,10 +58,11 @@ bool overlaps(b2Body * robot, Disturbance * disturbance){
 	return b2TestOverlap(sensor->GetShape(), 0, &d_shape, 0,robot_pose, d_pose);
 }
 
-simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
+simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
 		result.endPose = start;
 		if (action.L==0 & action.R==0){
+			printf("not simulating, exiting\n");
 			return result;
 		}
 		Listener listener(&disturbance);
@@ -76,8 +77,6 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 		}
 		float theta = start.q.GetAngle();
 		b2Vec2 instVelocity = {0,0};
-		//robot->SetTransform(start.p, theta);
-		//makeRobotSensor(robot.body);
 		int stepb2d=0;
 		float traj_error=0;
 		for (stepb2d; stepb2d < (HZ*remaining); stepb2d++) {//3 second
@@ -106,9 +105,11 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 				bool keep_going_out_x=(fabs(robot->GetTransform().p.x+instVelocity.x) >fabs(robot->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot->GetTransform().p.y+instVelocity.y) >fabs(robot->GetTransform().p.y))&&out_y;
 				if (ended){
+					printf("ended bumping that at step %i\n", stepb2d);
 					break;
 				}
 				if (keep_going_out_x || keep_going_out_y){
+					printf("keep bumping out at step %i\n", stepb2d);
 					break;
 				}
 			}
@@ -117,12 +118,11 @@ simResult Task::willCollide(b2World & _world, int iteration, b2Body * robot, boo
 			if (listener.collisions.size()>0){ //
 				int index = int(listener.collisions.size()/2);
 				Disturbance collision = Disturbance(listener.collisions[index]);
-				//b2Vec2 distance = collision.getPosition()-robot.body->GetTransform().p;
 				result = simResult(simResult::resultType::crashed, collision);
-				//stepb2d=0;
 				break;
 			}
 		}
+		printf("exit at step %i, L=%f, R=%f\n", stepb2d, action.L, action.R);
 		result.endPose = robot->GetTransform();
 		result.step=stepb2d;
 		for (b2Body * b = _world.GetBodyList(); b; b = b->GetNext()){
@@ -222,32 +222,6 @@ Direction Task::H(Disturbance ob, Direction d, bool topDown){
     return d;
 }
 
-void Task::Ray::assign(const Robot& robot, const Disturbance & disturbance){
-	if (!disturbance.isValid()){
-		return;
-	}
-	b2RayCastInput result;
-	result.p1=getClosest(robot, disturbance);
-	result.p2= disturbance.bf.pose.p;
-	result.maxFraction=1.5;
-	*input=result;
-}
-
-b2Vec2 Task::Ray::getClosest(const Robot& robot, const Disturbance & disturbance){
-	return b2Vec2();
-
-}
-
-
-
-void Task::Ray::update(const b2Transform& t){
-    if (NULL==input){
-        return;
-    }
-    b2Transform tmp(input->p1, b2Rot(0));
-    math::applyAffineTrans(t, tmp);
-    input->p1=tmp.p;
-}
 
 
 void Task::setEndCriteria(Angle angle, Distance distance){
@@ -257,16 +231,6 @@ void Task::setEndCriteria(Angle angle, Distance distance){
 			endCriteria.distance = Distance(0+DISTANCE_ERROR_TOLERANCE);
 		}
 		break;
-		// case AVOID:{
-		// 	if (direction==DEFAULT){
-				
-		// 	}
-		// 	else{
-		// 		//endCriteria.distance = distance;
-		// 		endCriteria.angle = angle;
-		// 	}
-		// }
-		//break;
 		default:
 		endCriteria.distance = distance;
 		endCriteria.angle = angle;
@@ -372,37 +336,6 @@ EndedResult Task::checkEnded(State n,  Direction dir, bool relax, std::pair<bool
 	r.estimatedCost+= endCriteria.getStandardError(a,d, n);
 	return r;
 }
-// b2AABB Task::makeRobotSensor(b2Body* robotBody){
-// 	b2AABB result;
-// 	if (!(disturbance.getAffIndex()==AVOID)){
-// 		return result;
-// 	}
-// 	b2PolygonShape * poly_robo=(b2PolygonShape*)robotBody->GetFixtureList()->GetShape();
-// 	//b2PolygonShape * poly_d=(b2PolygonShape*)disturbance.bf.fixture.GetShape();
-// 	std::vector <b2Vec2> all_points=arrayToVec(poly_robo->m_vertices, poly_robo->m_count), d_vertices=disturbance.vertices();
-// 	for (b2Vec2 p: d_vertices){
-// 		p =robotBody->GetLocalPoint(p);
-// 		all_points.push_back(p);
-// 	}
-// 	float minx=(std::min_element(all_points.begin(),all_points.end(), CompareX())).base()->x;
-// 	float miny=(std::min_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
-// 	float maxx=(std::max_element(all_points.begin(), all_points.end(), CompareX())).base()->x;
-// 	float maxy=(std::max_element(all_points.begin(), all_points.end(), CompareY())).base()->y;
-// 	float halfLength=(fabs(maxy-miny))/2; //
-//     float halfWidth=(fabs(maxx-minx))/2;
-// 	b2Vec2 centroid(maxx-halfWidth, maxy-halfLength);
-// 	b2Vec2 offset=centroid - robotBody->GetLocalPoint(robotBody->GetPosition());
-// 	b2PolygonShape shape;
-// 	shape.SetAsBox(halfWidth, halfLength, offset, 0);
-// 	b2FixtureDef fixtureDef;
-// 	fixtureDef.isSensor=true;
-// 	fixtureDef.shape=&shape;
-// 	robotBody->CreateFixture(&fixtureDef);
-// 	shape.ComputeAABB(&result, robotBody->GetTransform(), 0);
-// 	return result;
-	
-// }
-
 
 EndCriteria Task::getEndCriteria(const Disturbance &d){
 	EndCriteria endCriteria;

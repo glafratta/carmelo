@@ -24,7 +24,6 @@ void get_Foldername(char* custom, char name[60]){
 	sprintf(name, "%s_%02i%02i%02i_%02i%02i",custom, d,m,y,h,min);
 }
 
-void forget(Configurator*);
 
 Disturbance set_target(int&, b2Transform);
 
@@ -93,12 +92,12 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
 public:
 int ogStep=0;
 Configurator * c;
-int run=0;
+int run=0, og_plan=0;
 
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	printf("graph size=%i\n", c->transitionSystem.m_vertices.size());
+	//printf("graph size=%i, plan size=%i\n", c->transitionSystem.m_vertices.size(), c->planVertices.size());
 	if (c->getIteration() <=0){
 		return;
 	}
@@ -106,14 +105,18 @@ void step( AlphaBot &motors){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-
+	//DEBUG
+	if (c->getIteration()>1){
+		og_plan=c->transitionSystem.m_vertices.size();
+	}
+	// if (c->transitionSystem.m_vertices.size()>og_plan){
+	// 	c->stop();
+	// }
+	//END DEBUG
 	c->trackTaskExecution(*c->getTask());
-	printf("step=%i\n", c->getTask()->motorStep);
+	// printf("step=%i\n", c->getTask()->motorStep);
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
-	//bool planEnded = c->getTask()->motorStep<1 & c->planVertices.empty() & c->transitionSystem[c->currentEdge].direction!=STOP;
-	//EndedResult er2 = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);
 	if (er.ended && c->getTask()->motorStep==0){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
-		//printf("goal reached\n");
 		run++;
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
 		c->controlGoal = Task(new_goal, UNDEFINED);

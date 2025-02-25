@@ -14,15 +14,6 @@ bool overlaps(b2Body *, Disturbance *);
 
 class Task{
 
-struct Ray{
-    b2RayCastInput * input;
-
-    void assign(const Robot&, const Disturbance &);
-
-    b2Vec2 getClosest(const Robot&, const Disturbance &);
-
-    void update(const b2Transform&);
-};
 
 public:
     friend class Configurator;
@@ -72,7 +63,7 @@ public:
     }
 
 void setVelocities(float l, float r){
-    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
+    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in bumping_that
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(l+r)/2;
     recordedSpeed=linearSpeed;
@@ -337,7 +328,7 @@ Task(Disturbance ob, Direction d, b2Transform _start=b2Transform(b2Vec2(0.0, 0.0
 }
 
 
-simResult willCollide(b2World &, int, b2Body *,bool debug =0, float remaining = SIM_DURATION, float simulationStep=BOX2DRANGE);
+simResult bumping_that(b2World &, int, b2Body *,bool debug =0, float remaining = SIM_DURATION, float simulationStep=BOX2DRANGE);
 
 EndCriteria getEndCriteria(const Disturbance&);
 };

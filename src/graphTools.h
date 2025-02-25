@@ -106,15 +106,8 @@ struct State{
 
 
 struct StateDifference{
-	// b2Vec2 r_position=b2Vec2(0,0);
-	// float r_angle=0;
 	b2Transform pose=b2Transform_zero;
 	BodyFeatures Di, Dn;
-	// int D_type=0;
-	// b2Vec2 D_position=b2Vec2(0,0);
-	// float D_angle=0;
-	// float D_width=0;
-	// float D_length=0;
 	enum WHAT_D_FLAG{DI, DN};
 
 	StateDifference()=default;
