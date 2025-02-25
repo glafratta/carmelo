@@ -377,9 +377,9 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 
 					}
 					auto d_print=dirmap.find(t.direction);
-					printf("added v %i to %i, direction %s, distance: %f, start", v1, v0, (*d_print).second, g[v1].distance());
-					debug::print_pose(g[v1].start);
-					printf("v1 crashed=%i\n", g[v1].outcome==simResult::crashed);
+					printf("added v %i to %i, direction %s, distance: %f, start", v1, v0, (*d_print).second, sk.first.distance());
+					debug::print_pose(sk.first.start);
+					printf("v1 crashed=%i\n", sk.first.outcome==simResult::crashed);
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
@@ -1161,6 +1161,12 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 		bool condition=0;
 		StateMatcher::MATCH_TYPE m=StateMatcher::_FALSE;
 		float sum_tmp=sd.get_sum(match_type);
+		if (v==currentVertex){
+			printf("Di difference:");
+			debug::print_pose(sd.Di.pose);
+			printf("Dn difference:");
+			debug::print_pose(sd.Dn.pose);
+		}
 		if (!relax){
 			m=matcher.isMatch(sd, s.endPose.p.Length());
 			condition=matcher.match_equal(m, match_type);

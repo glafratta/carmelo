@@ -105,11 +105,9 @@ simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bo
 				bool keep_going_out_x=(fabs(robot->GetTransform().p.x+instVelocity.x) >fabs(robot->GetTransform().p.x))&&out_x;
 				bool keep_going_out_y=(fabs(robot->GetTransform().p.y+instVelocity.y) >fabs(robot->GetTransform().p.y))&&out_y;
 				if (ended){
-					printf("ended bumping that at step %i\n", stepb2d);
 					break;
 				}
 				if (keep_going_out_x || keep_going_out_y){
-					printf("keep bumping out at step %i\n", stepb2d);
 					break;
 				}
 			}
@@ -122,7 +120,6 @@ simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bo
 				break;
 			}
 		}
-		printf("exit at step %i, L=%f, R=%f\n", stepb2d, action.L, action.R);
 		result.endPose = robot->GetTransform();
 		result.step=stepb2d;
 		for (b2Body * b = _world.GetBodyList(); b; b = b->GetNext()){
