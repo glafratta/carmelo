@@ -279,7 +279,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				v1 =v0; //frontier
 				std::vector <vertexDescriptor> propagated;
 				do {
-				changeStart(start, v0, g, shift);
+				//changeStart(start, v0, g, shift);
+				start=g[v0].endPose +shift;
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0], start);
 				if (v0==2){
 					printf("Di pose:");
@@ -323,38 +324,42 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 							//printf("added edge: %i -> %i, step=%i\n", v0, v1, sk.second.step);
 							g[edge.first]=sk.second; //doesn't update motorstep
 						}
-					if (plan_prov.empty()&&currentTask.motorStep==0){
-						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
+					if (currentTask.motorStep==0){
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
-						//shift here?
 						vertexDescriptor task_start= task_vertices[0];
-						Task controlGoal_adjusted= controlGoal;
 						b2Transform shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
-						math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
-						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
-						bool filler=0;
-						shift_states(g, task_vertices, shift_start);
-						// if (match.second!=v){
-						// 	shift= b2MulT(g[task_start].start, start);
-						// }
-						if (finished){
-							plan_prov=plan_tmp;
-							//auto loop= matcher.isMatch(StateDifference(g[currentVertex], g[task_start]));
-							if (planVertices.empty() && currentTask.motorStep==0){ // task_start==currentVertex instead of pv empty
-								printf("inserting current vertex\n");
-								plan_prov.insert(plan_prov.begin(), task_start);
-							}
-							boost::remove_edge(edge.first, g);
-							edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
-							printf("edge %i -> %i added\n", v0, task_start);
-							if (t.direction== g[edge.first].direction){
-								g[v0].options.clear();
-							}
-							else{
-								g[v0].options={g[edge.first].direction};
+						if (plan_prov.empty()){
+							bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
+							//shift here?
+							Task controlGoal_adjusted= controlGoal;
+							math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
+							auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
+							bool filler=0;
+							// if (match.second!=v){
+							// 	shift= b2MulT(g[task_start].start, start);
+							// }
+							if (finished){
+								plan_prov=plan_tmp;
+								if (planVertices.empty()){ // task_start==currentVertex instead of pv empty
+									printf("inserting current vertex\n");
+									plan_prov.insert(plan_prov.begin(), task_start);
+								}
+								boost::remove_edge(edge.first, g);
+								edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
+								printf("edge %i -> %i added\n", v0, task_start);
+								if (t.direction== g[edge.first].direction){
+									g[v0].options.clear();
+								}
+								else{
+									g[v0].options={g[edge.first].direction};
+								}
 							}
 						}
+						if (planVertices.empty()){
+							shift_states(g, task_vertices, shift_start);
+						}
 					}
+					
 				}
 				else{
 					auto out_expected=gt::outEdges(g, v0, t.direction);
@@ -1179,36 +1184,36 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 }
 
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
-	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
-	//if (plan_prov.empty()){
-		return;
-	//}
-	}
-	auto v_it=check_vector_for(plan_prov, v);
-	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
-		int out_deg = boost::out_degree(v, g);
-		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){ //|| gt::inEdges(g, v, STOP).empty()
-			desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
-		}
-		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
-			closest_match=true;
-		}
-	}
+// void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
+// 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
+// 	//if (plan_prov.empty()){
+// 		return;
+// 	//}
+// 	}
+// 	auto v_it=check_vector_for(plan_prov, v);
+// 	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
+// 		int out_deg = boost::out_degree(v, g);
+// 		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){ //|| gt::inEdges(g, v, STOP).empty()
+// 			desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
+// 		}
+// 		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
+// 			closest_match=true;
+// 		}
+// 	}
 
 
-}
+// }
 
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
-	// if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
-	// 	edgeDescriptor e = boost::in_edges(v, g).first.dereference();
-	// 	start = g[e.m_source].endPose + shift;
-	// }
-	// else{
-		start=g[v].endPose +shift;
-	//}
-}
+// void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
+// 	// if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
+// 	// 	edgeDescriptor e = boost::in_edges(v, g).first.dereference();
+// 	// 	start = g[e.m_source].endPose + shift;
+// 	// }
+// 	// else{
+// 		start=g[v].endPose +shift;
+// 	//}
+// }
 
 
 
@@ -1403,7 +1408,7 @@ void Configurator::ts_cleanup(TransitionSystem * g){
 
 }
  
-void Configurator::shift_states(TransitionSystem & g, const std::vector<vertexDescriptor>& p, const b2Transform & current_pose){
+void Configurator::shift_states(TransitionSystem & g, const std::vector<vertexDescriptor>& p, const b2Transform & shift_start){
 	if (p.empty()){
 		return;
 	}
