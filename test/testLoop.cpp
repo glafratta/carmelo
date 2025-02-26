@@ -12,9 +12,9 @@ public:
         start=c->movingEdge.m_target;
     }
     void step(){
-        ExecutionError ee =c->trackTaskExecution(*c->getTask());
+        c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action, c->getTask()->motorStep);
+       // c->getTask()->correct(action, c->getTask()->motorStep);
         EndedResult er = c->controlGoal.checkEnded();
 	    if (er.ended){
             Disturbance new_goal(PURSUE, c->controlGoal.start.p, c->controlGoal.start.q.GetAngle());

@@ -1,7 +1,6 @@
 #ifndef GENERAL_H
 #define GENERAL_H
 #include <set>
-//#include "opencv2/opencv.hpp"
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp> //LMEDS
 #include <vector>
@@ -13,8 +12,6 @@
 #include <boost/graph/graph_utility.hpp>
 #include <map>
 #include <boost/property_map/property_map.hpp> //property map
-#include <boost/graph/subgraph.hpp>
-//#include <boost/variant/get.hpp> //get function
 #include <boost/graph/copy.hpp>
 #include <utility>
 #include "disturbance.h"
@@ -27,9 +24,7 @@ namespace math{
 };
 
 const float NAIVE_PHI=10.0;
-// enum M_CODES {THREE_M=3, FOUR_M=4};
 
-// enum GRAPH_CONSTRUCTION {BACKTRACKING, A_STAR, A_STAR_DEMAND, E};
 class Task;
 enum VERTEX_LABEL {UNLABELED, MOVING, ESCAPE, ESCAPE2};
 
@@ -70,7 +65,7 @@ struct State{
 	b2Transform endPose = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)), start = b2Transform(b2Vec2(0.0, 0.0), b2Rot(0)); 
 	simResult::resultType outcome;
 	std::vector <Direction> options;
-	int nodesInSameSpot =0;
+	//int nodesInSameSpot =0;
 	bool filled =0;
 	int nObs=0;
 	State* ID=this;
@@ -205,30 +200,16 @@ private:
 TransitionSystem * g;
 };
 
-struct MoreLikely{
-	bool operator()(Edge e1, Edge e2){//const
-		return e1.probability >e2.probability;
-	}
-};
+// struct MoreLikely{
+// 	bool operator()(Edge e1, Edge e2){//const
+// 		return e1.probability >e2.probability;
+// 	}
+// };
 
 
 
 
-struct Remember{
-	Remember(){}
-	Remember(TransitionSystem* ts):g(ts){}
 
-	bool operator()(const edgeDescriptor& e){//const
-		if ((*g)[e].probability<FORGET_THRESHOLD){ //filter signal
-		 	return false;
-		 }
-		return true;
-	}
-
-	private: 
-	TransitionSystem *g;
-	//std::set <edgeDescriptor> forget;
-};
 
 struct Visited{ //for debug
 	Visited(){}
@@ -241,35 +222,6 @@ struct Visited{ //for debug
 	TransitionSystem *g;
 };
 
-
-struct ExecutionError{
-
-	ExecutionError(){}
-
-	ExecutionError(float fr, float ft){
-		_r=fr;
-		_theta=ft;
-	}
-
-	float r(){
-		return _r;
-	}
-
-	float theta(){
-		return _theta;
-	}
-
-	void setTheta(float f){
-		_theta=f;
-	}
-
-	void setR(float f){
-		_r=f;
-	}
-	private:
-	float _r=0;
-	float _theta=0;
-};
 
 typedef std::pair<vertexDescriptor, std::vector<vertexDescriptor>> Frontier;
 
@@ -291,9 +243,9 @@ namespace gt{
 
 	int distanceToSimStep(const float&, const float&);
 	
-	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int); //returns disturbance rror based on expected vs observed D
+	void update(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, int); //returns disturbance rror based on expected vs observed D
 
-	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, std::unordered_map<State*, ExecutionError>&, int);
+	void set(edgeDescriptor,  std::pair <State, Edge>, TransitionSystem&, bool, int);
 
 	std::pair< bool, edgeDescriptor> getMostLikely(TransitionSystem&,std::vector<edgeDescriptor>, int);
 
@@ -322,8 +274,6 @@ struct NotSelfEdge{
 		bool not_self= e.m_source!=e.m_target && (*g)[e].step!=0 ; 
 		if (e.m_source==e.m_target){
 			auto def_kin =(*default_kinematics.find((*g)[e].direction)).second;
-			//not_self=(*g)[e].step>gt::distanceToSimStep(BOX2DRANGE-DISTANCE_ERROR_TOLERANCE, def_kin.first);
-			printf("p = %i, step=%i is not 0 =%i, keep=%i\n",  e.m_source,  (*g)[e].step, (*g)[e].step!=0, not_self);
 		}
 		return not_self;
 	}
@@ -340,10 +290,6 @@ typedef boost::filtered_graph<TransitionSystem, boost::keep_all, Visited> Visite
 class StateMatcher{
 	public:
 		enum MATCH_TYPE {_FALSE=0, D_NEW=2, DN_POSE=3, _TRUE=1, ANY=4, D_INIT=5, ABSTRACT=6, DI_POSE=7, DN_SHAPE=8, DI_SHAPE=9, POSE=10};
-        //std::vector <float> weights; //disturbance, position vector, angle
-		//assume mean difference 0
-		//std::vector <float> SDvector={0.03, 0.03, 0, 0.08, 0.08, M_PI/6};//hard-coded standard deviations for matching
-
 		struct Error{
 			const float endPosition=0.05;//0.05;
 			const float angle= M_PI/6;
@@ -354,13 +300,6 @@ class StateMatcher{
 
 		float mu=0.001;
 	    StateMatcher()=default;
-		// void initOnes(){
-		// 	for (auto i=weights.begin(); i!= weights.end(); i++){
-		// 		*i=1.0;
-		// 	}
-		// }
-
-	//StateDifference get_state_difference(State, State );
 
 		struct StateMatch{
 
@@ -412,7 +351,6 @@ class StateMatcher{
 			StateMatch(const StateDifference& sd, StateMatcher::Error error, float coefficient=1){
 				position = sd.pose.p.Length()<(error.endPosition*coefficient);
 				angle=fabs(sd.pose.q.GetAngle())<error.angle;
-				//d_type=sd.D_type==0;
 				Dn_position= sd.Dn.pose.p.Length()<(error.dPosition*coefficient);
 				Di_position= sd.Di.pose.p.Length()<(error.dPosition*coefficient);
 				Dn_angle=fabs(sd.Dn.pose.q.GetAngle())<error.angle;
@@ -463,11 +401,9 @@ class StateMatcher{
 			bool Di_position=false;
 			bool Di_angle=false;
 			bool Di_shape=false;
-			//bool Di_type=0;
 			bool Dn_position=false;
 			bool Dn_angle=false;
 			bool Dn_shape=false;
-			//bool Dn_type=0;
 		};
 
 		bool match_equal(const MATCH_TYPE& candidate, const MATCH_TYPE& desired);

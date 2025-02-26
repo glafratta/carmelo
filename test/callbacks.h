@@ -21,7 +21,21 @@ void printGraph(TransitionSystem& g){
     boost::print_graph(g);
 }
 
-Remember remember;
+struct Remember{
+	Remember(){}
+	Remember(TransitionSystem* ts):g(ts){}
+
+	bool operator()(const edgeDescriptor& e){//const
+		if ((*g)[e].probability<FORGET_THRESHOLD){ //filter signal
+		 	return false;
+		 }
+		return true;
+	}
+
+	private: 
+	TransitionSystem *g;
+}remember;
+
 Visited visited;
 
 template <typename Predicate> 
@@ -136,9 +150,9 @@ public:
             return;
         }
         printf("graph size = %i\n", c->transitionSystem.m_vertices.size());
-        ExecutionError ee =c->trackTaskExecution(*c->getTask());
+        c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action, c->getTask()->motorStep);
+       // c->getTask()->correct(action, c->getTask()->motorStep);
         EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, true);//true
 	    // if (c->getTask()->motorStep==0 && c->planVertices.empty() & c->transitionSystem.m_vertices.size()>2){ //&& (c->transitionSystem[c->movingEdge].step==0 || c->getIteration()<2)
         //     er.ended=1;

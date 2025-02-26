@@ -65,7 +65,6 @@ public:
 	vertexDescriptor movingVertex;
 	vertexDescriptor currentVertex;
 	edgeDescriptor movingEdge, currentEdge;
-	std::unordered_map <State*, ExecutionError> errorMap;
 
 Configurator()=default;
 
@@ -76,9 +75,6 @@ Configurator(Task _task, bool debug =0, bool noTimer=0): controlGoal(_task), cur
 	movingVertex=boost::add_vertex(transitionSystem);
 	transitionSystem[movingVertex].Di=controlGoal.disturbance;
 	currentVertex=movingVertex;
-	//dummy_vertex(currentVertex);
-	//movingEdge = boost::add_edge(movingVertex, currentVertex, transitionSystem).first;
-	//transitionSystem[movingEdge].direction=STOP;
 	currentTask.action.setVelocities(0,0);
 	gt::fill(simResult(), &transitionSystem[movingVertex]);
 }
@@ -157,21 +153,15 @@ void propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vect
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-//void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
 
 void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
-//void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
 void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
 void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&, std::pair<bool,vertexDescriptor> tgt=std::pair(false,TransitionSystem::null_vertex()));
-
-//std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
-
-//std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
@@ -182,10 +172,6 @@ std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, Tra
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0, bool wholeTask=false); //matches to most likely
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
-
-//std::pair <bool, vertexDescriptor>state_match(const State &, TransitionSystem&,Direction dir=Direction::UNDEFINED, std::vector <vertexDescriptor>* others=NULL, bool relax=0);
-
-//std::pair <bool, vertexDescriptor> exactPolicyMatch(vertexDescriptor, TransitionSystem&, Direction); //matches state and action (policy)
 
 void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end
 
@@ -234,24 +220,14 @@ void setStateLabel(State& s, vertexDescriptor src, Direction d){
 
 }
 
-//void adjustProbability(TransitionSystem &, edgeDescriptor&);
 
 std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0, const Task* custom_ctrl_goal=NULL, bool * finished =NULL) ;
-
-//std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
-
-
-//bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, Disturbance &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex());
-
-//b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
 void skip_reduced(edgeDescriptor &, TransitionSystem &, const std::vector<vertexDescriptor> &, std::vector<vertexDescriptor>::iterator);
 
 std::vector <vertexDescriptor> back_planner(TransitionSystem&, vertexDescriptor, vertexDescriptor root=0);
 
 EndedResult estimateCost(State&, b2Transform, Direction); //returns whether the controlGoal has ended and fills node with cost and error
-
-//EndedResult estimateCost(vertexDescriptor, TransitionSystem &, Direction); //finds error of task against the control goal adn its own cost (checks against itself)
 
 float evaluationFunction(EndedResult);
 
@@ -273,17 +249,7 @@ void addToPriorityQueue(vertexDescriptor, std::vector <vertexDescriptor>&, Trans
 
 void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, vertexDescriptor goal=TransitionSystem::null_vertex());
 
-// std::vector<Pointf> neighbours(b2Vec2,float radius =0.025); //finds if there are bodies close to a point. Used for 
-
-// std::pair <bool, float>  findOrientation(std::vector<Pointf> ); //finds  average slope of line passign through two points in a radius of 2.5 cm. Assumes low clutter 
-																		//and straight lines
-// std::pair <bool, vertexDescriptor> been_there(TransitionSystem &, Disturbance target=Disturbance());
-
-
-
-ExecutionError trackTaskExecution(Task &);
-
-//b2Transform assignDeltaPose(Task::Action, float);
+void trackTaskExecution(Task &);
 
 std::vector <vertexDescriptor> changeTask(bool, int&, std::vector <vertexDescriptor>);
 
@@ -294,8 +260,6 @@ void setSimulationStep(float f){
 }
 
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
-
-//bool current_task_equivalent(const Task &,const  Task &, const vertexDescriptor&);
 
 float approximate_angle(const float &, const Direction &, const simResult::resultType &);
 
