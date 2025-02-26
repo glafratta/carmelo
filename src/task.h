@@ -63,23 +63,23 @@ public:
     setVelocities(L, R);
     }
 
-void setVelocities(float l, float r){
-    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in bumping_that
+void setVelocities(const float & l,const float &r){
+    omega = (MAX_SPEED*(r-l)/BETWEEN_WHEELS); //instant velocity, determines angle increment in willcollide
     recordedOmega = omega;
     linearSpeed = MAX_SPEED*(l+r)/2;
     recordedSpeed=linearSpeed;
     valid=1;
 }
 
-    b2Vec2 getLinearVelocity(){
+    b2Vec2 getLinearVelocity(const float &dt=1)const{ //dt integrates
         b2Vec2 velocity;
-        velocity.x = linearSpeed *cos(omega);
-        velocity.y = linearSpeed *sin(omega);
+        velocity.x = linearSpeed *cos(omega)*dt;
+        velocity.y = linearSpeed *sin(omega)*dt;
         return velocity;
     }
 
-    b2Transform getTransform(){
-    return b2Transform(getLinearVelocity(), b2Rot(omega));
+    b2Transform getTransform(const float &dt=1)const{ //dt integrates
+    return b2Transform(getLinearVelocity(dt), b2Rot(getOmega(dt)));
 }
 
     float getRWheelSpeed(){
@@ -99,28 +99,28 @@ void setVelocities(float l, float r){
         return linearSpeed;
     }
 
-    float getOmega(){
-    return omega;
+    float getOmega(const float &dt=1)const{
+    return omega*dt;
     }
 
-    float getOmega(float l, float r){
-        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION;
+    float getOmega(const float l, const float r, float dt=1)const{
+        float result = (MAX_SPEED*(r-l)/BETWEEN_WHEELS)*TURN_FRICTION*dt;
         return result;
     }
 
-    void setOmega(float o){
+    void setOmega(const float &o){
         omega =o;
     }
 
-    void setLinearSpeed(float s){
+    void setLinearSpeed(const float & s){
         linearSpeed =s;
     }
 
-    void setRecSpeed(float s){
+    void setRecSpeed(const float &s){
         recordedSpeed =s;
     }
 
-    void setRecOmega(float w){
+    void setRecOmega(const float &w){
         recordedOmega=w;
     }
 
@@ -132,7 +132,7 @@ void setVelocities(float l, float r){
         return recordedOmega;
     }
     //friend class Configurator;
-    void setRec(float _speed, float _omega){
+    void setRec(const float& _speed, const float & _omega){
         recordedSpeed=_speed;
         recordedOmega=_omega;
     }
@@ -203,80 +203,86 @@ class Listener : public b2ContactListener {
     // };
 
 
-struct Correct{
+// struct Correct{
     
-    Correct(){}
+//     Correct(){}
 
-    void operator()( Action&, int);
+//     void operator()( Action&, int);
 
-    float errorCalc(Action, double);
+//     float errorCalc(Action , double);
 
-    float getError(){
-        return p();
-    }
+//     float getError(){
+//         return p();
+//     }
 
-    float Ki(){
-        return ki;
-    }
+//     float Ki(){
+//         return ki;
+//     }
 
-    float Kp(){
-        return kp;
-    }
-    float Kd(){
-        return kd;
-    }
+//     float Kp(){
+//         return kp;
+//     }
+//     float Kd(){
+//         return kd;
+//     }
 
-    float get_i(){
-        return i;
-    }
+//     float get_i(){
+//         return i;
+//     }
 
-    float get_d(){
-        return d;
-    }
+//     float get_d(){
+//         return d;
+//     }
 
-    float update(float);
+//     float update(float);
 
-    void reset(){
-        p_buffer=std::vector <float>(bufferSize,0);
-        i=0;
-        d=0;
-        mf.buffer=std::vector<float>(mf.kernelSize,0);
-    }
+//     void reset(){
+//         p_buffer=std::vector <float>(bufferSize,0);
+//         i=0;
+//         d=0;
+//         mf.buffer=std::vector<float>(mf.kernelSize,0);
+//     }
 
-    float kp=0.075;    
-    float kd=0, ki=0;
-    private:
+//     float kp=0.075;    
+//     float kd=0, ki=0;
+//     private:
 
 
-    float p(){
-        float sum=0;
-        for (int j=0;j<p_buffer.size(); j++){
-            sum+=p_buffer[j];
-        }
-        return sum;
-    }
-    int correction_rate=2; //Hz
-    int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
-    std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
-    float i=0, d=0;
-    float tolerance_upper=0.01, tolerance_lower=-0.01;
+//     float p(){
+//         float sum=0;
+//         for (int j=0;j<p_buffer.size(); j++){
+//             sum+=p_buffer[j];
+//         }
+//         return sum;
+//     }
+//     int correction_rate=2; //Hz
+//     int bufferSize= correction_rate*(FPS/MOTOR_CALLBACK);
+//     std::vector <float>p_buffer=std::vector <float>(bufferSize,0);
+//     float i=0, d=0;
+//     float tolerance_upper=0.01, tolerance_lower=-0.01;
 
-    struct MedianFilter{
-        int kernelSize=3;
-        std::vector<float>buffer=std::vector<float>(kernelSize,0);
+//     struct MedianFilter{
+//         int kernelSize=3;
+//         std::vector<float>buffer=std::vector<float>(kernelSize,0);
 
-        float get_median(){
-            std::vector <float> tmp=buffer;
-            std::sort(tmp.begin(), tmp.end());
-            return tmp[int(kernelSize/2)];
-        }
-    }mf;
+//         float get_median(){
+//             std::vector <float> tmp=buffer;
+//             std::sort(tmp.begin(), tmp.end());
+//             return tmp[int(kernelSize/2)];
+//         }
+//     }mf;
     
 
-}correct;
+// }correct;
 
 public:
-friend Task::Correct;    
+// friend Task::Correct;    
+
+class ControlLearner{ //to learn wheel speed controls
+    private:
+    float weight=1.0;
+};
+
 Action action;
 
 Disturbance disturbance;

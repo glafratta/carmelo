@@ -61,7 +61,6 @@ const std::map <Direction, std::pair<float, float>> default_kinematics={{DEFAULT
                                                                          {RIGHT, std::pair<float, float>(0, -WHEEL_SPEED_TURN)}};
 
 
-
 class Robot {
 private: 
 	b2FixtureDef fixtureDef;
@@ -85,7 +84,10 @@ public:
 		
 	}
 
-
+	static std::vector <b2Vec2> get_vertices(){ //returns vertices in local frame
+		std::vector <b2Vec2>result ={b2Vec2(-ROBOT_HALFWIDTH, -ROBOT_HALFLENGTH), b2Vec2(ROBOT_HALFWIDTH, -ROBOT_HALFLENGTH), b2Vec2(-ROBOT_HALFWIDTH, ROBOT_HALFLENGTH), b2Vec2(ROBOT_HALFWIDTH, ROBOT_HALFLENGTH) };
+		return result;
+	}
 };
 
 

@@ -156,12 +156,15 @@ void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tran
 
 void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
-
-void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
+void updateGraph(TransitionSystem&, const b2Transform & _deltaPose);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
-void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&, std::pair<bool,vertexDescriptor> tgt=std::pair(false,TransitionSystem::null_vertex()));
+void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
+
+std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
+
+//std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
 std::vector <Frontier> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
@@ -259,7 +262,9 @@ void setSimulationStep(float f){
 	simulationStep=f;
 }
 
-void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
+//void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
+
+//bool current_task_equivalent(const Task &,const  Task &, const vertexDescriptor&);
 
 float approximate_angle(const float &, const Direction &, const simResult::resultType &);
 

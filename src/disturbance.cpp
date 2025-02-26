@@ -9,7 +9,7 @@ bool BodyFeatures::match(const BodyFeatures& bf){
     return match_x && match_y && match_w && match_h;
 }
 
-std::vector <b2Vec2> Disturbance::vertices(){
+std::vector <b2Vec2> Disturbance::vertices()const{
     std::vector <b2Vec2> result;
     if (getAffIndex()==NONE){
         return result;
