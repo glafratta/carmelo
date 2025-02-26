@@ -157,11 +157,11 @@ void propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vect
 
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
-void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
+//void clearFromMap(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, std::unordered_map<State*, ExecutionError>);
 
 void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
-void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
+//void track_disturbance_cl(b2Transform &, Task::Action, float); //closed loop
 
 void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
 
@@ -169,7 +169,7 @@ void planPriority(TransitionSystem&, vertexDescriptor);
 
 void adjustStepDistance(vertexDescriptor, TransitionSystem &, Task*, float&, std::pair<bool,vertexDescriptor> tgt=std::pair(false,TransitionSystem::null_vertex()));
 
-std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
+//std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
 //std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
@@ -241,9 +241,9 @@ std::vector <vertexDescriptor> planner(TransitionSystem&, vertexDescriptor, vert
 //std::vector <vertexDescriptor> planner2(TransitionSystem&, vertexDescriptor, vertexDescriptor goal=TransitionSystem::null_vertex(), bool been=0);
 
 
-bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, Disturbance &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex());
+//bool checkPlan(b2World&,  std::vector <vertexDescriptor> &, TransitionSystem &, Disturbance &, b2Transform start=b2Transform(b2Vec2(0,0), b2Rot(0)), vertexDescriptor custom_start=TransitionSystem::null_vertex());
 
-b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
+//b2Transform skip(edgeDescriptor& , TransitionSystem &, int&, Task* , float&, std::vector <vertexDescriptor> );
 
 void skip_reduced(edgeDescriptor &, TransitionSystem &, const std::vector<vertexDescriptor> &, std::vector<vertexDescriptor>::iterator);
 
@@ -283,7 +283,7 @@ void addToPriorityQueue(Frontier, std::vector <Frontier>&, TransitionSystem&, ve
 
 ExecutionError trackTaskExecution(Task &);
 
-b2Transform assignDeltaPose(Task::Action, float);
+//b2Transform assignDeltaPose(Task::Action, float);
 
 std::vector <vertexDescriptor> changeTask(bool, int&, std::vector <vertexDescriptor>);
 
@@ -291,7 +291,6 @@ int motorStep(Task::Action a);
 
 void setSimulationStep(float f){
 	simulationStep=f;
-	//worldBuilder.simulationStep=f;
 }
 
 void done_that(vertexDescriptor&, bool &, b2World &, std::vector <vertexDescriptor>&);
@@ -302,7 +301,7 @@ float approximate_angle(const float &, const Direction &, const simResult::resul
 
 void ts_cleanup(TransitionSystem *);
 
-void shift_plan(TransitionSystem &, const std::vector<vertexDescriptor>&)
+void shift_plan(TransitionSystem &, const std::vector<vertexDescriptor>&);
 };
 
 

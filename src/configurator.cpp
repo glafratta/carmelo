@@ -4,13 +4,8 @@
 
 void math::applyAffineTrans(const b2Transform& deltaPose, Task* task){
 	math::applyAffineTrans(-deltaPose, task->start);
-	// if (task.disturbance.getAffIndex()!=NONE){
-	// 	math::applyAffineTrans(deltaPose, task.disturbance.bf.pose);
-	// }
 	applyAffineTrans(-deltaPose, task->disturbance);
 }
-
-
 
 
 void ConfiguratorInterface::setReady(bool b){
@@ -118,14 +113,7 @@ bool Configurator::Spawner(){
 			printf("recycled plan in explorer:\n");
 		}
 		printPlan(&planVertices);
-		// if (!planVertices.empty()){
-		// 	b2Vec2 debug_start=transitionSystem[*planVertices.begin()].start.p;
-		// 	b2Vec2 debug_end=transitionSystem[*(planVertices.end()-1)].endPose.p;
-		// 	b2Vec2 plan_dist(debug_start.x-debug_end.x, debug_start.y-debug_end.y);
-		// 	printf("total plan dist=%f", plan_dist.Length());
-		// }
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
-		//	}
 
 
 	}
@@ -1036,21 +1024,21 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 }
 
 
-std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, TransitionSystem& g, Direction d){
-	 	std::vector <edgeDescriptor> result;
-		edgeDescriptor e; 
-		do{
-			std::vector <edgeDescriptor> directionEdges=gt::inEdges(g, v, d);
-			if (directionEdges.empty()){
-				break;
-			}
-			auto eit=std::max_element(directionEdges.begin(), directionEdges.end()); //choosing the most recent edge
-			e = *eit;
-			result.push_back(e);
-			v=e.m_source;
-		}while (g[e].direction==d);
-	return result;
-} 
+// std::vector <edgeDescriptor> Configurator::inEdgesRecursive(vertexDescriptor v, TransitionSystem& g, Direction d){
+// 	 	std::vector <edgeDescriptor> result;
+// 		edgeDescriptor e; 
+// 		do{
+// 			std::vector <edgeDescriptor> directionEdges=gt::inEdges(g, v, d);
+// 			if (directionEdges.empty()){
+// 				break;
+// 			}
+// 			auto eit=std::max_element(directionEdges.begin(), directionEdges.end()); //choosing the most recent edge
+// 			e = *eit;
+// 			result.push_back(e);
+// 			v=e.m_source;
+// 		}while (g[e].direction==d);
+// 	return result;
+// } 
 
 std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, TransitionSystem& g, Direction d, bool been){
 	std::vector <Frontier> result;
@@ -1213,13 +1201,13 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 
 
 void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
-	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
-		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
-		start = g[e.m_source].endPose + shift;
-	}
-	else{
+	// if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
+	// 	edgeDescriptor e = boost::in_edges(v, g).first.dereference();
+	// 	start = g[e.m_source].endPose + shift;
+	// }
+	// else{
 		start=g[v].endPose +shift;
-	}
+	//}
 }
 
 
@@ -1256,13 +1244,13 @@ ExecutionError Configurator::trackTaskExecution(Task & t){
 	return error;
 }
 
-b2Transform Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
-	b2Transform result;
-	float theta = a.getOmega()* timeElapsed;
-	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
-	result.q.Set(a.getOmega());
-	return result;
-}
+// b2Transform Configurator::assignDeltaPose(Task::Action a, float timeElapsed){
+// 	b2Transform result;
+// 	float theta = a.getOmega()* timeElapsed;
+// 	result.p ={a.getLinearSpeed()*cos(theta),a.getLinearSpeed()*sin(theta)};
+// 	result.q.Set(a.getOmega());
+// 	return result;
+// }
 
 
 int Configurator::motorStep(Task::Action a){
