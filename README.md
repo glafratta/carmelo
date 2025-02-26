@@ -42,5 +42,13 @@ sudo make install
 ## Run
 ### Navigation demo (Raspberry Pi)
 * `sudo ./targetless` : this program demonstrates planning over a 1m distance horizon for a control goal that is not a target location but rather an objective to drive straight for the longest time with the least amount of disturbances
-* `sudo ./target`: this program (under construction) demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0m.
-Run with options `0`: for turning debug options off. In debug mode, LIDAR coordinates, Box2D objects and robot trajectories are dumped into the `/tmp` folder.
+* `sudo ./target`: this program demonstrates target seeking behaviour, where the target is imaginary and located at x=1.0m, y=0m.
+
+
+Run with options `0`: for turning debug options off. In debug mode, LIDAR coordinates, Box2D objects and robot trajectories are dumped into the `/tmp` folder. Additional option to turn planning on/off by adding `0` or `1`. 
+Examples:
+- `./target 0` : runs with debugging off (0) and planning on (default)
+- `./target 1 0` : runs with debugging on (1) and planning off (0)
+
+
+
