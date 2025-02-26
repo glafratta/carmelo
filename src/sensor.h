@@ -87,6 +87,6 @@ std::set<T> vec2set(std::vector<T> vec){
         set.emplace(t);
     }
     return set;
-
+}
 
 #endif
