@@ -327,16 +327,15 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 						bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						//shift here?
-						shift_states(g, task_vertices, sk.first.start);
 						vertexDescriptor task_start= task_vertices[0];
-						//Task controlGoal_adjusted= controlGoal;
-						// b2Transform shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
-						//math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
-						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal, &finished);
+						Task controlGoal_adjusted= controlGoal;
+						b2Transform shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
+						math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
+						auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 						bool filler=0;
+						shift_states(g, task_vertices, shift_start);
 						// if (match.second!=v){
 						// 	shift= b2MulT(g[task_start].start, start);
-						// 	//shift=start-g[task_start].start;
 						// }
 						if (finished){
 							plan_prov=plan_tmp;
@@ -696,7 +695,6 @@ std::vector <vertexDescriptor> Configurator::planner( TransitionSystem& g, verte
 		}
 	}
 	printf("PLANNED! size=%i\n",plan.size());
-
 	return plan;
 
 }
@@ -1409,8 +1407,8 @@ void Configurator::shift_states(TransitionSystem & g, const std::vector<vertexDe
 	if (p.empty()){
 		return;
 	}
-	//b2Transform shift=g[p[0]].start;
-	b2Transform shift_start= b2MulT(b2MulT(current_pose, controlGoal.start), g[0].start);
+	//b2Transform shift_start=current_pose- g[p[0]].start;
+	//b2Transform shift_start= b2MulT(b2MulT(current_pose, controlGoal.start), g[0].start);
 	for (const vertexDescriptor &v:p){
 		math::applyAffineTrans(shift_start, g[v]);
 	}
