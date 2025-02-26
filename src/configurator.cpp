@@ -253,7 +253,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	Direction direction=currentTask.direction;
 	std::vector <vertexDescriptor> priorityQueue = {v}, evaluationQueue, plan_prov=planVertices;
 	std::set <vertexDescriptor> closed;
-	b2Transform start= b2Transform_zero, shift=b2Transform_zero, v_shift=shift;
+	b2Transform start= b2Transform_zero, shift=b2Transform_zero, shift_start=shift;
 	EndedResult er;
 	printf("v=%i, initial plan size=%i\n",v, plan_prov.size());
 	printf("GOAL IS: ");
@@ -262,11 +262,11 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
-		State shifted_state=g[v];
-		printf("v_shift:");
-		debug::print_pose(v_shift);
-		math::applyAffineTrans(v_shift, shifted_state);
-		er = controlGoal.checkEnded(shifted_state, t.direction);
+		// State shifted_state=g[v];
+		// printf("v_shift:");
+		// debug::print_pose(v_shift);
+		// math::applyAffineTrans(v_shift, shifted_state);
+		er = controlGoal.checkEnded(g[v], t.direction);
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
 		//printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
 		//printf("v=%i, dir=%s\n", v, (*dirmap.find(t.direction)).second);
@@ -327,11 +327,11 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					if (currentTask.motorStep==0){
 						std::vector <vertexDescriptor> task_vertices=gt::task_vertices(v1, g, iteration, currentVertex);
 						vertexDescriptor task_start= task_vertices[0];
-						b2Transform shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
 						if (plan_prov.empty()){
 							bool finished=false, been=matcher.match_equal(match.first, StateMatcher::ABSTRACT); //(match.first==StateMatcher::DISTURBANCE); //ADD representation of task but shifted
 							//shift here?
 							Task controlGoal_adjusted= controlGoal;
+							shift_start= b2MulT(b2MulT(sk.first.start, controlGoal.start), g[task_start].start);
 							math::applyAffineTrans(shift_start, &controlGoal_adjusted); //as start
 							auto plan_tmp=planner(g, task_start, TransitionSystem::null_vertex(), been, &controlGoal_adjusted, &finished);
 							bool filler=0;
@@ -1139,7 +1139,7 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 				q.start=g[vertices[0]].start;
 			}			
 		}
-		if (v==currentVertex){
+		if (v==currentVertex && currentTask.motorStep!=0){
 			q.start=b2Transform_zero;
 		}
 		StateDifference sd(s, q);
