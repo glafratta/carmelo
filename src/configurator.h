@@ -56,8 +56,6 @@ public:
 	char bodyFile[100];
 	bool timerOff=0;
 	int bodies=0;
-	//PointCloudProc pcProc;
-	ImgProc imgProc;
 	std::vector <vertexDescriptor> planVertices;
 	TransitionSystem transitionSystem;
 	StateMatcher matcher;
@@ -156,7 +154,7 @@ void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tran
 
 void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
-void updateGraph(TransitionSystem&, const b2Transform & _deltaPose);
+void updateGraph(TransitionSystem&, const b2Transform &);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 

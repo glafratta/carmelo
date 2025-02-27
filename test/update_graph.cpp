@@ -14,7 +14,7 @@ public:
     void step(){
         c->trackTaskExecution(*c->getTask());
         Task::Action action= c->getTask()->getAction();
-        c->getTask()->correct(action, c->getTask()->motorStep);
+        //c->getTask()->correct(action, c->getTask()->motorStep);
         EndedResult er = c->controlGoal.checkEnded();
 	    if (er.ended){
             Disturbance new_goal(PURSUE, c->transitionSystem[start].endPose.p);

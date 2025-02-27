@@ -134,58 +134,58 @@ simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bo
 }
 
 
-void Task::Correct::operator()(Action & action, int step){
-	float tolerance = 0.1; //tolerance in radians/pi = just under 2 degrees degrees
-	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
-		//printf("returning\n");
-		return;
-	}
-	//printf("error buffer sum = %f, i=%f\n", p(), get_i());
-	if (fabs(get_i())>tolerance){//& step>correction_rate
-		float p_correction= ((p()/bufferSize)*kp)/2; //do not increase one wheel speed too much
-		float i_correction= (get_i()*ki)/2; //do not increase one wheel speed too much
-		float d_correction= (get_d()*kd)/2; //do not increase one wheel speed too much
-			action.R -= p_correction+ i_correction; 
-		 	action.L+= p_correction+ i_correction;
-		if (action.L>1.0){
-		action.L=1.0;
-		}
-		if (action.R>1.0){
-			action.R=1;
-		}
-		if (action.L<(-1.0)){
-			action.L=-1;
-		}
-		if (action.R<(-1.0)){
-			action.R=-1;
-		}
+// void Task::Correct::operator()(Action & action, int step){
+// 	float tolerance = 0.1; //tolerance in radians/pi = just under 2 degrees degrees
+// 	if (action.getOmega()!=0){ //only check every 2 sec, og || motorstep<1
+// 		//printf("returning\n");
+// 		return;
+// 	}
+// 	//printf("error buffer sum = %f, i=%f\n", p(), get_i());
+// 	if (fabs(get_i())>tolerance){//& step>correction_rate
+// 		float p_correction= ((p()/bufferSize)*kp)/2; //do not increase one wheel speed too much
+// 		float i_correction= (get_i()*ki)/2; //do not increase one wheel speed too much
+// 		float d_correction= (get_d()*kd)/2; //do not increase one wheel speed too much
+// 			action.R -= p_correction+ i_correction; 
+// 		 	action.L+= p_correction+ i_correction;
+// 		if (action.L>1.0){
+// 		action.L=1.0;
+// 		}
+// 		if (action.R>1.0){
+// 			action.R=1;
+// 		}
+// 		if (action.L<(-1.0)){
+// 			action.L=-1;
+// 		}
+// 		if (action.R<(-1.0)){
+// 			action.R=-1;
+// 		}
 	
-	}
-}
+// 	}
+// }
 
-float Task::Correct::errorCalc(Action a, double x){
-	float result=0;
-	if (a.getOmega()!=0){
-		return result;
-	}
-	else{
-		return sin(a.getOmega())*MOTOR_CALLBACK-float(x); //-ve error if robot goes R, +ve error if goes L
-	}	
+// float Task::Correct::errorCalc(Action a, double x){
+// 	float result=0;
+// 	if (a.getOmega()!=0){
+// 		return result;
+// 	}
+// 	else{
+// 		return sin(a.getOmega())*MOTOR_CALLBACK-float(x); //-ve error if robot goes R, +ve error if goes L
+// 	}	
 
-}
+// }
 
 
-float Task::Correct::update(float e){
-	float p0=p();
-	p_buffer.erase(p_buffer.begin());
-	p_buffer.push_back(e);
-	float p1=p();
-	mf.buffer.erase(mf.buffer.begin());
-	mf.buffer.push_back(p1);
-	d=p1-p0;
-	i+=e;
-	return p1;
-}
+// float Task::Correct::update(float e){
+// 	float p0=p();
+// 	p_buffer.erase(p_buffer.begin());
+// 	p_buffer.push_back(e);
+// 	float p1=p();
+// 	mf.buffer.erase(mf.buffer.begin());
+// 	mf.buffer.push_back(p1);
+// 	d=p1-p0;
+// 	i+=e;
+// 	return p1;
+// }
 
 
 Direction Task::H(Disturbance ob, Direction d, bool topDown){

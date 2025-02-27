@@ -1201,8 +1201,6 @@ void Configurator::trackTaskExecution(Task & t){
 	//here need to update end criteria for current task
 
 	if(t.motorStep==0 || (t.checkEnded()).ended){
-	updateGraph(transitionSystem);//lateral error is hopefully noise and is ignored
-	if(t.motorStep==0){
 		t.change=1;
 	}
 
@@ -1302,21 +1300,6 @@ void Configurator::planPriority(TransitionSystem&g, vertexDescriptor v){
 }
 
 void Configurator::updateGraph(TransitionSystem&g, const b2Transform & deltaPose){
-	// b2Transform deltaPose;
-	// if (NULL==_deltaPose){
-	// 	float angularDisplacement= getTask()->getAction().getOmega()*MOTOR_CALLBACK;
-	// 	float xdistance=cos(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	// 	float ydistance=sin(angularDisplacement) * getTask()->getAction().getLinearSpeed()*MOTOR_CALLBACK;
-	// 	deltaPose=b2Transform(b2Vec2(xdistance,
-	// 				ydistance), 
-	// 				b2Rot(angularDisplacement));
-	// }
-	// else{
-	// 	deltaPose=*_deltaPose;
-	// }
-	//printf("displacement: ");
-	//debug::print_pose(deltaPose);
-	//printf("currentVertex = %i, direction =%i\n", currentVertex, currentTask.direction);
 	math::applyAffineTrans(deltaPose, g);
 	math::applyAffineTrans(-deltaPose, &controlGoal);
 	math::applyAffineTrans(-deltaPose, getTask()->start); //d update happens in get_transform

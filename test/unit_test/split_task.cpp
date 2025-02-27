@@ -5,10 +5,6 @@ std::vector <BodyFeatures> WorldBuilder::processData(const CoordinateContainer &
     return result;
 }
 
-void Configurator::done_that(vertexDescriptor& src, bool & plan_works, b2World & world, std::vector<vertexDescriptor>& plan_provisional){
-
-}
-
 int desired_split_size(b2Vec2 pos, float simulationStep){
     return int(pos.Length()/(simulationStep+0.00001))+1;
 }
