@@ -152,9 +152,8 @@ void propagateD(vertexDescriptor, vertexDescriptor, TransitionSystem&, std::vect
 void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, TransitionSystem&, vertexDescriptor&, vertexDescriptor&,std::vector <vertexDescriptor>&, std::vector<std::pair<vertexDescriptor, vertexDescriptor>>&); //clears edges out of redundant vertices, removes the vertices from PQ, returns vertices to remove at the end
 
 
-void trackDisturbance(b2Transform &, Task::Action, float); //open loop
 
-void updateGraph(TransitionSystem&, const b2Transform &);
+void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
