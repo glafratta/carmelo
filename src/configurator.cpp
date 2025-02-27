@@ -137,7 +137,7 @@ bool Configurator::Spawner(){
 			printf("recycled plan in explorer:\n");
 		}
 		printPlan(&planVertices);
-		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
+//		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 
 
 	}
@@ -164,7 +164,6 @@ bool Configurator::Spawner(){
 	auto endTime =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
  	duration=abs(float(d.count())/1000); //express in seconds
-	//printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
 		if (explored){
@@ -223,7 +222,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				return controlGoal.disturbance;
 			}
 			else if (v==movingVertex){
-			return g[v].Di;
+				return g[v].Di;
 			}
 	}
 	Disturbance Dn= g[v].Dn;
@@ -286,14 +285,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
-		// State shifted_state=g[v];
-		// printf("v_shift:");
-		// debug::print_pose(v_shift);
-		// math::applyAffineTrans(v_shift, shifted_state);
 		er = controlGoal.checkEnded(g[v], t.direction);
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
-		//printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
-		//printf("v=%i, dir=%s\n", v, (*dirmap.find(t.direction)).second);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
 			std::vector <Direction> options=g[v0_exp].options;
@@ -303,13 +296,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				v1 =v0; //frontier
 				std::vector <vertexDescriptor> propagated;
 				do {
-				//changeStart(start, v0, g, shift);
 				start=g[v0].endPose +shift;
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0], start);
-				if (v0==2){
-					printf("Di pose:");
-					debug::print_pose(Di.pose());
-				}
 				t = Task(Di, g[v0].options[0], start, true);
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
@@ -386,12 +374,11 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					if (!out_expected.empty()){
 						vertexDescriptor exp=out_expected[0].m_target;
 						printf("thought it'd be vertex %i , end pose:", exp );
+						debug::print_pose(g[exp].endPose);
 
 					}
 					auto d_print=dirmap.find(t.direction);
-					printf("added v %i to %i, direction %s, distance: %f, start", v1, v0, (*d_print).second, sk.first.distance());
-					debug::print_pose(sk.first.start);
-					printf("v1 crashed=%i\n", sk.first.outcome==simResult::crashed);
+					printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
@@ -410,6 +397,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	}
 	backtrack(evaluationQueue, priorityQueue, closed, g, plan_prov);
 	bestNext=priorityQueue[0];
+	printf("best=%i end", bestNext);
+	debug::print_pose(g[bestNext].endPose);
 	std::vector <edgeDescriptor> best_in_edges= gt::inEdges(g,bestNext);
 	if (best_in_edges.empty()){
 		direction=currentTask.direction;
@@ -1256,7 +1245,9 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
+	printf("pv=%i\n", pv.size());
 	if (!b){
+		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		return pv;
 	}
 	if (planning){
@@ -1270,7 +1261,10 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
+		std::pair<edgeDescriptor, bool> ep_mov=boost::edge(movingVertex, pv[0], transitionSystem);
+		printf("ep %i -> %i exists=%i, moving exists=%i\n", currentVertex, pv[0], ep.second, ep_mov.second);
 		currentVertex= pv[0];
+		printf("current v=%i, direction=%s\n", currentVertex, (*dirmap.find(transitionSystem[ep.first].direction)).second);
 		pv.erase(pv.begin());
 		currentEdge=ep.first;
 		transitionSystem[movingVertex].Di=transitionSystem[currentVertex].Di;

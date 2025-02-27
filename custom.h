@@ -76,9 +76,7 @@ public:
 		if (ci->debugOn){
 		fclose(f);
 		}
-		//if (!ci->data2fp.empty()){
-			ci->setReady(1);
-		//}
+		ci->setReady(1);
 		ci->iteration++;
 
 	}
@@ -92,12 +90,11 @@ class MotorCallback :public AlphaBot::StepCallback { //every 100ms the callback 
 public:
 int ogStep=0;
 Configurator * c;
-int run=0, og_plan=0;
+int run=0;
 
 MotorCallback(Configurator *conf): c(conf){
 }
 void step( AlphaBot &motors){
-	//printf("graph size=%i, plan size=%i\n", c->transitionSystem.m_vertices.size(), c->planVertices.size());
 	if (c->getIteration() <=0){
 		return;
 	}
@@ -105,32 +102,21 @@ void step( AlphaBot &motors){
 		motors.setRightWheelSpeed(0);
  	   motors.setLeftWheelSpeed(0);		
 	}
-	//DEBUG
-	if (c->getIteration()>1){
-		og_plan=c->transitionSystem.m_vertices.size();
-	}
-	// if (c->transitionSystem.m_vertices.size()>og_plan){
-	// 	c->stop();
+	// if (c->getIteration()>1){
+	// 	og_plan=c->transitionSystem.m_vertices.size();
 	// }
-	//END DEBUG
 	c->trackTaskExecution(*c->getTask());
-	// printf("step=%i\n", c->getTask()->motorStep);
 	EndedResult er = c->controlGoal.checkEnded(b2Transform(b2Vec2(0,0), b2Rot(0)), UNDEFINED, false);
 	if (er.ended && c->getTask()->motorStep==0){ //|| (er2.ended & c->getTask()->motorStep<1 & c->planVertices.empty())
 		run++;
 		Disturbance new_goal=set_target(run, c->controlGoal.start);
 		c->controlGoal = Task(new_goal, UNDEFINED);
-		b2Vec2 v = c->controlGoal.disturbance.getPosition() - b2Vec2(0,0);
-		//printf("new control goal start: %f, %f, %f, distance = %f, valid =%i\n", c->controlGoal.start.p.x, c->controlGoal.start.p.y, c->controlGoal.start.q.GetAngle(), v.Length(), c->controlGoal.disturbance.isValid());
-		printf("change task? %i\n goal: ", c->getTask()->change);
-		debug::print_pose(new_goal.pose());
+		c->transitionSystem[c->movingVertex].Di=new_goal;
 		if (c->is_benchmarking()){
 			FILE * f = fopen(c->statFile, "a+");
 			fprintf(f, "!");
 			fclose(f);			
 		}
-	//	forget(c);
-
 	}
 	c->planVertices = c->changeTask(c->getTask()->change,  ogStep, c->planVertices);
 	R= c->getTask()->getAction().getRWheelSpeed();
@@ -149,7 +135,7 @@ void step( AlphaBot &motors){
 	}
     motors.setRightWheelSpeed(R); //temporary fix because motors on despacito are the wrong way around
     motors.setLeftWheelSpeed(L);
-	//printf(",R=%f\tL=%f\n",c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed());
+	printf(",R=%f\tL=%f\n",c->getTask()->getAction().getRWheelSpeed(), c->getTask()->getAction().getLWheelSpeed());
 }
 };
 

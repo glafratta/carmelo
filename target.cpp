@@ -5,13 +5,12 @@ void forget(Configurator *c){}
 
 Disturbance set_target(int& run, b2Transform start){
 	Disturbance result;
-	if (run%2!=0 && run >0){
+	if (run%2!=0){
 		result= Disturbance(PURSUE, b2Vec2(1.0f, 0.0f), 0.0f);
 	}
 	else{
 		result= Disturbance(PURSUE, b2Vec2(-1.0f, 0.0f), 0.0f);
 	}
-	run++;
 	return result;
 }
 
@@ -38,21 +37,21 @@ int main(int argc, char** argv) {
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
-	CameraCallback cameraCB(&cb);
-	Libcam2OpenCV camera;
-    camera.registerCallback(&cameraCB);
-    Libcam2OpenCVSettings settings;
-    settings.framerate = FPS;
+	//CameraCallback cameraCB(&cb);
+	//Libcam2OpenCV camera;
+    //camera.registerCallback(&cameraCB);
+    //Libcam2OpenCVSettings settings;
+    //settings.framerate = FPS;
 	motors.registerStepCallback(&cb);
 	configurator.start();
 	lidar.start();
-    camera.start(settings);
+    //camera.start(settings);
 	motors.start();
 	getchar();
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
-	camera.stop();
+	//camera.stop();
 }
 	
 	
