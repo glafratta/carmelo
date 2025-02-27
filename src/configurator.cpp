@@ -1301,20 +1301,20 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 	return pv;
 }
 
-void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float error){
-	float angleTurned =MOTOR_CALLBACK*a.getOmega();
-	pose.q.Set(pose.q.GetAngle()-angleTurned);	
-	float distanceTraversed = 0;
-	float initialL = pose.p.Length();
-	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
-		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
-	}
-	else{
-		distanceTraversed=error;
-	}
-	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
-	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
-}
+// void Configurator::trackDisturbance(b2Transform & pose, Task::Action a, float error){
+// 	float angleTurned =MOTOR_CALLBACK*a.getOmega();
+// 	pose.q.Set(pose.q.GetAngle()-angleTurned);	
+// 	float distanceTraversed = 0;
+// 	float initialL = pose.p.Length();
+// 	if(fabs(error)<TRACKING_ERROR_TOLERANCE){
+// 		distanceTraversed= MOTOR_CALLBACK*a.getLinearSpeed();
+// 	}
+// 	else{
+// 		distanceTraversed=error;
+// 	}
+// 	pose.p.x=cos(pose.q.GetAngle())*initialL-cos(angleTurned)*distanceTraversed;
+// 	pose.p.y = sin(pose.q.GetAngle())*initialL-sin(angleTurned)*distanceTraversed;
+// }
 
 
 
