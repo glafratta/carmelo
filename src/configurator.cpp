@@ -7,6 +7,40 @@ void math::applyAffineTrans(const b2Transform& deltaPose, Task* task){
 	applyAffineTrans(-deltaPose, task->disturbance);
 }
 
+void Configurator::setBenchmarking(bool b, char * new_folder, char * _dir=NULL){
+	benchmark =b;
+		if (benchmark){
+		char dirName[50];
+		if (_dir==NULL){
+			sprintf(dirName, "benchmark");
+		}
+		else{
+			sprintf(dirName, _dir);
+		}
+		if (!opendir(dirName)){
+			mkdir(dirName, 0777);
+		}
+		char new_path[60];
+		sprintf(new_path, "%s/%s", dirName, new_folder);
+		if (!opendir(new_path)){
+			mkdir(new_path, 0777); //""
+		}
+		//TODAYS DATE AND TIME
+		time_t now =time(0);
+		tm *ltm = localtime(&now);
+		int y,m,d, h, min;
+		y=ltm->tm_year-100;
+		m = ltm->tm_mon +1;
+		d=ltm->tm_mday;
+		h= ltm->tm_hour;
+		min = ltm->tm_min;
+		sprintf(statFile, "%s/stats%02i%02i%02i_%02i%02i.txt",new_path, d,m,y,h,min);
+		FILE * f = fopen(statFile, "w");
+		fclose(f);
+	}
+}
+
+
 
 void ConfiguratorInterface::setReady(bool b){
 	ready = b;
