@@ -264,10 +264,11 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				do {
 				start=g[v0].endPose +shift;
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0], start);
-				t = Task(Di, g[v0].options[0], start, true);
+				t = Task(Di, g[v0].options[0], start, true);//need to update end crit
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
-				float _simulationStep=BOX2DRANGE;
+				//float _simulationStep=BOX2DRANGE;
 				//adjustStepDistance(v0, g, &t, _simulationStep);
+				adjust_simulated_task(v0, g, &t);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				printf("v0=%i, dir=%s\n", v0, (*dirmap.find(t.direction)).second);
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
@@ -951,6 +952,20 @@ std::pair <edgeDescriptor, bool> Configurator::maxProbability(std::vector<edgeDe
 	return result;
 }
 
+void Configurator::adjust_simulated_task(const vertexDescriptor &v, TransitionSystem &g, Task * t){
+	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
+
+	if(!ep.second){ //no tgt	
+		return; //check until needs to be checked
+	}
+	if (t->action.direction==currentTask.action.direction){
+		t->endCriteria=currentTask.endCriteria;
+	}
+	else if (t->action.direction==getOppositeDirection(currentTask.direction).second){
+		t->setEndCriteria(Angle(M_PI-t->endCriteria.angle.get()));
+	}
+}
+
 
 
 void Configurator::adjust_rw_task(const vertexDescriptor &v, TransitionSystem &g, Task * t, const b2Transform & deltaPose){
@@ -966,9 +981,9 @@ void Configurator::adjust_rw_task(const vertexDescriptor &v, TransitionSystem &g
 	if (t->getAction().getOmega()!=0){
 		float remainingAngle = t->endCriteria.angle.get()-abs(deltaPose.q.GetAngle());
 	//	printf("step =%i/%i, remaining angle=%f\n", currentTask.motorStep, transitionSystem[currentEdge].step,remainingAngle);
-		if (t->direction==getOppositeDirection(t->direction).second){
-			remainingAngle=M_PI-remainingAngle;
-		}
+		// if (t->direction==getOppositeDirection(t->direction).second){
+		// 	remainingAngle=M_PI-remainingAngle;
+		// }
 		t->setEndCriteria(Angle(remainingAngle));
 	}
 	if(t->getAction().getLinearSpeed()>0){
@@ -1167,28 +1182,14 @@ void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& de
 }
 
 
-void Configurator::changeStart(b2Transform& start, vertexDescriptor v, TransitionSystem& g, const b2Transform& shift){
-	if (g[v].outcome == simResult::crashed && boost::in_degree(v, g)>0){
-		edgeDescriptor e = boost::in_edges(v, g).first.dereference();
-		start = g[e.m_source].endPose + shift;
-	}
-	else{
-		start=g[v].endPose +shift;
-	}
-	//shift=b2Transform_zero;
-}
-
-
 
 
 void Configurator::trackTaskExecution(Task & t){
 	b2Transform deltaPose=worldBuilder.wb_bridger.get_transform(&t, data2fp); //track using obstacle OR dead reckoning
 	//here can insert something for wb.bridger, wheel speed control (for step)
-	adjust_rw_task(movingVertex, transitionSystem, &t, deltaPose);
+	adjust_rw_task(movingVertex, transitionSystem, &t, deltaPose); //readjust end criteria
 	updateGraph(transitionSystem, deltaPose);//lateral error is hopefully noise and is ignored
-
-	//here need to update end criteria for current task
-
+	math::applyAffineTrans(deltaPose, t.disturbance); //remove later
 	if(t.motorStep==0 || (t.checkEnded()).ended){
 		t.change=1;
 	}

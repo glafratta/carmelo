@@ -157,9 +157,12 @@ void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
-void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
+void adjust_simulated_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
 
-std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
+
+void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*);
+
+//std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 
 //std::vector <edgeDescriptor> frontierVertices(vertexDescriptor, TransitionSystem&, Direction , bool been=0); //returns the closest vertices to the start vertex which are reached by executing a task of the specified direction
 
@@ -171,11 +174,11 @@ std::pair <edgeDescriptor, bool> maxProbability(std::vector<edgeDescriptor>, Tra
 
 std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(State, TransitionSystem&, State * src, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL, bool relax=0, bool wholeTask=false); //matches to most likely
 
-std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
+//std::pair <StateMatcher::MATCH_TYPE, vertexDescriptor> findMatch(vertexDescriptor, TransitionSystem&, Direction dir=Direction::UNDEFINED, StateMatcher::MATCH_TYPE match_type=StateMatcher::_TRUE, std::vector <vertexDescriptor>* others=NULL); //has a safety to prevent matching a vertex with self
 
-void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end
+//void changeStart(b2Transform&, vertexDescriptor, TransitionSystem&, const b2Transform& shift=b2Transform_zero); //if task at vertex v fails, start is set to v's predecessor's end
 
-void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, std::vector<vertexDescriptor>&, const Direction&, TransitionSystem &);
+//void match_setup(bool&, StateMatcher::MATCH_TYPE&, const vertexDescriptor &, std::vector<vertexDescriptor>&, const Direction&, TransitionSystem &);
 
 
 std::vector<vertexDescriptor> explorer(vertexDescriptor, TransitionSystem&, Task, b2World &); //evaluates only after DEFAULT, internal one step lookahead
