@@ -5,13 +5,12 @@ void forget(Configurator *c){}
 
 Disturbance set_target(int& run, b2Transform start){
 	Disturbance result;
-	if (run%2!=0 && run >0){
+	if (run%2!=0){
 		result= Disturbance(PURSUE, b2Vec2(1.0f, 0.0f), 0.0f);
 	}
 	else{
 		result= Disturbance(PURSUE, b2Vec2(-1.0f, 0.0f), 0.0f);
 	}
-	run++;
 	return result;
 }
 

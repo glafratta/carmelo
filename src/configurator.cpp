@@ -94,9 +94,7 @@ bool Configurator::Spawner(){
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}		
-		printf("before clean\n");
 		ts_cleanup(&transitionSystem);
-		printf("cleaned\n");
 		if (planVertices.empty() && (!transitionSystem[currentVertex].visited() || currentTask.motorStep==0)){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
 			planVertices= planner(transitionSystem, currentVertex); //src
@@ -105,7 +103,7 @@ bool Configurator::Spawner(){
 			printf("recycled plan in explorer:\n");
 		}
 		printPlan(&planVertices);
-		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
+//		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 
 
 	}
@@ -266,10 +264,6 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				do {
 				start=g[v0].endPose +shift;
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0], start);
-				if (v0==2){
-					printf("Di pose:");
-					debug::print_pose(Di.pose());
-				}
 				t = Task(Di, g[v0].options[0], start, true);
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
@@ -350,17 +344,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 
 					}
 					auto d_print=dirmap.find(t.direction);
-					printf("added v %i to %i, direction %s, distance: %f, start", v1, v0, (*d_print).second, sk.first.distance());
-					debug::print_pose(sk.first.start);
-					printf("Di position:");
-					debug::print_pose(sk.first.Di.pose());
+					printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, iteration);
-					printf("edge\n");
 					gt::adjustProbability(g, edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
-					printf("adjust\n");
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
@@ -1157,6 +1146,7 @@ int Configurator::motorStep(Task::Action a){
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
 	printf("pv=%i\n", pv.size());
 	if (!b){
+		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		return pv;
 	}
 	if (planning){
@@ -1170,7 +1160,10 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
+		std::pair<edgeDescriptor, bool> ep_mov=boost::edge(movingVertex, pv[0], transitionSystem);
+		printf("ep %i -> %i exists=%i, moving exists=%i\n", currentVertex, pv[0], ep.second, ep_mov.second);
 		currentVertex= pv[0];
+		printf("current v=%i, direction=%s\n", currentVertex, (*dirmap.find(transitionSystem[ep.first].direction)).second);
 		pv.erase(pv.begin());
 		currentEdge=ep.first;
 		transitionSystem[movingVertex].Di=transitionSystem[currentVertex].Di;
