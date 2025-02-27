@@ -38,21 +38,21 @@ int main(int argc, char** argv) {
 	configurator.registerInterface(&configuratorInterface);
 	MotorCallback cb(&configurator);
 	lidar.registerInterface(&dataInterface);
-	CameraCallback cameraCB(&cb);
-	Libcam2OpenCV camera;
-    camera.registerCallback(&cameraCB);
-    Libcam2OpenCVSettings settings;
-    settings.framerate = FPS;
+	//CameraCallback cameraCB(&cb);
+	//Libcam2OpenCV camera;
+    //camera.registerCallback(&cameraCB);
+    //Libcam2OpenCVSettings settings;
+    //settings.framerate = FPS;
 	motors.registerStepCallback(&cb);
 	configurator.start();
 	lidar.start();
-    camera.start(settings);
+    //camera.start(settings);
 	motors.start();
 	getchar();
 	configurator.stop();
 	motors.stop();
 	lidar.stop();
-	camera.stop();
+	//camera.stop();
 }
 	
 	

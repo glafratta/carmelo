@@ -190,7 +190,7 @@ Disturbance Configurator::getDisturbance(TransitionSystem&g, const  vertexDescri
 				return controlGoal.disturbance;
 			}
 			else if (v==movingVertex){
-			return g[v].Di;
+				return g[v].Di;
 			}
 	}
 	Disturbance Dn= g[v].Dn;
@@ -346,12 +346,14 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 					if (!out_expected.empty()){
 						vertexDescriptor exp=out_expected[0].m_target;
 						printf("thought it'd be vertex %i , end pose:", exp );
+						debug::print_pose(g[exp].endPose);
 
 					}
 					auto d_print=dirmap.find(t.direction);
 					printf("added v %i to %i, direction %s, distance: %f, start", v1, v0, (*d_print).second, sk.first.distance());
 					debug::print_pose(sk.first.start);
-					printf("v1 crashed=%i\n", sk.first.outcome==simResult::crashed);
+					printf("Di position:");
+					debug::print_pose(sk.first.Di.pose());
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
