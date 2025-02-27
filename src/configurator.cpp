@@ -94,7 +94,9 @@ bool Configurator::Spawner(){
 		if (debugOn){
 			debug::graph_file(iteration, transitionSystem, controlGoal.disturbance, planVertices, currentVertex);
 		}		
+		printf("before clean\n");
 		ts_cleanup(&transitionSystem);
+		printf("cleaned\n");
 		if (planVertices.empty() && (!transitionSystem[currentVertex].visited() || currentTask.motorStep==0)){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
 			planVertices= planner(transitionSystem, currentVertex); //src
@@ -130,7 +132,6 @@ bool Configurator::Spawner(){
 	auto endTime =std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float, std::milli>d= startTime- endTime; //in seconds
  	duration=abs(float(d.count())/1000); //express in seconds
-	//printf("took %f seconds\n", duration);
 	if (benchmark){
 		FILE * f = fopen(statFile, "a+");
 		if (explored){
@@ -252,14 +253,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
 		priorityQueue.erase(priorityQueue.begin());
-		// State shifted_state=g[v];
-		// printf("v_shift:");
-		// debug::print_pose(v_shift);
-		// math::applyAffineTrans(v_shift, shifted_state);
 		er = controlGoal.checkEnded(g[v], t.direction);
 		applyTransitionMatrix(g, v, direction, er.ended, v, plan_prov);
-		//printf("v %i options: %i, ended =%i\n", v,  g[v].options.size(), er.ended);
-		//printf("v=%i, dir=%s\n", v, (*dirmap.find(t.direction)).second);
 		for (Direction d: g[v].options){ //add and evaluate all vertices
 			v0_exp=v;
 			std::vector <Direction> options=g[v0_exp].options;
@@ -269,7 +264,6 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				v1 =v0; //frontier
 				std::vector <vertexDescriptor> propagated;
 				do {
-				//changeStart(start, v0, g, shift);
 				start=g[v0].endPose +shift;
 				Disturbance Di=getDisturbance(g, v0, w, g[v0].options[0], start);
 				if (v0==2){
@@ -362,7 +356,9 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				}
 				if(edge.second){
 					gt::set(edge.first, sk, g, v1==currentVertex, iteration);
+					printf("edge\n");
 					gt::adjustProbability(g, edge.first); //new_edge to allow to adjust prob if the sim state has been previously ecountered and split
+					printf("adjust\n");
 				}
 				applyTransitionMatrix(g, v1, t.direction, er.ended, v0, plan_prov);
 				g[v1].phi=evaluationFunction(er);
@@ -376,6 +372,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	}
 	backtrack(evaluationQueue, priorityQueue, closed, g, plan_prov);
 	bestNext=priorityQueue[0];
+	printf("best=%i end", bestNext);
+	debug::print_pose(g[bestNext].endPose);
 	std::vector <edgeDescriptor> best_in_edges= gt::inEdges(g,bestNext);
 	if (best_in_edges.empty()){
 		direction=currentTask.direction;
@@ -1155,6 +1153,7 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
+	printf("pv=%i\n", pv.size());
 	if (!b){
 		return pv;
 	}
