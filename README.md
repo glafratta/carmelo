@@ -36,7 +36,10 @@ There are some constants pertaining to our robot's kinematic model (e.g. speed, 
 ```
 cd CloCK
 cmake .
+cd src/
 sudo make install
+cd ..
+make
 ```
 
 ## Run
