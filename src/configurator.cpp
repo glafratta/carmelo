@@ -97,7 +97,11 @@ bool Configurator::Spawner(){
 		ts_cleanup(&transitionSystem);
 		if (planVertices.empty() && (!transitionSystem[currentVertex].visited() || currentTask.motorStep==0)){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
-			planVertices= planner(transitionSystem, currentVertex); //src
+			bool finished=false;
+			planVertices= planner(transitionSystem, currentVertex, TransitionSystem::null_vertex(), false, NULL, &finished); //src
+			// if (!finished && planVertices.empty()){
+			// 	controlGoal=Task();
+			// }
 		}
 		else{
 			printf("recycled plan in explorer:\n");
@@ -244,8 +248,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 	b2Transform start= b2Transform_zero, shift=b2Transform_zero, shift_start=shift;
 	EndedResult er;
 	printf("v=%i, initial plan size=%i\n",v, plan_prov.size());
-	printf("GOAL IS: ");
-	debug::print_pose(controlGoal.disturbance.pose());
+	// printf("GOAL IS: ");
+	// debug::print_pose(controlGoal.disturbance.pose());
 	do{
 		v=bestNext;
 		closed.emplace(*priorityQueue.begin().base());
@@ -314,12 +318,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 							if (finished){
 								plan_prov=plan_tmp;
 								if (planVertices.empty()){ // task_start==currentVertex instead of pv empty
-									printf("inserting current vertex\n");
+									//printf("inserting current vertex\n");
 									plan_prov.insert(plan_prov.begin(), task_start);
 								}
 								boost::remove_edge(edge.first, g);
 								edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
-								printf("edge %i -> %i added\n", v0, task_start);
+								//printf("edge %i -> %i added\n", v0, task_start);
 								if (t.direction== g[edge.first].direction){
 									g[v0].options.clear();
 								}
@@ -345,7 +349,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 
 					}
 					auto d_print=dirmap.find(t.direction);
-					printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
+					//printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
@@ -972,6 +976,9 @@ void Configurator::adjust_rw_task(const vertexDescriptor &v, TransitionSystem &g
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 
 	if(!ep.second){ //no tgt	
+		if (v==0){
+			printf("edge doesn't exist");
+		}
 		return; //check until needs to be checked
 	}
 	// auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
@@ -1188,12 +1195,14 @@ void Configurator::trackTaskExecution(Task & t){
 	//b2Transform deltaPose=worldBuilder.wb_bridger.get_transform(&t, data2fp); //track using obstacle OR dead reckoning
 	//here can insert something for wb.bridger, wheel speed control (for step)
 	b2Transform deltaPose=t.action.getTransform(MOTOR_CALLBACK);
-	printf("shift graph by:\n");
-	debug::print_pose(deltaPose);
+	// printf("shift graph by:\n");
+	// debug::print_pose(deltaPose);
 	adjust_rw_task(movingVertex, transitionSystem, &t, deltaPose); //readjust end criteria
 	updateGraph(transitionSystem, deltaPose);//lateral error is hopefully noise and is ignored
 	//TO REMOVE ONCE YOU APPY FULLY CLOSED LOOP INSTEAD OF DEAD RECKONING
 	math::applyAffineTrans(-deltaPose, t.disturbance); //remove later
+	printf("TASK DISTURBANCE Is ");
+	debug::print_pose(t.disturbance.pose());
 	if(t.motorStep==0 || (t.checkEnded()).ended){
 		t.change=1;
 	}
@@ -1216,7 +1225,6 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
-	printf("pv=%i\n", pv.size());
 	if (!b){
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		return pv;
@@ -1232,8 +1240,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-		std::pair<edgeDescriptor, bool> ep_mov=boost::edge(movingVertex, pv[0], transitionSystem);
-		printf("ep %i -> %i exists=%i, moving exists=%i\n", currentVertex, pv[0], ep.second, ep_mov.second);
 		currentVertex= pv[0];
 		printf("current v=%i, direction=%s\n", currentVertex, (*dirmap.find(transitionSystem[ep.first].direction)).second);
 		pv.erase(pv.begin());

@@ -100,7 +100,7 @@ void step( AlphaBot &motors){
 	}
 	if (!c->running){
 		motors.setRightWheelSpeed(0);
- 	   motors.setLeftWheelSpeed(0);		
+ 	    motors.setLeftWheelSpeed(0);		
 	}
 	// if (c->getIteration()>1){
 	// 	og_plan=c->transitionSystem.m_vertices.size();
