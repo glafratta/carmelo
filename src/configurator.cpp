@@ -97,11 +97,11 @@ bool Configurator::Spawner(){
 		ts_cleanup(&transitionSystem);
 		if (planVertices.empty() && (!transitionSystem[currentVertex].visited() || currentTask.motorStep==0)){ //currentv not visited means that it wasn't observed ()
 			printf("no plan, searchign from %i\n", src);
-			bool finished=0;
-			planVertices= planner(transitionSystem, currentVertex, TransitionSystem::null_vertex(), false, &controlGoal, &finished); //src
-			if (!finished){
-				controlGoal=Task();
-			}
+			bool finished=false;
+			planVertices= planner(transitionSystem, currentVertex, TransitionSystem::null_vertex(), false, NULL, &finished); //src
+			// if (!finished && planVertices.empty()){
+			// 	controlGoal=Task();
+			// }
 		}
 		else{
 			printf("recycled plan in explorer:\n");
