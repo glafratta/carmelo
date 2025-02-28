@@ -389,20 +389,20 @@ cv::Rect2f WorldBuilder::Bridger::real_world_focus(const Task * t){
 
 
 b2Transform WorldBuilder::Bridger::get_transform(Task * t, const CoordinateContainer & pts){
-   // if (t->disturbance.getAffIndex()!=AVOID){
+   if (t->disturbance.getAffIndex()!=AVOID){
         return t->action.getTransform(MOTOR_CALLBACK); //LIDAR_SAMPLING_RATE
-    // }
-    // cv::Rect2f focus=real_world_focus(t);
-    // std::vector <cv::Point2f> focus_points;
-    // for (auto p: pts){
-    //     cv::Point2f p_cv=cv::Point2f(p.x, p.y);
-    //     if (focus.contains(p_cv)){
-    //         focus_points.push_back(p_cv);
-    //     }
-    // }
-    // std::pair <bool, BodyFeatures> new_d=bounding_rotated_box(focus_points);
-    // t->disturbance.bf=new_d.second; //update task
-    // return new_d.second.pose- t->disturbance.pose();
+    }
+    cv::Rect2f focus=real_world_focus(t);
+    std::vector <cv::Point2f> focus_points;
+    for (auto p: pts){
+        cv::Point2f p_cv=cv::Point2f(p.x, p.y);
+        if (focus.contains(p_cv)){
+            focus_points.push_back(p_cv);
+        }
+    }
+    std::pair <bool, BodyFeatures> new_d=bounding_rotated_box(focus_points);
+    t->disturbance.bf=new_d.second; //update task
+    return new_d.second.pose- t->disturbance.pose();
     //what's the most likely angle??
 }
 

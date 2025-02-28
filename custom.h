@@ -139,48 +139,48 @@ void step( AlphaBot &motors){
 }
 };
 
-struct CameraCallback: Libcam2OpenCV::Callback {
-    char dumpname[50];
-    double signal=0;
-    double filtered_signal=0;
-    Iir::Butterworth::LowPass<order>low_pass;
-    Iir::Butterworth::BandStop<order>band_stop;
-	const int reset_hz=10;
+// struct CameraCallback: Libcam2OpenCV::Callback {
+//     char dumpname[50];
+//     double signal=0;
+//     double filtered_signal=0;
+//     Iir::Butterworth::LowPass<order>low_pass;
+//     Iir::Butterworth::BandStop<order>band_stop;
+// 	const int reset_hz=10;
 
-    CameraCallback(MotorCallback * _cb):cb(_cb){
-        low_pass.setup(FPS, cutoff_frequency);
-        band_stop.setup(FPS, DC, band_width);
-    }
+//     CameraCallback(MotorCallback * _cb):cb(_cb){
+//         low_pass.setup(FPS, cutoff_frequency);
+//         band_stop.setup(FPS, DC, band_width);
+//     }
 
 
-	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
-		if (cb==NULL){
-			printf("null cb\n");
-		}
-		if (cb->c==NULL){
-			printf("null c\n");
-		}
-		if (cb->c->getTask()==NULL){
-			printf("null task\n");
-		}
-        float error=0;
-        cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
-        cv::Vec2d  optic_flow_filtered=optic_flow;
-        signal= signal+optic_flow[0];
-        optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
-        optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
-        filtered_signal=filtered_signal+optic_flow_filtered[0];
-		if (cb->c->getTask()->motorStep!=cb->ogStep & cb->c->getTask()->motorStep!=0){ //, in the future t.motorStepdiscard will be t.change
-																//signal while the robot isn' moving
-        	Task::Action action= cb->c->getTask()->getAction();
-			error= cb->c->getTask()->correct.errorCalc(action, double(optic_flow_filtered[0]));
-		}
-        cb->c->getTask()->correct.update(error); //for now just going straight
-    }
-private:
-ImgProc imgProc;
-MotorCallback *cb=NULL;
-};
+// 	void hasFrame(const cv::Mat &frame, const libcamera::ControlList &){
+// 		if (cb==NULL){
+// 			printf("null cb\n");
+// 		}
+// 		if (cb->c==NULL){
+// 			printf("null c\n");
+// 		}
+// 		if (cb->c->getTask()==NULL){
+// 			printf("null task\n");
+// 		}
+//         float error=0;
+//         cv::Vec2d  optic_flow=imgProc.avgOpticFlow(frame);
+//         cv::Vec2d  optic_flow_filtered=optic_flow;
+//         signal= signal+optic_flow[0];
+//         optic_flow_filtered[0]=low_pass.filter((optic_flow[0]));
+//         optic_flow_filtered[0]= band_stop.filter(optic_flow_filtered[0]);
+//         filtered_signal=filtered_signal+optic_flow_filtered[0];
+// 		if (cb->c->getTask()->motorStep!=cb->ogStep & cb->c->getTask()->motorStep!=0){ //, in the future t.motorStepdiscard will be t.change
+// 																//signal while the robot isn' moving
+//         	Task::Action action= cb->c->getTask()->getAction();
+// 			//error= cb->c->getTask()->correct.errorCalc(action, double(optic_flow_filtered[0]));
+// 		}
+//       //  cb->c->getTask()->correct.update(error); //for now just going straight
+//     }
+// private:
+// ImgProc imgProc;
+// MotorCallback *cb=NULL;
+// };
 
 float Configurator::taskRotationError(){
     return 0;

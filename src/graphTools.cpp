@@ -19,7 +19,6 @@ b2Transform State::start_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	//return Di.pose()-start; //START
 	return b2MulT(start, Di.pose());
 }
 
@@ -27,7 +26,6 @@ b2Transform State::end_from_Dn()const{
 	if (Dn.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	//return Dn.pose()-endPose; //START
 	return b2MulT(endPose, Dn.pose());
 
 }
@@ -36,7 +34,6 @@ b2Transform State::end_from_Di()const{
 	if (Di.getAffIndex()==NONE){
 		return b2Transform_inf;
 	}
-	//return Di.pose()-endPose; //START
 	return b2MulT(endPose, Di.pose());
 }
 
@@ -62,19 +59,8 @@ float angle_subtract(float a1, float a2){
 
 
 void math::applyAffineTrans(const b2Transform& deltaPose, b2Transform& pose){
-	// pose.q.Set(pose.q.GetAngle()+deltaPose.q.GetAngle());
-	// pose.p.x-=deltaPose.p.x; //-
-	// pose.p.y-=deltaPose.p.y; //-
-	// float og_x= pose.p.x, og_y=pose.p.y;
-	// pose.p.x= og_x* cos(deltaPose.q.GetAngle())+ og_y*sin(deltaPose.q.GetAngle());
-	// pose.p.y= og_y* cos(deltaPose.q.GetAngle())- og_x*sin(deltaPose.q.GetAngle());
 	pose =b2MulT(deltaPose, pose);
 }
-
-// b2Transform math::returnAffineTrans(const b2Transform & dp, b2Transform pose){
-// 	applyAffineTrans(dp, pose);
-// 	return pose;
-// }
 
 void math::applyAffineTrans(const b2Transform& deltaPose, State& state){
 	applyAffineTrans(deltaPose, state.endPose);
@@ -314,19 +300,12 @@ void gt::adjustProbability(TransitionSystem &g, edgeDescriptor e){
 	if (e.m_target==TransitionSystem::null_vertex()){
 		return;
 	}
-	//auto es= boost::out_edges(e.m_source, g);
 	std::vector <edgeDescriptor> es=gt::outEdges(g, e.m_source, g[e].direction);
 	float totObs=0;
-	//std::vector <edgeDescriptor> sameTask;
 	//find total observations
 	for (edgeDescriptor & ei:es){
 		g[ei].probability=g[ei.m_target].nObs/es.size();
-		//edgeDescriptor ei_deref=*ei;
-		// if (g[ei].direction==g[e].direction){
 		 	totObs+=g[ei.m_target].nObs;
-		// 	//sameTask.push_back(ei);
-		 	//g[*ei].probability=g[e.m_target].nObs/g[e.m_source].nObs;
-		// }
 	}
 	//adjust
 	for (edgeDescriptor &ei: es){
@@ -382,7 +361,6 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 			if (ep2.second.m_target==result[0]){ //size 1
 				_ep=ep2; //assign ep to define direction
 				d= g[_ep.second].direction;
-				//if (ie.size()>1){
 				if (ep!=NULL){
 					g[_ep.second].it_observed=it;
 				}
@@ -391,7 +369,6 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 						ep2.second=e;
 						break;
 					}
-				//}
 			}
 			}
 			else if (g[ep2.second].direction==d &&
@@ -407,12 +384,9 @@ std::vector <vertexDescriptor> gt::task_vertices( vertexDescriptor v, Transition
 		}
 		v=ep2.second.m_source;
 		if (ep2.second.m_target==current_v){ //source
-			//result.push_back(0);
-			//ep=ep2; //reassign ep so that the source is the vertex from which the task actually started
 			break;
 		}
 	}while(g[ep2.second].direction==d);
-	//ep=boost::edge(ep2.second)
 	std::reverse(result.begin(), result.end());
 	if (NULL!=ep){
 		*ep=_ep;
@@ -499,29 +473,6 @@ float StateMatcher::get_coefficient(const float & endDistance){
 	// }
 	return coefficient;
 }
-
-
-// void StateMatcher::ICOadjustWeight(DistanceVector E, DistanceVector dE){
-// 	for (int i=0; i<weights.size();i++){
-// 		//float weight= weights[i];
-// 		weights[i]+=mu*E[i]*dE[i];
-// 	}
-// }
-
-// std::pair <bool, vertexDescriptor> StateMatcher::soft_match(TransitionSystem& g, b2Transform pose){
-// 	std::pair <bool, vertexDescriptor> result;
-// 	auto es= boost::edges(g);
-// 	for (auto ei=es.first; ei!=es.second; ei++){
-// 		float x=g[(*ei).m_target].endPose.p.x- pose.p.x;
-// 		float y=g[(*ei).m_target].endPose.p.y- pose.p.y;
-// 		float theta=g[(*ei).m_target].endPose.q.GetAngle()- pose.q.GetAngle();
-
-// 		if (fabs(x)<error.endPosition & fabs(y)<error.endPosition & fabs(theta)<error.angle){
-
-// 		}
-// 	}
-// 	return result;
-// }
 
 
 bool operator!=(Transform const &t1, Transform const& t2){

@@ -58,7 +58,7 @@ bool overlaps(b2Body * robot, Disturbance * disturbance){
 	return b2TestOverlap(sensor->GetShape(), 0, &d_shape, 0,robot_pose, d_pose);
 }
 
-simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining, float simulationStep){ //CLOSED LOOP CONTROL, og return simreult
+simResult Task::bumping_that(b2World & _world, int iteration, b2Body * robot, bool debugOn, float remaining){ //CLOSED LOOP CONTROL, og return simreult
 		simResult result=simResult(simResult::resultType::successful);
 		result.endPose = start;
 		if (action.L==0 & action.R==0){

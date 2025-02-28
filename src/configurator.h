@@ -141,7 +141,7 @@ Disturbance getDisturbance(TransitionSystem&, const vertexDescriptor&, b2World &
 
 Task task_to_execute(const TransitionSystem &, const edgeDescriptor&);
 
-simResult simulate(Task, b2World &, float _simulationStep=BOX2DRANGE);
+simResult simulate(Task, b2World &);
 
 void backtrack(std::vector <vertexDescriptor>&, std::vector <vertexDescriptor>&, const std::set<vertexDescriptor>&, TransitionSystem&, std::vector <vertexDescriptor>&);
 
@@ -153,14 +153,14 @@ void pruneEdges(std::vector<std::pair<vertexDescriptor, vertexDescriptor>>, Tran
 
 
 
-void updateGraph(TransitionSystem&, b2Transform * _deltaPose=NULL);
+void updateGraph(TransitionSystem&, const b2Transform & _deltaPose);
 
 void planPriority(TransitionSystem&, vertexDescriptor); 
 
-void adjust_simulated_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
+void adjust_simulated_task(const vertexDescriptor&, TransitionSystem &, Task*);
 
 
-void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*);
+void adjust_rw_task(const vertexDescriptor&, TransitionSystem &, Task*, const b2Transform &);
 
 //std::vector <edgeDescriptor> inEdgesRecursive(vertexDescriptor, TransitionSystem&, Direction ); //returns a vector of all in-edges leading to the vertex which have the same direction (most proximal first)
 

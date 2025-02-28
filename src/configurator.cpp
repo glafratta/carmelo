@@ -116,10 +116,9 @@ bool Configurator::Spawner(){
 		if (currentTask.action.getOmega()!=0 && currentTask.motorStep<(transitionSystem[movingEdge].step)){
 			return 1;
 		}
-		float _simulationStep=simulationStep;
 		//adjustStepDistance(currentVertex, transitionSystem, &currentTask, _simulationStep);
 		worldBuilder.buildWorld(world, data2fp, transitionSystem[movingVertex].start, currentTask.direction); //was g[v].endPose
-		simResult result = simulate(currentTask, world, _simulationStep); //transitionSystem[currentVertex],transitionSystem[currentVertex],
+		simResult result = simulate(currentTask, world); //transitionSystem[currentVertex],transitionSystem[currentVertex],
 		gt::fill(result, transitionSystem[currentVertex].ID, &transitionSystem[currentEdge]);
 		currentTask.change = transitionSystem[currentVertex].outcome!=simResult::successful;
 		if (currentTask.change){
@@ -216,7 +215,7 @@ Task Configurator::task_to_execute(const TransitionSystem & g, const edgeDescrip
 }
 
 
-simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ //State& state, State src, 
+simResult Configurator::simulate(Task  t, b2World & w){ //State& state, State src, 
 		//EVALUATE NODE()
 	simResult result;
 	float distance=BOX2DRANGE;
@@ -228,7 +227,7 @@ simResult Configurator::simulate(Task  t, b2World & w, float _simulationStep){ /
 	worldBuilder.bodies++;
 	robot.body->SetTransform(t.start.p, t.start.q.GetAngle());
 	b2AABB sensor_aabb=worldBuilder.makeRobotSensor(robot.body, &controlGoal.disturbance);
-	result =t.bumping_that(w, iteration, robot.body, debugOn, remaining, _simulationStep); //default start from 0
+	result =t.bumping_that(w, iteration, robot.body, debugOn, remaining); //default start from 0
 	worldBuilder.world_cleanup(&w);
 	//approximate angle to avoid stupid rounding errors
 	float approximated_angle=approximate_angle(result.endPose.q.GetAngle(), t.direction, result.resultCode);
@@ -271,7 +270,8 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				adjust_simulated_task(v0, g, &t);
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				printf("v0=%i, dir=%s\n", v0, (*dirmap.find(t.direction)).second);
-				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
+				simResult sim=simulate(t, w); //sk.first, g[v0], 
+				printf("sim step=%i\n", sim.step);
 				if (v==0 && sim.resultCode==sim.crashed){
 					printf("IM GONNA CRASH!!!! at");
 					debug::print_pose(sim.collision.pose());
@@ -958,10 +958,10 @@ void Configurator::adjust_simulated_task(const vertexDescriptor &v, TransitionSy
 	if(!ep.second){ //no tgt	
 		return; //check until needs to be checked
 	}
-	if (t->action.direction==currentTask.action.direction){
+	if (t->direction==currentTask.direction){
 		t->endCriteria=currentTask.endCriteria;
 	}
-	else if (t->action.direction==getOppositeDirection(currentTask.direction).second){
+	else if (t->direction==getOppositeDirection(currentTask.direction).second){
 		t->setEndCriteria(Angle(M_PI-t->endCriteria.angle.get()));
 	}
 }
@@ -1161,35 +1161,39 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 // 	return result;
 // }
 
-void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
-	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
-	//if (plan_prov.empty()){
-		return;
-	//}
-	}
-	auto v_it=check_vector_for(plan_prov, v);
-	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
-		int out_deg = boost::out_degree(v, g);
-		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){ //|| gt::inEdges(g, v, STOP).empty()
-			desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
-		}
-		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
-			closest_match=true;
-		}
-	}
+// void Configurator::match_setup(bool& closest_match, StateMatcher::MATCH_TYPE& desired_match, const vertexDescriptor& v, std::vector<vertexDescriptor>& plan_prov, const Direction& dir,  TransitionSystem & g){
+// 	if (currentTask.motorStep!=0 || !planVertices.empty() ){ //
+// 	//if (plan_prov.empty()){
+// 		return;
+// 	//}
+// 	}
+// 	auto v_it=check_vector_for(plan_prov, v);
+// 	if ((v==movingVertex || v==currentVertex) || v_it!=plan_prov.end() ){ //|| !plan_prov.empty()
+// 		int out_deg = boost::out_degree(v, g);
+// 		if (g[v].options.capacity() < out_deg || v_it!=plan_prov.end() || gt::inEdges(g, v, STOP).empty()){ //|| gt::inEdges(g, v, STOP).empty()
+// 			desired_match=StateMatcher::MATCH_TYPE::ABSTRACT;
+// 		}
+// 		if (v==currentVertex && dir==currentTask.direction ){ //!plan_prov.empty() || dir==currentTask.direction
+// 			closest_match=true;
+// 		}
+// 	}
 
 
-}
+// }
 
 
 
 
 void Configurator::trackTaskExecution(Task & t){
-	b2Transform deltaPose=worldBuilder.wb_bridger.get_transform(&t, data2fp); //track using obstacle OR dead reckoning
+	//b2Transform deltaPose=worldBuilder.wb_bridger.get_transform(&t, data2fp); //track using obstacle OR dead reckoning
 	//here can insert something for wb.bridger, wheel speed control (for step)
+	b2Transform deltaPose=t.action.getTransform(MOTOR_CALLBACK);
+	printf("shift graph by:\n");
+	debug::print_pose(deltaPose);
 	adjust_rw_task(movingVertex, transitionSystem, &t, deltaPose); //readjust end criteria
 	updateGraph(transitionSystem, deltaPose);//lateral error is hopefully noise and is ignored
-	math::applyAffineTrans(deltaPose, t.disturbance); //remove later
+	//TO REMOVE ONCE YOU APPY FULLY CLOSED LOOP INSTEAD OF DEAD RECKONING
+	math::applyAffineTrans(-deltaPose, t.disturbance); //remove later
 	if(t.motorStep==0 || (t.checkEnded()).ended){
 		t.change=1;
 	}
