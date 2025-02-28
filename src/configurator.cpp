@@ -272,6 +272,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 				std::pair <State, Edge> sk(State(start, Di), Edge(g[v0].options[0]));
 				float _simulationStep=BOX2DRANGE;
 				adjustStepDistance(v0, g, &t, _simulationStep);
+				printf("end criteria angle:%f\n", t.endCriteria.angle.get());
 				worldBuilder.buildWorld(w, data2fp, t.start, t.direction, t.disturbance, 0.15, WorldBuilder::PARTITION); //was g[v].endPose
 				printf("v0=%i, dir=%s\n", v0, (*dirmap.find(t.direction)).second);
 				simResult sim=simulate(t, w, _simulationStep); //sk.first, g[v0], 
@@ -317,12 +318,12 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 							if (finished){
 								plan_prov=plan_tmp;
 								if (planVertices.empty()){ // task_start==currentVertex instead of pv empty
-									printf("inserting current vertex\n");
+									//printf("inserting current vertex\n");
 									plan_prov.insert(plan_prov.begin(), task_start);
 								}
 								boost::remove_edge(edge.first, g);
 								edge= gt::add_edge(v0, task_start, g, iteration, g[edge.first].direction);
-								printf("edge %i -> %i added\n", v0, task_start);
+								//printf("edge %i -> %i added\n", v0, task_start);
 								if (t.direction== g[edge.first].direction){
 									g[v0].options.clear();
 								}
@@ -348,7 +349,7 @@ std::vector<vertexDescriptor> Configurator::explorer(vertexDescriptor v, Transit
 
 					}
 					auto d_print=dirmap.find(t.direction);
-					printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
+					//printf("added v %i to %i, direction %s", v1, v0, (*d_print).second);
 					shift=b2Transform_zero;
 				}
 				if(edge.second){
@@ -962,6 +963,9 @@ void Configurator::adjustStepDistance(vertexDescriptor v, TransitionSystem &g, T
 	std::pair<edgeDescriptor, bool> ep= boost::edge(v, currentVertex, g);
 
 	if(!ep.second){ //no tgt	
+		if (v==0){
+			printf("edge doesn't exist");
+		}
 		return; //check until needs to be checked
 	}
 	auto eb=boost::edge(currentEdge.m_source,currentEdge.m_target, transitionSystem);
@@ -1124,7 +1128,6 @@ std::vector <Frontier> Configurator::frontierVertices(vertexDescriptor v, Transi
 
 void Configurator::trackTaskExecution(Task & t){		
 	t.motorStep--;
-
 	updateGraph(transitionSystem);//lateral error is hopefully noise and is ignored
 	if(t.motorStep==0){
 		t.change=1;
@@ -1148,7 +1151,6 @@ int Configurator::motorStep(Task::Action a){
     }
 
 std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std::vector <vertexDescriptor> pv){
-	printf("pv=%i\n", pv.size());
 	if (!b){
 		boost::remove_out_edge_if(movingVertex, is_not_v(currentVertex), transitionSystem);
 		return pv;
@@ -1164,8 +1166,6 @@ std::vector <vertexDescriptor> Configurator::changeTask(bool b, int &ogStep, std
 			return pv;
 		}
 		std::pair<edgeDescriptor, bool> ep=boost::add_edge(currentVertex, pv[0], transitionSystem);
-		std::pair<edgeDescriptor, bool> ep_mov=boost::edge(movingVertex, pv[0], transitionSystem);
-		printf("ep %i -> %i exists=%i, moving exists=%i\n", currentVertex, pv[0], ep.second, ep_mov.second);
 		currentVertex= pv[0];
 		printf("current v=%i, direction=%s\n", currentVertex, (*dirmap.find(transitionSystem[ep.first].direction)).second);
 		pv.erase(pv.begin());
